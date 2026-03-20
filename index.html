@@ -484,6 +484,43 @@ input, textarea { font-size: 16px; }
   border-radius: 50%;
   background: rgba(255,255,255,0.1);
 }
+/* ===== Language course card ===== */
+.lang-card {
+  background: linear-gradient(135deg, #6366F1, #EC4899);
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.lang-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(99,102,241,0.25); }
+.lang-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.lang-flag { font-size: 2rem; line-height: 1; }
+.lang-level-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: var(--shadow);
+}
+.lang-level-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-1);
+  box-shadow: 0 8px 28px rgba(108,92,231,0.15);
+}
+.dark .lang-level-card:hover { box-shadow: 0 8px 28px rgba(167,139,250,0.15); }
+.lang-selected { border-color: var(--accent-1) !important; box-shadow: 0 0 0 3px rgba(108,92,231,0.2) !important; }
 .calc-subject-row {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -676,6 +713,19 @@ input, textarea { font-size: 16px; }
         <i class="fas fa-chevron-right opacity-60"></i>
       </div>
     </div>
+    <!-- Language Course Card -->
+    <div class="lang-card mb-5 anim-fade-up" style="animation-delay:0.1s" onclick="openLangSelectView()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-globe text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Cursos de Idiomas</p>
+          <p class="text-xs opacity-80">Aprenda novos idiomas com ajuda da IA 🌍</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
     <!-- Subject Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="subjectGrid"></div>
   </div>
@@ -780,6 +830,21 @@ input, textarea { font-size: 16px; }
         </div>
         <p class="font-heading font-bold" style="color:var(--text-2);">Gerando perguntas...</p>
         <p class="text-xs" style="color:var(--text-3);">A IA está preparando seu quiz</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Language Select View -->
+  <div id="langSelectView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <div class="mb-5 anim-fade-up">
+        <h2 class="font-heading text-2xl font-bold"><span style="font-size:1.2em;">🌍</span> Cursos de Idiomas</h2>
+        <p class="text-sm mt-1" style="color:var(--text-2);">Escolha um idioma para começar a estudar</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="langGrid"></div>
+      <div id="langLevelSection" class="view-hidden mt-6 anim-fade-up">
+        <h3 class="font-heading text-lg font-bold mb-3" id="langLevelTitle">Escolha o nível</h3>
+        <div class="flex flex-col gap-3" id="langLevelGrid"></div>
       </div>
     </div>
   </div>
@@ -916,6 +981,9 @@ const state = {
   chatHistories: {},
   isStreaming: false,
   quiz: { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false },
+  langMode: false,
+  currentLanguage: null,
+  currentLangLevel: null,
   calc: {
     units: 4,
     minAvg: 7,
@@ -959,6 +1027,23 @@ const LEVEL_SUBJECTS = {
   f2: ['Português', 'Matemática', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes'],
   em: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
 };
+
+const LANGUAGES = {
+  'Inglês':   { icon: 'fa-flag-usa',    color: '#3B82F6', flag: '🇺🇸' },
+  'Espanhol': { icon: 'fa-guitar',      color: '#EF4444', flag: '🇪🇸' },
+  'Francês':  { icon: 'fa-wine-glass',  color: '#6366F1', flag: '🇫🇷' },
+  'Alemão':   { icon: 'fa-beer-mug-empty', color: '#F59E0B', flag: '🇩🇪' },
+  'Italiano': { icon: 'fa-pizza-slice', color: '#10B981', flag: '🇮🇹' },
+  'Japonês':  { icon: 'fa-torii-gate',  color: '#EC4899', flag: '🇯🇵' },
+  'Coreano':  { icon: 'fa-yin-yang',    color: '#8B5CF6', flag: '🇰🇷' },
+  'Mandarim': { icon: 'fa-dragon',      color: '#F97316', flag: '🇨🇳' },
+};
+
+const LANG_LEVELS = [
+  { id: 'beginner', label: 'Iniciante', icon: 'fa-seedling', desc: 'Começando do zero ou com pouco conhecimento' },
+  { id: 'intermediate', label: 'Mediano', icon: 'fa-leaf', desc: 'Já entende o básico e quer avançar' },
+  { id: 'advanced', label: 'Avançado', icon: 'fa-tree', desc: 'Bom domínio, quer aperfeiçoar' },
+];
 
 // ===== DOM HELPERS =====
 function $(id) { return document.getElementById(id); }
@@ -1006,6 +1091,8 @@ function openHelpModal() {
           'Teste seus conhecimentos com 5 perguntas geradas pela IA, adequadas ao conteúdo da sua série. Ganhe pontos e tente manter sequências de acertos! 🔥') +
         helpItem('fa-chart-line', 'var(--success)', 'Calculadora de Média',
           'Configure quantas unidades sua escola tem e qual é a média. Insira suas notas em cada matéria e veja automaticamente quanto precisa tirar nas próximas unidades para ser aprovado.') +
+        helpItem('fa-globe', '#EC4899', 'Cursos de Idiomas',
+          'Aprenda idiomas como Inglês, Espanhol, Francês, Japonês e mais! Escolha seu nível (Iniciante, Mediano ou Avançado) e use o Chat, Atividades e Quiz para praticar. A IA adapta o conteúdo ao seu nível! 🌍') +
         helpItem('fa-brain', 'var(--accent-3)', 'IA com Pesquisa',
           'A inteligência artificial busca informações atualizadas para dar respostas precisas e confiáveis sobre o conteúdo escolar.') +
         helpItem('fa-save', '#A78BFA', 'Dados Salvos',
@@ -1163,8 +1250,8 @@ function saveSettings() {
   modal.remove();
   showToast('Configurações salvas! ✅', 'success');
 
-  // If on subject view, go back to dashboard since subjects may have changed
-  if (gradeChanged && state.currentView === 'subject') {
+  // If on subject view (school mode), go back to dashboard since subjects may have changed
+  if (gradeChanged && state.currentView === 'subject' && !state.langMode) {
     goBack();
   }
 }
@@ -1206,6 +1293,9 @@ function confirmResetAll() {
   state.studentName = '';
   state.grade = null;
   state.chatHistories = {};
+  state.langMode = false;
+  state.currentLanguage = null;
+  state.currentLangLevel = null;
   state.calc = { units: 4, minAvg: 7, grades: {} };
 
   // Close modals
@@ -1217,6 +1307,7 @@ function confirmResetAll() {
   // Go back to API key screen
   hide('mainScreen');
   hide('helpFab');
+  hide('langSelectView');
   show('apiKeyScreen');
   $('apiKeyInput').value = '';
   $('modelSelect').value = 'GPT-5.2';
@@ -1419,6 +1510,7 @@ function initDashboard() {
 // ===== SUBJECT VIEW =====
 function openSubject(name, mode) {
   state.currentSubject = name;
+  state.langMode = false;
   var info = SUBJECTS[name];
 
   $('subjectIcon').style.background = info.color;
@@ -1429,6 +1521,7 @@ function openSubject(name, mode) {
   show('backBtn');
   hide('dashboardView');
   hide('calcView');
+  hide('langSelectView');
   show('subjectView');
   state.currentView = 'subject';
 
@@ -1438,6 +1531,32 @@ function openSubject(name, mode) {
 
 function goBack() {
   if (state.isStreaming) return;
+
+  // From language subject → back to language select
+  if (state.langMode && state.currentView === 'subject') {
+    hide('subjectView');
+    show('langSelectView');
+    state.currentView = 'langSelect';
+    state.langMode = false;
+    state.currentSubject = null;
+    $('headerTitle').textContent = 'Cursos de Idiomas';
+    return;
+  }
+
+  // From language select → back to dashboard
+  if (state.currentView === 'langSelect') {
+    hide('langSelectView');
+    show('dashboardView');
+    hide('backBtn');
+    $('headerTitle').textContent = 'EstudAI';
+    state.currentView = 'dashboard';
+    state.currentLanguage = null;
+    state.currentLangLevel = null;
+    updateCalcCardSummary();
+    return;
+  }
+
+  // Default: from subject/calc → back to dashboard
   hide('subjectView');
   hide('calcView');
   show('dashboardView');
@@ -1471,7 +1590,36 @@ function getGradeLabel() {
   return state.grade.label;
 }
 
+function getLangSystemPrompt(mode) {
+  var lang = state.currentLanguage;
+  var levelObj = LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; });
+  var levelLabel = levelObj ? levelObj.label : 'Iniciante';
+
+  if (mode === 'chat') {
+    return 'Você é um professor particular de ' + lang + ' para um aluno brasileiro de nível ' + levelLabel + '. ' +
+      'Ensine o idioma de forma divertida e interativa. Adapte a complexidade das explicações ao nível do aluno. ' +
+      'Use exemplos práticos, frases do dia a dia, e explique gramática de forma simples. ' +
+      'Quando der exemplos no idioma, sempre forneça a tradução para português. ' +
+      'Corrija erros com gentileza e incentive o aluno. Responda em português do Brasil, usando ' + lang + ' apenas para exemplos e exercícios.';
+  } else if (mode === 'activity') {
+    return 'Você é um professor de ' + lang + ' para um aluno brasileiro de nível ' + levelLabel + '. ' +
+      'O aluno precisa de ajuda com uma atividade de ' + lang + '. ' +
+      'Ajude o aluno a entender e resolver a atividade passo a passo. ' +
+      'Explique regras gramaticais, vocabulário e contexto cultural quando relevante. ' +
+      'NÃO dê a resposta diretamente - guie o aluno para que ele compreenda o raciocínio. ' +
+      'Responda em português do Brasil, usando ' + lang + ' apenas para os exemplos.';
+  } else {
+    return 'Você é um gerador de quizzes para ensino de ' + lang + ' para alunos brasileiros de nível ' + levelLabel + '. ' +
+      'Gere 5 perguntas de múltipla escolha sobre ' + lang + ' adequadas ao nível ' + levelLabel + '. ' +
+      'Inclua perguntas sobre vocabulário, gramática, tradução e expressões comuns. ' +
+      'Retorne APENAS um JSON válido sem texto adicional, no formato:\n' +
+      '{"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}\n' +
+      'O campo "correct" é o índice (0-3) da opção correta. As perguntas devem ser variadas e educativas.';
+  }
+}
+
 function getSystemPrompt(mode) {
+  if (state.langMode) return getLangSystemPrompt(mode);
   var grade = getGradeLabel();
   var subject = state.currentSubject;
   if (mode === 'chat') {
@@ -1496,6 +1644,9 @@ function getSystemPrompt(mode) {
 }
 
 function getChatKey() {
+  if (state.langMode) {
+    return 'lang_' + state.currentLanguage + '_' + state.currentLangLevel;
+  }
   return state.currentSubject + '_' + state.grade.id;
 }
 
@@ -1511,7 +1662,7 @@ function loadChatHistory() {
           '<i class="fas fa-robot text-2xl" style="color:var(--accent-1)"></i>' +
         '</div>' +
         '<p class="font-heading font-bold" style="color:var(--text-2);">Pergunte qualquer coisa!</p>' +
-        '<p class="text-xs" style="color:var(--text-3);">Tire suas dúvidas sobre ' + state.currentSubject + '</p>' +
+        '<p class="text-xs" style="color:var(--text-3);">' + (state.langMode ? 'Pratique ' + state.currentLanguage + ' com a IA' : 'Tire suas dúvidas sobre ' + state.currentSubject) + '</p>' +
       '</div>';
     return;
   }
@@ -1622,7 +1773,9 @@ async function startQuiz() {
   hide('quizStart'); hide('quizActive'); hide('quizResults'); show('quizLoading');
   var apiMessages = [
     { role: 'system', content: getSystemPrompt('quiz') },
-    { role: 'user', content: 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.' }
+    { role: 'user', content: state.langMode
+      ? 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno de nível ' + (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || {label:'Iniciante'}).label + '. Retorne apenas JSON.'
+      : 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.' }
   ];
   var result = await callAPI(apiMessages, null, null, function(error) {
     showToast('Erro ao gerar quiz: ' + error);
@@ -1772,12 +1925,130 @@ function initCalcGrades() {
   $('calcMinAvg').value = state.calc.minAvg;
 }
 
+// ===== LANGUAGE COURSE FUNCTIONS =====
+function openLangSelectView() {
+  state.currentView = 'langSelect';
+  $('headerTitle').textContent = 'Cursos de Idiomas';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  hide('calcView');
+  show('langSelectView');
+  renderLangGrid();
+  hide('langLevelSection');
+}
+
+function renderLangGrid() {
+  var grid = $('langGrid');
+  grid.innerHTML = '';
+  var langNames = Object.keys(LANGUAGES);
+
+  langNames.forEach(function(name, i) {
+    var info = LANGUAGES[name];
+    var card = document.createElement('div');
+    card.className = 'subject-card anim-fade-up';
+    card.style.setProperty('--card-accent', info.color);
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.opacity = '0';
+    card.style.cursor = 'pointer';
+    card.setAttribute('data-lang', name);
+    card.innerHTML =
+      '<div class="flex flex-col items-center text-center gap-2 py-2">' +
+        '<span class="lang-flag">' + info.flag + '</span>' +
+        '<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" style="background:' + info.color + '">' +
+          '<i class="fas ' + info.icon + '"></i>' +
+        '</div>' +
+        '<span class="font-heading font-bold text-sm">' + name + '</span>' +
+      '</div>';
+    card.onclick = function() { selectLanguageCard(name); };
+    grid.appendChild(card);
+  });
+}
+
+function selectLanguageCard(name) {
+  state.currentLanguage = name;
+
+  // Highlight selected card
+  var cards = $('langGrid').querySelectorAll('.subject-card');
+  cards.forEach(function(c) {
+    if (c.getAttribute('data-lang') === name) {
+      c.classList.add('lang-selected');
+    } else {
+      c.classList.remove('lang-selected');
+    }
+  });
+
+  // Show level section
+  var info = LANGUAGES[name];
+  $('langLevelTitle').innerHTML = '<span style="font-size:1.2em;">' + info.flag + '</span> Escolha o nível de ' + name;
+  renderLangLevels(name);
+  show('langLevelSection');
+
+  // Scroll to levels
+  var section = $('langLevelSection');
+  setTimeout(function() {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function renderLangLevels(langName) {
+  var grid = $('langLevelGrid');
+  grid.innerHTML = '';
+  var info = LANGUAGES[langName];
+
+  LANG_LEVELS.forEach(function(level, i) {
+    var card = document.createElement('div');
+    card.className = 'lang-level-card anim-fade-up';
+    card.style.animationDelay = (i * 0.1) + 's';
+    card.style.opacity = '0';
+    card.innerHTML =
+      '<div class="flex items-center gap-3">' +
+        '<div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl" style="background:' + info.color + '">' +
+          '<i class="fas ' + level.icon + '"></i>' +
+        '</div>' +
+        '<div class="flex-1">' +
+          '<p class="font-heading font-bold text-base" style="color:var(--text-1);">' + level.label + '</p>' +
+          '<p class="text-xs" style="color:var(--text-2);">' + level.desc + '</p>' +
+        '</div>' +
+        '<i class="fas fa-chevron-right" style="color:var(--text-3);"></i>' +
+      '</div>';
+    card.onclick = function() { openLangSubject(langName, level.id); };
+    grid.appendChild(card);
+  });
+}
+
+function openLangSubject(langName, levelId) {
+  state.langMode = true;
+  state.currentLanguage = langName;
+  state.currentLangLevel = levelId;
+  state.currentSubject = langName;
+
+  var info = LANGUAGES[langName];
+  var levelObj = LANG_LEVELS.find(function(l) { return l.id === levelId; });
+
+  $('subjectIcon').style.background = info.color;
+  $('subjectIcon').innerHTML = '<span style="font-size:1.1em;">' + info.flag + '</span>';
+  $('subjectTitle').textContent = langName + ' — ' + (levelObj ? levelObj.label : '');
+
+  $('headerTitle').textContent = langName;
+  show('backBtn');
+  hide('dashboardView');
+  hide('calcView');
+  hide('langSelectView');
+  show('subjectView');
+  state.currentView = 'subject';
+
+  switchTab('chat');
+  loadChatHistory();
+}
+
 function openCalcView() {
   state.currentView = 'calc';
   $('headerTitle').textContent = 'Calculadora de Média';
   show('backBtn');
   hide('dashboardView');
   hide('subjectView');
+  hide('langSelectView');
   show('calcView');
   renderCalcSubjects();
   updateCalcSummary();
