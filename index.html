@@ -552,6 +552,113 @@ input, textarea { font-size: 16px; }
 .random-quiz-card:hover { box-shadow: 0 8px 28px rgba(168,85,247,0.3); }
 .ctx-subject-grid .subject-card { margin-bottom: 0; }
 
+/* ===== Topics / Units system ===== */
+.unit-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.25s;
+  box-shadow: var(--shadow);
+}
+.unit-card + .unit-card { margin-top: 0.75rem; }
+.unit-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+.unit-header:hover { background: var(--bg-input); }
+.unit-header .unit-num {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: white;
+  flex-shrink: 0;
+}
+.unit-header .unit-title { flex: 1; font-weight: 700; font-size: 0.95rem; }
+.unit-header .unit-chevron { color: var(--text-3); transition: transform 0.3s; }
+.unit-card.open .unit-chevron { transform: rotate(180deg); }
+.unit-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.unit-card.open .unit-body { max-height: 2000px; }
+.unit-body-inner { padding: 0 1.25rem 1rem 1.25rem; }
+.topic-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.topic-item:hover {
+  background: var(--bg-input);
+  border-color: var(--border);
+}
+.topic-item .topic-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.topic-item .topic-name {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.topic-item .topic-arrow {
+  color: var(--text-3);
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.topic-item:hover .topic-arrow { opacity: 1; }
+.topic-explanation-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-top: 0.5rem;
+  animation: slideDown 0.3s ease;
+}
+.topic-explanation-box .md-content { font-size: 0.88rem; line-height: 1.7; color: var(--text-2); }
+.topics-loading-unit {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 1.5rem; color: var(--text-3); font-size: 0.85rem;
+}
+.topics-unit-count-bar {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+.topics-unit-count-bar label {
+  font-weight: 700; font-size: 0.85rem; color: var(--text-2); white-space: nowrap;
+}
+.topics-unit-count-bar select {
+  padding: 6px 10px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-1);
+  font-weight: 700;
+  font-size: 16px;
+  outline: none;
+  cursor: pointer;
+}
+.topics-unit-count-bar select:focus { border-color: var(--accent-1); }
+
 .calc-subject-row {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -822,6 +929,7 @@ input, textarea { font-size: 16px; }
         <button class="tab-btn active" onclick="switchTab('chat')"><i class="fas fa-comments mr-1"></i> Chat</button>
         <button class="tab-btn" onclick="switchTab('activity')"><i class="fas fa-clipboard-list mr-1"></i> Atividades</button>
         <button class="tab-btn" onclick="switchTab('quiz')"><i class="fas fa-gamepad mr-1"></i> Quiz</button>
+        <button class="tab-btn" onclick="switchTab('topics')"><i class="fas fa-list-ol mr-1"></i> Conteúdo</button>
       </div>
     </div>
     <!-- Chat Content -->
@@ -912,6 +1020,24 @@ input, textarea { font-size: 16px; }
         <p class="font-heading font-bold" style="color:var(--text-2);">Gerando perguntas...</p>
         <p class="text-xs" style="color:var(--text-3);">A IA está preparando seu quiz</p>
       </div>
+    </div>
+    <!-- Topics/Content -->
+    <div id="topicsContent" class="view-hidden flex-1 flex flex-col p-4" style="overflow-y:auto;">
+      <div class="topics-unit-count-bar anim-fade-up">
+        <label><i class="fas fa-layer-group mr-1"></i> Unidades:</label>
+        <select id="topicsUnitCount" onchange="setTopicsUnits(parseInt(this.value))">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
+        <span class="text-xs" style="color:var(--text-3);flex:1;">Clique na unidade para carregar os tópicos via IA</span>
+      </div>
+      <div id="topicsUnitList"></div>
     </div>
   </div>
 
@@ -1139,7 +1265,8 @@ const state = {
     units: 4,
     minAvg: 7,
     grades: {} // { subjectName: [null, null, null, null] }
-  }
+  },
+  topicsData: {} // { topicsKey: { numUnits: 4, units: { 0: { topics: [...], explanations: {} }, ... } } }
 };
 
 // ===== CONSTANTS =====
@@ -1320,6 +1447,8 @@ function openHelpModal() {
           'Para quem está na faculdade! Informe seu curso, adicione suas matérias universitárias e use o Chat, Atividades e Quiz com prompts adaptados para o nível superior. 🎓') +
         helpItem('fa-file-contract', '#F97316', 'Concursos Públicos',
           'Prepare-se para concursos! Vem com matérias padrão (Português, Matemática, Direito, Raciocínio Lógico...) e você pode personalizar. Questões no estilo de bancas reais! 📋') +
+        helpItem('fa-list-ol', '#0984E3', 'Conteúdo por Unidades',
+          'Organize o estudo por unidades! Escolha quantas unidades quer, clique em uma unidade e a IA gera os tópicos automaticamente. Clique em um tópico para receber uma explicação detalhada! 📚') +
         helpItem('fa-shuffle', '#A855F7', 'Quiz Aleatório',
           '20 perguntas de matérias variadas! A IA gera um quiz misturando todas as suas matérias cadastradas. Cada pergunta mostra de qual matéria é. 🎲') +
         helpItem('fa-brain', 'var(--accent-3)', 'IA com Pesquisa',
@@ -2001,6 +2130,10 @@ function openSubject(name, mode, context) {
   state.currentSubject = name;
   state.langMode = false;
   state.currentContext = context || 'school';
+  // Reset quiz so switching subjects always generates a new quiz
+  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: false };
+  // Reset quiz UI to start screen
+  show('quizStart'); hide('quizActive'); hide('quizResults'); hide('quizLoading');
   var info = (context === 'college' || context === 'concurso') ? getCtxSubjectInfo(name, context) : getSubjectInfo(name);
 
   $('subjectIcon').style.background = info.color;
@@ -2110,14 +2243,16 @@ function switchTab(tab) {
   tabs.forEach(function(t) {
     if ((tab === 'chat' && t.textContent.indexOf('Chat') !== -1) ||
         (tab === 'activity' && t.textContent.indexOf('Atividade') !== -1) ||
-        (tab === 'quiz' && t.textContent.indexOf('Quiz') !== -1)) {
+        (tab === 'quiz' && t.textContent.indexOf('Quiz') !== -1) ||
+        (tab === 'topics' && t.textContent.indexOf('Conteúdo') !== -1)) {
       t.classList.add('active');
     }
   });
-  hide('chatContent'); hide('activityContent'); hide('quizContent');
+  hide('chatContent'); hide('activityContent'); hide('quizContent'); hide('topicsContent');
   if (tab === 'chat') show('chatContent');
   else if (tab === 'activity') show('activityContent');
   else if (tab === 'quiz') show('quizContent');
+  else if (tab === 'topics') { show('topicsContent'); initTopicsView(); }
 }
 
 // ===== CHAT FUNCTIONS =====
@@ -2209,6 +2344,247 @@ function getChatKey() {
   if (state.currentContext === 'college') return 'col_' + state.currentSubject;
   if (state.currentContext === 'concurso') return 'conc_' + state.currentSubject;
   return state.currentSubject + '_' + state.grade.id;
+}
+
+// ===== TOPICS / UNITS SYSTEM =====
+function getTopicsKey() {
+  return 'topics_' + getChatKey();
+}
+
+function getTopicsData() {
+  var key = getTopicsKey();
+  if (!state.topicsData[key]) {
+    state.topicsData[key] = { numUnits: 4, units: {} };
+  }
+  return state.topicsData[key];
+}
+
+function initTopicsView() {
+  var data = getTopicsData();
+  $('topicsUnitCount').value = data.numUnits;
+  renderUnitsAccordion();
+}
+
+function setTopicsUnits(n) {
+  var data = getTopicsData();
+  data.numUnits = n;
+  renderUnitsAccordion();
+}
+
+function getUnitColor(idx) {
+  var colors = ['#6C5CE7', '#00B894', '#E17055', '#0984E3', '#FDCB6E', '#E84393', '#00CEC9', '#6366F1'];
+  return colors[idx % colors.length];
+}
+
+function renderUnitsAccordion() {
+  var data = getTopicsData();
+  var container = $('topicsUnitList');
+  var html = '';
+  for (var i = 0; i < data.numUnits; i++) {
+    var unitData = data.units[i];
+    var hasTopics = unitData && unitData.topics && unitData.topics.length > 0;
+    var isOpen = unitData && unitData._open;
+    var color = getUnitColor(i);
+    html += '<div class="unit-card' + (isOpen ? ' open' : '') + '" id="unitCard_' + i + '">';
+    html += '<div class="unit-header" onclick="toggleUnit(' + i + ')">';
+    html += '<div class="unit-num" style="background:' + color + ';">' + (i + 1) + '</div>';
+    html += '<div class="unit-title">Unidade ' + (i + 1);
+    if (hasTopics) html += ' <span style="color:var(--text-3);font-weight:400;font-size:0.8rem;">(' + unitData.topics.length + ' tópicos)</span>';
+    html += '</div>';
+    html += '<i class="fas fa-chevron-down unit-chevron"></i>';
+    html += '</div>';
+    html += '<div class="unit-body"><div class="unit-body-inner" id="unitBody_' + i + '">';
+    if (hasTopics) {
+      html += renderUnitTopicsHTML(i, unitData, color);
+    } else if (unitData && unitData._loading) {
+      html += '<div class="topics-loading-unit"><div class="spinner" style="border-color:var(--border);border-top-color:' + color + ';width:20px;height:20px;"></div> Gerando tópicos via IA...</div>';
+    } else {
+      html += '<div style="text-align:center;padding:1rem;"><button class="btn-primary" style="font-size:0.85rem;padding:8px 20px;" onclick="loadUnitTopics(' + i + ')"><i class="fas fa-wand-magic-sparkles mr-1"></i> Gerar Tópicos com IA</button></div>';
+    }
+    html += '</div></div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function renderUnitTopicsHTML(unitIdx, unitData, color) {
+  var html = '';
+  unitData.topics.forEach(function(topic, tIdx) {
+    var safeTopic = topic.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += '<div class="topic-item" onclick="showTopicExplanation(' + unitIdx + ',' + tIdx + ',\'' + safeTopic + '\')" id="topicItem_' + unitIdx + '_' + tIdx + '">';
+    html += '<div class="topic-dot" style="background:' + color + ';"></div>';
+    html += '<div class="topic-name">' + topic + '</div>';
+    html += '<i class="fas fa-chevron-right topic-arrow"></i>';
+    html += '</div>';
+    // Show explanation if already loaded
+    if (unitData.explanations && unitData.explanations[tIdx]) {
+      html += '<div class="topic-explanation-box" id="topicExpl_' + unitIdx + '_' + tIdx + '">';
+      html += '<div class="md-content">' + marked.parse(unitData.explanations[tIdx]) + '</div>';
+      html += '</div>';
+    }
+  });
+  return html;
+}
+
+function toggleUnit(idx) {
+  var data = getTopicsData();
+  if (!data.units[idx]) data.units[idx] = {};
+  data.units[idx]._open = !data.units[idx]._open;
+
+  var card = $('unitCard_' + idx);
+  if (card) card.classList.toggle('open');
+
+  // If opening and no topics yet, auto-generate
+  if (data.units[idx]._open && (!data.units[idx].topics || data.units[idx].topics.length === 0) && !data.units[idx]._loading) {
+    loadUnitTopics(idx);
+  }
+}
+
+async function loadUnitTopics(unitIdx) {
+  var data = getTopicsData();
+  if (!data.units[unitIdx]) data.units[unitIdx] = { _open: true };
+  data.units[unitIdx]._loading = true;
+  data.units[unitIdx]._open = true;
+
+  // Re-render to show loading
+  renderUnitsAccordion();
+
+  var subject = state.currentSubject;
+  var unitNum = unitIdx + 1;
+  var totalUnits = data.numUnits;
+  var sysPrompt, userMsg;
+
+  if (state.langMode) {
+    var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
+    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de um curso de ' + subject + '. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' do curso de ' + subject + ' nível ' + langLevel + '. Retorne apenas JSON.';
+  } else if (state.currentContext === 'college') {
+    var courseName = state.college.courseName || 'Ensino Superior';
+    sysPrompt = 'Você é um professor universitário de ' + subject + ' do curso de ' + courseName + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades da disciplina. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' (curso de ' + courseName + '). Retorne apenas JSON.';
+  } else if (state.currentContext === 'concurso') {
+    sysPrompt = 'Você é um professor preparatório para concursos públicos, especialista em ' + subject + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de preparação. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos que mais caem em provas, progressivos.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' para concursos. Retorne apenas JSON.';
+  } else {
+    var grade = getGradeLabel();
+    sysPrompt = 'Você é um professor de ' + subject + ' para alunos do ' + grade + ' no Brasil. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades do ano letivo. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade, seguindo o currículo brasileiro.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' para o ' + grade + '. Retorne apenas JSON.';
+  }
+
+  try {
+    var fullText = '';
+    await callAPI(
+      [{ role: 'system', content: sysPrompt }, { role: 'user', content: userMsg }],
+      null,
+      function(text) {
+        fullText = text;
+        try {
+          var parsed = JSON.parse(fullText);
+          if (parsed.topics) {
+            data.units[unitIdx].topics = parsed.topics;
+            data.units[unitIdx].explanations = {};
+          }
+        } catch(e) {
+          var match = fullText.match(/\{[\s\S]*"topics"\s*:\s*\[[\s\S]*\][\s\S]*\}/);
+          if (match) {
+            try {
+              var parsed2 = JSON.parse(match[0]);
+              if (parsed2.topics) {
+                data.units[unitIdx].topics = parsed2.topics;
+                data.units[unitIdx].explanations = {};
+              }
+            } catch(e2) { /* ignore */ }
+          }
+        }
+        data.units[unitIdx]._loading = false;
+        if (!data.units[unitIdx].topics || data.units[unitIdx].topics.length === 0) {
+          data.units[unitIdx].topics = ['Erro ao gerar tópicos. Tente novamente.'];
+        }
+        renderUnitsAccordion();
+      },
+      function(err) {
+        data.units[unitIdx]._loading = false;
+        data.units[unitIdx].topics = ['Erro: ' + err + '. Tente novamente.'];
+        renderUnitsAccordion();
+      }
+    );
+  } catch(e) {
+    data.units[unitIdx]._loading = false;
+    data.units[unitIdx].topics = ['Erro ao conectar. Tente novamente.'];
+    renderUnitsAccordion();
+  }
+}
+
+async function showTopicExplanation(unitIdx, topicIdx, topicName) {
+  var data = getTopicsData();
+  if (!data.units[unitIdx]) return;
+
+  // If already has explanation, toggle visibility
+  var explEl = $('topicExpl_' + unitIdx + '_' + topicIdx);
+  if (explEl) {
+    explEl.remove();
+    if (data.units[unitIdx].explanations) delete data.units[unitIdx].explanations[topicIdx];
+    return;
+  }
+
+  // Create explanation box with loading
+  var topicItem = $('topicItem_' + unitIdx + '_' + topicIdx);
+  if (!topicItem) return;
+
+  var explBox = document.createElement('div');
+  explBox.className = 'topic-explanation-box';
+  explBox.id = 'topicExpl_' + unitIdx + '_' + topicIdx;
+  explBox.innerHTML = '<div class="flex items-center gap-2" style="color:var(--text-3);font-size:0.85rem;"><div class="spinner" style="border-color:var(--border);border-top-color:var(--accent-1);width:18px;height:18px;"></div> Explicando...</div>';
+  topicItem.insertAdjacentElement('afterend', explBox);
+
+  var subject = state.currentSubject;
+  var sysPrompt;
+
+  if (state.langMode) {
+    var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
+    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Explique de forma clara, didática e com exemplos o seguinte tópico: "' + topicName + '". Use markdown para formatar a resposta. Responda em português do Brasil.';
+  } else if (state.currentContext === 'college') {
+    var courseName = state.college.courseName || 'Ensino Superior';
+    sysPrompt = 'Você é um professor universitário de ' + subject + ' do curso de ' + courseName + '. Explique de forma aprofundada e didática o seguinte tópico: "' + topicName + '". Use markdown, exemplos e referências. Responda em português do Brasil.';
+  } else if (state.currentContext === 'concurso') {
+    sysPrompt = 'Você é um professor preparatório para concursos públicos, especialista em ' + subject + '. Explique o seguinte tópico focando no que é cobrado em provas: "' + topicName + '". Use markdown, exemplos de questões e macetes. Responda em português do Brasil.';
+  } else {
+    var grade = getGradeLabel();
+    sysPrompt = 'Você é um tutor educacional amigável para alunos do ' + grade + ' no Brasil. Explique de forma clara, divertida e didática o seguinte tópico de ' + subject + ': "' + topicName + '". Use markdown, exemplos práticos e linguagem acessível. Responda em português do Brasil.';
+  }
+
+  try {
+    await callAPI(
+      [{ role: 'system', content: sysPrompt }, { role: 'user', content: 'Explique o tópico: ' + topicName }],
+      function(chunk) {
+        // Streaming update
+        var box = $('topicExpl_' + unitIdx + '_' + topicIdx);
+        if (box) {
+          box.innerHTML = '<div class="md-content">' + marked.parse(chunk) + '</div>';
+        }
+      },
+      function(finalText) {
+        // Save to cache
+        if (!data.units[unitIdx].explanations) data.units[unitIdx].explanations = {};
+        data.units[unitIdx].explanations[topicIdx] = finalText;
+        var box = $('topicExpl_' + unitIdx + '_' + topicIdx);
+        if (box) {
+          box.innerHTML = '<div class="md-content">' + marked.parse(finalText) + '</div>';
+        }
+      },
+      function(err) {
+        var box = $('topicExpl_' + unitIdx + '_' + topicIdx);
+        if (box) {
+          box.innerHTML = '<div style="color:var(--error);font-size:0.85rem;"><i class="fas fa-exclamation-triangle mr-1"></i> Erro: ' + err + '</div>';
+        }
+      }
+    );
+  } catch(e) {
+    var box = $('topicExpl_' + unitIdx + '_' + topicIdx);
+    if (box) {
+      box.innerHTML = '<div style="color:var(--error);font-size:0.85rem;"><i class="fas fa-exclamation-triangle mr-1"></i> Erro ao conectar.</div>';
+    }
+  }
 }
 
 function loadChatHistory() {
@@ -2604,6 +2980,10 @@ function openLangSubject(langName, levelId) {
   state.currentLanguage = langName;
   state.currentLangLevel = levelId;
   state.currentSubject = langName;
+  // Reset quiz so switching subjects always generates a new quiz
+  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: false };
+  // Reset quiz UI to start screen
+  show('quizStart'); hide('quizActive'); hide('quizResults'); hide('quizLoading');
 
   var info = LANGUAGES[langName];
   var levelObj = LANG_LEVELS.find(function(l) { return l.id === levelId; });
