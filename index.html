@@ -416,9 +416,125 @@ input, textarea { font-size: 16px; }
 /* ===== Logo pulse ===== */
 .logo-glow { animation: pulse-glow 2s ease-in-out infinite; }
 
+/* ===== Help floating button ===== */
+.fab-help {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  color: white;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(108,92,231,0.35);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.fab-help:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(108,92,231,0.5); }
+
+/* ===== Modal overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  max-width: 520px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: bounce-in 0.3s ease-out;
+}
+.modal-box h2 { font-family: 'Sora', sans-serif; }
+
+/* ===== Calculator ===== */
+.calc-card {
+  background: linear-gradient(135deg, var(--accent-4), var(--accent-1));
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.calc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,210,211,0.25); }
+.calc-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.calc-subject-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  transition: all 0.2s;
+}
+.calc-grade-input {
+  width: 100%;
+  padding: 8px 6px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-1);
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.calc-grade-input:focus { border-color: var(--accent-1); }
+.calc-grade-input::placeholder { color: var(--text-3); font-weight: 400; font-size: 13px; }
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.status-approved { background: rgba(0,184,148,0.15); color: var(--success); }
+.status-ontrack { background: rgba(108,92,231,0.12); color: var(--accent-1); }
+.status-warning { background: rgba(254,202,87,0.2); color: #D4A017; }
+.dark .status-warning { color: var(--accent-3); }
+.status-danger { background: rgba(255,107,107,0.15); color: var(--error); }
+.status-none { background: var(--bg-input); color: var(--text-3); }
+
+/* ===== Calc summary ring ===== */
+.ring-container { position: relative; width: 80px; height: 80px; }
+.ring-container svg { transform: rotate(-90deg); }
+.ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
 @media (max-width: 640px) {
   .tab-btn { padding: 8px 14px; font-size: 12px; }
   .subject-card { padding: 1rem; }
+  .fab-help { bottom: 14px; right: 14px; width: 46px; height: 46px; font-size: 18px; }
 }
 </style>
 </head>
@@ -429,7 +545,6 @@ input, textarea { font-size: 16px; }
 
 <!-- ===== API KEY SCREEN ===== -->
 <section id="apiKeyScreen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-  <!-- Floating decorative shapes -->
   <div class="floating-shape bg-purple-500" style="width:200px;height:200px;top:10%;left:5%;animation-delay:0s;"></div>
   <div class="floating-shape bg-pink-500" style="width:150px;height:150px;top:60%;right:10%;animation-delay:2s;"></div>
   <div class="floating-shape bg-cyan-400" style="width:100px;height:100px;bottom:15%;left:20%;animation-delay:4s;"></div>
@@ -448,15 +563,10 @@ input, textarea { font-size: 16px; }
       <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)">
         <i class="fas fa-key mr-1"></i> Chave da API Poe
       </label>
-      <input
-        id="apiKeyInput"
-        type="password"
-        placeholder="Cole sua chave API aqui..."
+      <input id="apiKeyInput" type="password" placeholder="Cole sua chave API aqui..."
         class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all"
         style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
-        onfocus="this.style.borderColor='var(--accent-1)'"
-        onblur="this.style.borderColor='var(--border)'"
-      >
+        onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
       <p class="text-xs mt-2" style="color:var(--text-3)">
         Obtenha sua chave em <span style="color:var(--accent-1);font-weight:700;">poe.com/api_key</span>
       </p>
@@ -464,11 +574,9 @@ input, textarea { font-size: 16px; }
       <label class="block font-heading font-semibold text-sm mb-2 mt-4" style="color:var(--text-2)">
         <i class="fas fa-robot mr-1"></i> Modelo da IA
       </label>
-      <select
-        id="modelSelect"
+      <select id="modelSelect"
         class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all"
-        style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
-      >
+        style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);">
         <option value="GPT-5.2">GPT-5.2 (Recomendado)</option>
         <option value="Gemini-3-Flash">Gemini 3 Flash (Rápido)</option>
         <option value="Claude-Sonnet-4.5">Claude Sonnet 4.5</option>
@@ -489,43 +597,29 @@ input, textarea { font-size: 16px; }
       <h2 class="font-brand text-3xl font-bold gradient-text">Bem-vindo! 🎉</h2>
       <p class="font-heading text-sm mt-1" style="color:var(--text-2)">Nos conte um pouco sobre você</p>
     </div>
-
     <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow);">
       <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)">
         <i class="fas fa-user mr-1"></i> Seu nome
       </label>
-      <input
-        id="nameInput"
-        type="text"
-        placeholder="Como você se chama?"
+      <input id="nameInput" type="text" placeholder="Como você se chama?"
         class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-5"
         style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
-        onfocus="this.style.borderColor='var(--accent-1)'"
-        onblur="this.style.borderColor='var(--border)'"
-      >
-
+        onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
       <label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)">
         <i class="fas fa-school mr-1"></i> Sua série
       </label>
-
-      <!-- Fundamental I -->
       <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1)">
         <i class="fas fa-seedling mr-1"></i> Ensino Fundamental I
       </p>
       <div class="grid grid-cols-5 gap-2 mb-4" id="gradeGridF1"></div>
-
-      <!-- Fundamental II -->
       <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2)">
         <i class="fas fa-leaf mr-1"></i> Ensino Fundamental II
       </p>
       <div class="grid grid-cols-4 gap-2 mb-4" id="gradeGridF2"></div>
-
-      <!-- Ensino Médio -->
       <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4)">
         <i class="fas fa-tree mr-1"></i> Ensino Médio
       </p>
       <div class="grid grid-cols-3 gap-2 mb-5" id="gradeGridEM"></div>
-
       <button class="btn-primary w-full justify-center" onclick="completeSetup()">
         <i class="fas fa-rocket"></i> Começar a Estudar!
       </button>
@@ -553,39 +647,52 @@ input, textarea { font-size: 16px; }
     <div class="flex items-center gap-2">
       <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:var(--bg-input);color:var(--text-2);" id="headerGrade"></span>
       <span class="text-sm font-bold" style="color:var(--text-2);" id="headerName"></span>
+      <button id="settingsBtn" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+        style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;"
+        onclick="openSettingsModal()"
+        onmouseenter="this.style.background='var(--accent-1)';this.style.color='white'"
+        onmouseleave="this.style.background='var(--bg-input)';this.style.color='var(--text-2)'">
+        <i class="fas fa-cog text-sm"></i>
+      </button>
     </div>
   </header>
 
   <!-- Dashboard View -->
-  <div id="dashboardView" class="flex-1 p-4 max-w-5xl mx-auto w-full">
-    <div class="mb-6 anim-fade-up">
+  <div id="dashboardView" class="flex-1 p-4 max-w-5xl mx-auto w-full" style="overflow-y:auto;">
+    <div class="mb-5 anim-fade-up">
       <h2 class="font-heading text-2xl font-bold" id="welcomeMsg"></h2>
       <p class="text-sm mt-1" style="color:var(--text-2);">Escolha uma matéria para começar</p>
     </div>
+    <!-- Calculator Card -->
+    <div class="calc-card mb-5 anim-fade-up" style="animation-delay:0.05s" onclick="openCalcView()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-chart-line text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Calculadora de Média</p>
+          <p class="text-xs opacity-80" id="calcCardSummary">Acompanhe suas notas e veja quanto precisa tirar</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
+    <!-- Subject Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="subjectGrid"></div>
   </div>
 
   <!-- Subject View -->
   <div id="subjectView" class="view-hidden flex-1 flex flex-col">
-    <!-- Subject header + tabs -->
     <div class="px-4 pt-3 pb-2" style="background:var(--bg-card);border-bottom:1px solid var(--border);">
       <div class="flex items-center gap-3 mb-3">
         <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" id="subjectIcon"></div>
         <h3 class="font-heading text-xl font-bold" id="subjectTitle"></h3>
       </div>
       <div class="flex gap-2 overflow-x-auto pb-1" id="tabBar">
-        <button class="tab-btn active" onclick="switchTab('chat')">
-          <i class="fas fa-comments mr-1"></i> Chat
-        </button>
-        <button class="tab-btn" onclick="switchTab('activity')">
-          <i class="fas fa-clipboard-list mr-1"></i> Atividades
-        </button>
-        <button class="tab-btn" onclick="switchTab('quiz')">
-          <i class="fas fa-gamepad mr-1"></i> Quiz
-        </button>
+        <button class="tab-btn active" onclick="switchTab('chat')"><i class="fas fa-comments mr-1"></i> Chat</button>
+        <button class="tab-btn" onclick="switchTab('activity')"><i class="fas fa-clipboard-list mr-1"></i> Atividades</button>
+        <button class="tab-btn" onclick="switchTab('quiz')"><i class="fas fa-gamepad mr-1"></i> Quiz</button>
       </div>
     </div>
-
     <!-- Chat Content -->
     <div id="chatContent" class="flex-1 flex flex-col" style="min-height:0;">
       <div class="chat-messages flex-1" id="chatMessages">
@@ -598,61 +705,43 @@ input, textarea { font-size: 16px; }
         </div>
       </div>
       <div class="p-3 flex gap-2" style="background:var(--bg-card);border-top:1px solid var(--border);">
-        <input
-          id="chatInput"
-          type="text"
-          placeholder="Digite sua dúvida..."
+        <input id="chatInput" type="text" placeholder="Digite sua dúvida..."
           class="flex-1 px-4 py-3 rounded-xl border-2 outline-none transition-all"
           style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
-          onfocus="this.style.borderColor='var(--accent-1)'"
-          onblur="this.style.borderColor='var(--border)'"
-          onkeydown="if(event.key==='Enter')sendChatMessage()"
-        >
+          onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"
+          onkeydown="if(event.key==='Enter')sendChatMessage()">
         <button class="btn-primary px-4" onclick="sendChatMessage()" id="chatSendBtn">
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
     </div>
-
     <!-- Activity Content -->
     <div id="activityContent" class="view-hidden flex-1 flex flex-col p-4 gap-4" style="overflow-y:auto;">
       <div class="anim-fade-up">
         <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2);">
           <i class="fas fa-paste mr-1"></i> Cole sua atividade aqui
         </label>
-        <textarea
-          id="activityInput"
-          rows="5"
-          placeholder="Cole a questão ou atividade que precisa de ajuda..."
+        <textarea id="activityInput" rows="5" placeholder="Cole a questão ou atividade que precisa de ajuda..."
           class="w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-y"
           style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);min-height:100px;"
-          onfocus="this.style.borderColor='var(--accent-1)'"
-          onblur="this.style.borderColor='var(--border)'"
-        ></textarea>
+          onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"></textarea>
         <button class="btn-primary mt-3" onclick="sendActivity()" id="activitySendBtn">
           <i class="fas fa-wand-magic-sparkles"></i> Pedir Ajuda
         </button>
       </div>
       <div id="activityResponse" class="activity-response md-content view-hidden"></div>
     </div>
-
     <!-- Quiz Content -->
     <div id="quizContent" class="view-hidden flex-1 flex flex-col p-4" style="overflow-y:auto;">
-      <!-- Quiz Start -->
       <div id="quizStart" class="flex-1 flex flex-col items-center justify-center text-center anim-fade-up">
         <div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg, var(--accent-1), var(--accent-4));">
           <i class="fas fa-brain text-white text-4xl"></i>
         </div>
         <h3 class="font-heading text-xl font-bold mb-2">Teste seus conhecimentos!</h3>
         <p class="text-sm mb-6" style="color:var(--text-2);max-width:300px;">5 perguntas geradas pela IA sobre o conteúdo da sua série</p>
-        <button class="btn-primary" onclick="startQuiz()" id="quizStartBtn">
-          <i class="fas fa-play"></i> Iniciar Quiz
-        </button>
+        <button class="btn-primary" onclick="startQuiz()" id="quizStartBtn"><i class="fas fa-play"></i> Iniciar Quiz</button>
       </div>
-
-      <!-- Quiz Active -->
       <div id="quizActive" class="view-hidden flex-1 flex flex-col">
-        <!-- Score bar -->
         <div class="flex items-center gap-3 mb-4">
           <div class="flex-1">
             <div class="flex justify-between text-xs font-bold mb-1" style="color:var(--text-2);">
@@ -665,46 +754,26 @@ input, textarea { font-size: 16px; }
             <span class="streak-fire">🔥</span><span id="streakCount">0</span>
           </div>
         </div>
-
-        <!-- Question card -->
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;box-shadow:var(--shadow);" class="mb-4">
           <p class="font-heading font-bold text-base" id="quizQuestion"></p>
         </div>
-
-        <!-- Options -->
         <div class="flex flex-col gap-2 mb-4" id="quizOptions"></div>
-
-        <!-- Explanation -->
         <div id="quizExplanation" class="view-hidden p-4 rounded-xl mb-4 anim-slide-down" style="background:var(--bg-input);border:1px solid var(--border);">
-          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--accent-1);">
-            <i class="fas fa-lightbulb mr-1"></i> Explicação
-          </p>
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--accent-1);"><i class="fas fa-lightbulb mr-1"></i> Explicação</p>
           <p class="text-sm" id="quizExplanationText" style="color:var(--text-2);"></p>
         </div>
-
-        <!-- Next button -->
-        <button id="quizNextBtn" class="view-hidden btn-primary self-end" onclick="nextQuestion()">
-          Próxima <i class="fas fa-arrow-right ml-1"></i>
-        </button>
+        <button id="quizNextBtn" class="view-hidden btn-primary self-end" onclick="nextQuestion()">Próxima <i class="fas fa-arrow-right ml-1"></i></button>
       </div>
-
-      <!-- Quiz Results -->
       <div id="quizResults" class="view-hidden flex-1 flex flex-col items-center justify-center text-center anim-bounce-in">
         <div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center" id="resultsIcon"></div>
         <h3 class="font-heading text-2xl font-bold mb-1" id="resultsTitle"></h3>
         <p class="text-lg font-bold mb-1" style="color:var(--accent-1);" id="resultsScore"></p>
         <p class="text-sm mb-6" style="color:var(--text-2);" id="resultsMsg"></p>
         <div class="flex gap-3">
-          <button class="btn-primary" onclick="startQuiz()">
-            <i class="fas fa-redo"></i> Jogar de Novo
-          </button>
-          <button class="btn-primary" style="background:var(--accent-4);" onclick="switchTab('chat')">
-            <i class="fas fa-comments"></i> Estudar Mais
-          </button>
+          <button class="btn-primary" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar de Novo</button>
+          <button class="btn-primary" style="background:var(--accent-4);" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Estudar Mais</button>
         </div>
       </div>
-
-      <!-- Quiz Loading -->
       <div id="quizLoading" class="view-hidden flex-1 flex flex-col items-center justify-center text-center">
         <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:var(--bg-input);">
           <div class="spinner" style="border-color:var(--border);border-top-color:var(--accent-1);width:32px;height:32px;"></div>
@@ -714,10 +783,65 @@ input, textarea { font-size: 16px; }
       </div>
     </div>
   </div>
+
+  <!-- Calculator View -->
+  <div id="calcView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <!-- Calc config bar -->
+      <div class="flex flex-wrap items-end gap-4 mb-5 p-4 rounded-xl anim-fade-up"
+        style="background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow);">
+        <div class="flex-1" style="min-width:120px;">
+          <label class="block font-heading font-bold text-xs mb-1" style="color:var(--text-2);">
+            <i class="fas fa-calendar-alt mr-1"></i> Quantas unidades?
+          </label>
+          <select id="calcUnits" onchange="onCalcConfigChange()"
+            class="w-full px-3 py-2 rounded-lg border-2 outline-none font-body font-bold transition-all"
+            style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;">
+            <option value="2">2 unidades</option>
+            <option value="3">3 unidades</option>
+            <option value="4" selected>4 unidades</option>
+            <option value="5">5 unidades</option>
+            <option value="6">6 unidades</option>
+          </select>
+        </div>
+        <div class="flex-1" style="min-width:120px;">
+          <label class="block font-heading font-bold text-xs mb-1" style="color:var(--text-2);">
+            <i class="fas fa-bullseye mr-1"></i> Média para aprovação
+          </label>
+          <input id="calcMinAvg" type="number" min="0" max="10" step="0.5" value="7" onchange="onCalcConfigChange()" oninput="onCalcConfigChange()"
+            class="w-full px-3 py-2 rounded-lg border-2 outline-none font-body font-bold transition-all"
+            style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+            onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+      </div>
+
+      <!-- Calc summary -->
+      <div class="flex flex-wrap items-center gap-4 mb-5 p-4 rounded-xl anim-fade-up" style="animation-delay:0.08s;background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow);">
+        <div class="ring-container" id="calcRing">
+          <svg width="80" height="80"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--bg-input)" stroke-width="8"/><circle id="calcRingCircle" cx="40" cy="40" r="34" fill="none" stroke="var(--accent-1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/></svg>
+          <div class="ring-text">
+            <span class="font-heading font-bold text-lg" id="calcRingPct">0%</span>
+          </div>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-sm" style="color:var(--text-1);" id="calcSummaryTitle">Resumo das Notas</p>
+          <p class="text-xs" style="color:var(--text-2);" id="calcSummaryText">Insira suas notas abaixo para ver o resumo</p>
+        </div>
+      </div>
+
+      <!-- Subject rows -->
+      <div class="flex flex-col gap-3" id="calcSubjects"></div>
+    </div>
+  </div>
 </section>
 
+<!-- ===== HELP FLOATING BUTTON ===== -->
+<button class="fab-help view-hidden" id="helpFab" onclick="openHelpModal()">
+  <i class="fas fa-question"></i>
+</button>
+
 <script>
- 
+
 
 // ===== MARKED CONFIG =====
 marked.setOptions({ breaks: true, gfm: true });
@@ -734,6 +858,52 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', eve
   }
 });
 
+// ===== STORAGE WRAPPER (cookies + in-memory) =====
+const store = {
+  _mem: {},
+  _setCookie(name, value, days) {
+    var expires = '';
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = '; expires=' + date.toUTCString();
+    }
+    document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Lax';
+  },
+  _getCookie(name) {
+    var nameEQ = name + '=';
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i].trim();
+      if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length));
+    }
+    return null;
+  },
+  _removeCookie(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax';
+  },
+  set(key, val) {
+    this._mem[key] = val;
+    try { this._setCookie('estudai_' + key, JSON.stringify(val), 365); } catch (_e) { /* ignore */ }
+  },
+  get(key, fallback) {
+    if (this._mem[key] !== undefined) return this._mem[key];
+    try {
+      var raw = this._getCookie('estudai_' + key);
+      if (raw !== null) {
+        var parsed = JSON.parse(raw);
+        this._mem[key] = parsed;
+        return parsed;
+      }
+    } catch (_e) { /* ignore */ }
+    return fallback;
+  },
+  remove(key) {
+    delete this._mem[key];
+    try { this._removeCookie('estudai_' + key); } catch (_e) { /* ignore */ }
+  }
+};
+
 // ===== STATE =====
 const state = {
   apiKey: '',
@@ -745,13 +915,11 @@ const state = {
   currentTab: 'chat',
   chatHistories: {},
   isStreaming: false,
-  quiz: {
-    questions: [],
-    currentIndex: 0,
-    score: 0,
-    streak: 0,
-    maxStreak: 0,
-    answered: false
+  quiz: { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false },
+  calc: {
+    units: 4,
+    minAvg: 7,
+    grades: {} // { subjectName: [null, null, null, null] }
   }
 };
 
@@ -794,26 +962,271 @@ const LEVEL_SUBJECTS = {
 
 // ===== DOM HELPERS =====
 function $(id) { return document.getElementById(id); }
-function show(el) { if (typeof el === 'string') el = $(el); el.classList.remove('view-hidden'); }
-function hide(el) { if (typeof el === 'string') el = $(el); el.classList.add('view-hidden'); }
+function show(el) { if (typeof el === 'string') el = $(el); if (el) el.classList.remove('view-hidden'); }
+function hide(el) { if (typeof el === 'string') el = $(el); if (el) el.classList.add('view-hidden'); }
 
 // ===== TOAST =====
-function showToast(message, type = 'error') {
+function showToast(message, type) {
+  type = type || 'error';
   const container = $('toastContainer');
   const toast = document.createElement('div');
   toast.className = 'toast ' + type;
   toast.textContent = message;
   container.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add('show'));
-  setTimeout(() => {
+  requestAnimationFrame(function() { toast.classList.add('show'); });
+  setTimeout(function() {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
+    setTimeout(function() { toast.remove(); }, 300);
   }, 3500);
+}
+
+// ===== HELP MODAL =====
+function openHelpModal() {
+  var existing = document.getElementById('helpModal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'helpModal';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="flex items-center justify-between mb-4">' +
+        '<h2 class="font-heading text-xl font-bold gradient-text">Como usar o EstudAI</h2>' +
+        '<button onclick="document.getElementById(\'helpModal\').remove()" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;font-size:14px;">' +
+          '<i class="fas fa-times"></i>' +
+        '</button>' +
+      '</div>' +
+      '<div class="flex flex-col gap-4">' +
+        helpItem('fa-comments', 'var(--accent-1)', 'Chat com IA',
+          'Tire dúvidas sobre qualquer matéria! A IA responde de forma adaptada à sua série, com explicações claras e exemplos práticos.') +
+        helpItem('fa-clipboard-list', 'var(--accent-2)', 'Ajuda com Atividades',
+          'Cole a questão da sua atividade ou prova e receba orientação passo a passo. A IA te guia para entender o raciocínio, sem dar a resposta pronta!') +
+        helpItem('fa-gamepad', 'var(--accent-4)', 'Quiz Interativo',
+          'Teste seus conhecimentos com 5 perguntas geradas pela IA, adequadas ao conteúdo da sua série. Ganhe pontos e tente manter sequências de acertos! 🔥') +
+        helpItem('fa-chart-line', 'var(--success)', 'Calculadora de Média',
+          'Configure quantas unidades sua escola tem e qual é a média. Insira suas notas em cada matéria e veja automaticamente quanto precisa tirar nas próximas unidades para ser aprovado.') +
+        helpItem('fa-brain', 'var(--accent-3)', 'IA com Pesquisa',
+          'A inteligência artificial busca informações atualizadas para dar respostas precisas e confiáveis sobre o conteúdo escolar.') +
+        helpItem('fa-save', '#A78BFA', 'Dados Salvos',
+          'Suas informações (nome, série, notas da calculadora) são salvas automaticamente no navegador. Ao voltar, tudo estará como você deixou!') +
+        helpItem('fa-moon', 'var(--text-3)', 'Modo Escuro',
+          'O tema se adapta automaticamente às configurações do seu dispositivo para maior conforto visual.') +
+      '</div>' +
+      '<div class="mt-5 pt-4" style="border-top:1px solid var(--border);">' +
+        '<p class="text-xs text-center" style="color:var(--text-3);">' +
+          'EstudAI — Feito para estudantes do Ensino Fundamental ao Médio 🎓' +
+        '</p>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function helpItem(icon, color, title, desc) {
+  return '<div class="flex gap-3">' +
+    '<div class="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center" style="background:' + color + '20;color:' + color + ';">' +
+      '<i class="fas ' + icon + '"></i>' +
+    '</div>' +
+    '<div>' +
+      '<p class="font-heading font-bold text-sm" style="color:var(--text-1);">' + title + '</p>' +
+      '<p class="text-xs" style="color:var(--text-2);line-height:1.5;">' + desc + '</p>' +
+    '</div>' +
+  '</div>';
+}
+
+// ===== SETTINGS MODAL =====
+function openSettingsModal() {
+  var existing = document.getElementById('settingsModal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'settingsModal';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  // Build grade buttons for each level
+  function gradeButtons(level, colorVar) {
+    var html = '';
+    GRADES.forEach(function(g) {
+      if (g.level !== level) return;
+      var sel = (state.grade && state.grade.id === g.id) ? ' selected' : '';
+      html += '<button class="grade-btn' + sel + '" style="padding:10px 12px;font-size:13px;" data-grade-id="' + g.id + '" onclick="settingsSelectGrade(\'' + g.id + '\', this)">' + g.label + '</button>';
+    });
+    return html;
+  }
+
+  overlay.innerHTML =
+    '<div class="modal-box">' +
+      '<div class="flex items-center justify-between mb-4">' +
+        '<h2 class="font-heading text-xl font-bold gradient-text"><i class="fas fa-cog mr-2"></i>Configurações</h2>' +
+        '<button onclick="document.getElementById(\'settingsModal\').remove()" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;font-size:14px;">' +
+          '<i class="fas fa-times"></i>' +
+        '</button>' +
+      '</div>' +
+
+      '<label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2);">' +
+        '<i class="fas fa-user mr-1"></i> Seu nome' +
+      '</label>' +
+      '<input id="settingsNameInput" type="text" value="' + (state.studentName || '').replace(/"/g, '&quot;') + '"' +
+        ' class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-4"' +
+        ' style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"' +
+        ' onfocus="this.style.borderColor=\'var(--accent-1)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+
+      '<label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2);">' +
+        '<i class="fas fa-school mr-1"></i> Sua série' +
+      '</label>' +
+
+      '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1);">' +
+        '<i class="fas fa-seedling mr-1"></i> Ensino Fundamental I</p>' +
+      '<div class="grid grid-cols-5 gap-2 mb-3">' + gradeButtons('f1') + '</div>' +
+
+      '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2);">' +
+        '<i class="fas fa-leaf mr-1"></i> Ensino Fundamental II</p>' +
+      '<div class="grid grid-cols-4 gap-2 mb-3">' + gradeButtons('f2') + '</div>' +
+
+      '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4);">' +
+        '<i class="fas fa-tree mr-1"></i> Ensino Médio</p>' +
+      '<div class="grid grid-cols-3 gap-2 mb-4">' + gradeButtons('em') + '</div>' +
+
+      '<div class="flex gap-3">' +
+        '<button class="btn-primary flex-1 justify-center" onclick="saveSettings()">' +
+          '<i class="fas fa-check"></i> Salvar' +
+        '</button>' +
+        '<button class="btn-primary flex-1 justify-center" style="background:var(--error);" onclick="resetAllData()">' +
+          '<i class="fas fa-trash-alt"></i> Resetar Tudo' +
+        '</button>' +
+      '</div>' +
+
+      '<p class="text-xs text-center mt-3" style="color:var(--text-3);">' +
+        'Alterar a série recarrega as matérias e pode limpar notas de matérias que não existem na nova série.' +
+      '</p>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+// Temp var for settings grade selection
+var _settingsSelectedGrade = null;
+
+function settingsSelectGrade(gradeId, btn) {
+  var modal = document.getElementById('settingsModal');
+  if (!modal) return;
+  modal.querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  _settingsSelectedGrade = GRADES.find(function(g) { return g.id === gradeId; }) || null;
+}
+
+function saveSettings() {
+  var modal = document.getElementById('settingsModal');
+  if (!modal) return;
+
+  var nameInput = document.getElementById('settingsNameInput');
+  var newName = nameInput ? nameInput.value.trim() : '';
+  if (!newName) { showToast('Digite seu nome'); return; }
+
+  var newGrade = _settingsSelectedGrade || state.grade;
+  if (!newGrade) { showToast('Selecione sua série'); return; }
+
+  var gradeChanged = !state.grade || state.grade.id !== newGrade.id;
+
+  state.studentName = newName;
+  state.grade = newGrade;
+  store.set('studentName', newName);
+  store.set('grade', newGrade);
+
+  // If grade changed, rebuild calc grades (preserve grades for subjects that still exist)
+  if (gradeChanged) {
+    var newSubjects = LEVEL_SUBJECTS[newGrade.level];
+    var oldGrades = state.calc.grades;
+    state.calc.grades = {};
+    newSubjects.forEach(function(name) {
+      if (oldGrades[name] && oldGrades[name].length) {
+        state.calc.grades[name] = oldGrades[name].slice(0, state.calc.units);
+        while (state.calc.grades[name].length < state.calc.units) state.calc.grades[name].push(null);
+      } else {
+        state.calc.grades[name] = [];
+        for (var i = 0; i < state.calc.units; i++) state.calc.grades[name].push(null);
+      }
+    });
+    saveCalcData();
+    // Clear chat histories for old subjects
+    state.chatHistories = {};
+  }
+
+  // Re-render
+  initDashboard();
+  if (state.currentView === 'calc') {
+    renderCalcSubjects();
+    updateCalcSummary();
+  }
+
+  _settingsSelectedGrade = null;
+  modal.remove();
+  showToast('Configurações salvas! ✅', 'success');
+
+  // If on subject view, go back to dashboard since subjects may have changed
+  if (gradeChanged && state.currentView === 'subject') {
+    goBack();
+  }
+}
+
+function resetAllData() {
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'resetConfirmModal';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:380px;">' +
+      '<div class="text-center mb-4">' +
+        '<div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:rgba(255,107,107,0.15);">' +
+          '<i class="fas fa-exclamation-triangle text-2xl" style="color:var(--error);"></i>' +
+        '</div>' +
+        '<h3 class="font-heading font-bold text-lg">Tem certeza?</h3>' +
+        '<p class="text-sm mt-1" style="color:var(--text-2);">Isso apagará todos os seus dados: nome, série, notas e histórico de chat.</p>' +
+      '</div>' +
+      '<div class="flex gap-3">' +
+        '<button class="btn-primary flex-1 justify-center" style="background:var(--bg-input);color:var(--text-2);" onclick="document.getElementById(\'resetConfirmModal\').remove()">Cancelar</button>' +
+        '<button class="btn-primary flex-1 justify-center" style="background:var(--error);" onclick="confirmResetAll()">Apagar Tudo</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function confirmResetAll() {
+  // Clear storage
+  store.remove('apiKey');
+  store.remove('model');
+  store.remove('studentName');
+  store.remove('grade');
+  store.remove('calcGrades');
+  store.remove('calcConfig');
+
+  // Reset state
+  state.apiKey = '';
+  state.model = 'GPT-5.2';
+  state.studentName = '';
+  state.grade = null;
+  state.chatHistories = {};
+  state.calc = { units: 4, minAvg: 7, grades: {} };
+
+  // Close modals
+  var m1 = document.getElementById('resetConfirmModal');
+  var m2 = document.getElementById('settingsModal');
+  if (m1) m1.remove();
+  if (m2) m2.remove();
+
+  // Go back to API key screen
+  hide('mainScreen');
+  hide('helpFab');
+  show('apiKeyScreen');
+  $('apiKeyInput').value = '';
+  $('modelSelect').value = 'GPT-5.2';
+
+  showToast('Todos os dados foram apagados', 'info');
 }
 
 // ===== API FUNCTIONS =====
 async function callAPI(messages, onChunk, onDone, onError) {
-  const body = {
+  var body = {
     model: state.model,
     messages: messages,
     stream: !!onChunk,
@@ -821,7 +1234,7 @@ async function callAPI(messages, onChunk, onDone, onError) {
   };
 
   try {
-    const response = await fetch('https://api.poe.com/v1/chat/completions', {
+    var response = await fetch('https://api.poe.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -831,52 +1244,50 @@ async function callAPI(messages, onChunk, onDone, onError) {
     });
 
     if (!response.ok) {
-      const errText = await response.text().catch(() => '');
+      await response.text().catch(function() { return ''; });
       if (response.status === 401 || response.status === 403) {
         throw new Error('Chave API inválida ou sem permissão.');
       }
-      throw new Error('Erro da API: ' + response.status + ' ' + errText);
+      throw new Error('Erro da API: ' + response.status);
     }
 
     if (onChunk) {
-      // Streaming
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let fullContent = '';
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder();
+      var buffer = '';
+      var fullContent = '';
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
+        var result = await reader.read();
+        if (result.done) break;
+        buffer += decoder.decode(result.value, { stream: true });
+        var lines = buffer.split('\n');
         buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('data: ')) {
-            const data = trimmed.slice(6);
+        for (var li = 0; li < lines.length; li++) {
+          var trimmed = lines[li].trim();
+          if (trimmed.indexOf('data: ') === 0) {
+            var data = trimmed.slice(6);
             if (data === '[DONE]') {
               if (onDone) onDone(fullContent);
               return fullContent;
             }
             try {
-              const json = JSON.parse(data);
-              const delta = json.choices && json.choices[0] && json.choices[0].delta;
+              var json = JSON.parse(data);
+              var delta = json.choices && json.choices[0] && json.choices[0].delta;
               if (delta && delta.content) {
                 fullContent += delta.content;
                 onChunk(fullContent);
               }
-            } catch (_e) { /* skip non-json lines */ }
+            } catch (_e) { /* skip */ }
           }
         }
       }
       if (onDone) onDone(fullContent);
       return fullContent;
     } else {
-      // Non-streaming
-      const data = await response.json();
-      const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      var respData = await response.json();
+      var content = respData.choices && respData.choices[0] && respData.choices[0].message && respData.choices[0].message.content;
       if (onDone) onDone(content || '');
       return content || '';
     }
@@ -889,14 +1300,11 @@ async function callAPI(messages, onChunk, onDone, onError) {
 
 // ===== API KEY VALIDATION =====
 async function validateApiKey() {
-  const key = $('apiKeyInput').value.trim();
-  if (!key) {
-    showToast('Digite sua chave API');
-    return;
-  }
+  var key = $('apiKeyInput').value.trim();
+  if (!key) { showToast('Digite sua chave API'); return; }
 
-  const btn = $('apiKeySubmit');
-  const originalHTML = btn.innerHTML;
+  var btn = $('apiKeySubmit');
+  var originalHTML = btn.innerHTML;
   btn.innerHTML = '<div class="spinner"></div> Verificando...';
   btn.disabled = true;
 
@@ -904,26 +1312,20 @@ async function validateApiKey() {
   state.model = $('modelSelect').value;
 
   try {
-    const response = await fetch('https://api.poe.com/v1/chat/completions', {
+    var response = await fetch('https://api.poe.com/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + key
-      },
-      body: JSON.stringify({
-        model: state.model,
-        messages: [{ role: 'user', content: 'Diga apenas: OK' }],
-        stream: false
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: state.model, messages: [{ role: 'user', content: 'Diga apenas: OK' }], stream: false })
     });
-
-    if (!response.ok) {
-      throw new Error('Chave inválida');
-    }
-
+    if (!response.ok) throw new Error('Chave inválida');
     await response.json();
+
+    // Save to storage
+    store.set('apiKey', key);
+    store.set('model', state.model);
+
     showToast('Chave válida! ✅', 'success');
-    setTimeout(() => {
+    setTimeout(function() {
       hide('apiKeyScreen');
       show('setupScreen');
     }, 500);
@@ -938,15 +1340,15 @@ async function validateApiKey() {
 
 // ===== SETUP =====
 function initSetup() {
-  const f1 = $('gradeGridF1');
-  const f2 = $('gradeGridF2');
-  const em = $('gradeGridEM');
+  var f1 = $('gradeGridF1');
+  var f2 = $('gradeGridF2');
+  var em = $('gradeGridEM');
 
-  GRADES.forEach(g => {
-    const btn = document.createElement('button');
+  GRADES.forEach(function(g) {
+    var btn = document.createElement('button');
     btn.className = 'grade-btn';
     btn.textContent = g.label;
-    btn.onclick = () => selectGrade(g, btn);
+    btn.onclick = function() { selectGrade(g, btn); };
     if (g.level === 'f1') f1.appendChild(btn);
     else if (g.level === 'f2') f2.appendChild(btn);
     else em.appendChild(btn);
@@ -954,26 +1356,25 @@ function initSetup() {
 }
 
 function selectGrade(grade, btn) {
-  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   state.grade = grade;
 }
 
 function completeSetup() {
-  const name = $('nameInput').value.trim();
-  if (!name) {
-    showToast('Digite seu nome');
-    return;
-  }
-  if (!state.grade) {
-    showToast('Selecione sua série');
-    return;
-  }
+  var name = $('nameInput').value.trim();
+  if (!name) { showToast('Digite seu nome'); return; }
+  if (!state.grade) { showToast('Selecione sua série'); return; }
 
   state.studentName = name;
+  store.set('studentName', name);
+  store.set('grade', state.grade);
+
   hide('setupScreen');
   show('mainScreen');
+  show('helpFab');
   initDashboard();
+  initCalcGrades();
 }
 
 // ===== DASHBOARD =====
@@ -982,16 +1383,16 @@ function initDashboard() {
   $('headerGrade').textContent = state.grade.label;
   $('welcomeMsg').textContent = 'Olá, ' + state.studentName + '! 👋';
 
-  const grid = $('subjectGrid');
+  var grid = $('subjectGrid');
   grid.innerHTML = '';
-  const subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
 
-  subjects.forEach((name, i) => {
-    const info = SUBJECTS[name];
-    const card = document.createElement('div');
+  subjects.forEach(function(name, i) {
+    var info = SUBJECTS[name];
+    var card = document.createElement('div');
     card.className = 'subject-card anim-fade-up';
     card.style.setProperty('--card-accent', info.color);
-    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.animationDelay = (i * 0.06 + 0.12) + 's';
     card.style.opacity = '0';
     card.innerHTML =
       '<div class="flex items-center gap-3 mb-3">' +
@@ -1008,15 +1409,17 @@ function initDashboard() {
         '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'quiz\')">' +
           '<i class="fas fa-gamepad"></i> Quiz</button>' +
       '</div>';
-    card.onclick = () => openSubject(name, 'chat');
+    card.onclick = function() { openSubject(name, 'chat'); };
     grid.appendChild(card);
   });
+
+  updateCalcCardSummary();
 }
 
 // ===== SUBJECT VIEW =====
 function openSubject(name, mode) {
   state.currentSubject = name;
-  const info = SUBJECTS[name];
+  var info = SUBJECTS[name];
 
   $('subjectIcon').style.background = info.color;
   $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
@@ -1025,6 +1428,7 @@ function openSubject(name, mode) {
   $('headerTitle').textContent = name;
   show('backBtn');
   hide('dashboardView');
+  hide('calcView');
   show('subjectView');
   state.currentView = 'subject';
 
@@ -1035,29 +1439,27 @@ function openSubject(name, mode) {
 function goBack() {
   if (state.isStreaming) return;
   hide('subjectView');
+  hide('calcView');
   show('dashboardView');
   hide('backBtn');
   $('headerTitle').textContent = 'EstudAI';
   state.currentView = 'dashboard';
   state.currentSubject = null;
+  updateCalcCardSummary();
 }
 
 function switchTab(tab) {
   state.currentTab = tab;
-  const tabs = $('tabBar').querySelectorAll('.tab-btn');
-  tabs.forEach(t => t.classList.remove('active'));
-  tabs.forEach(t => {
-    if ((tab === 'chat' && t.textContent.includes('Chat')) ||
-        (tab === 'activity' && t.textContent.includes('Atividade')) ||
-        (tab === 'quiz' && t.textContent.includes('Quiz'))) {
+  var tabs = $('tabBar').querySelectorAll('.tab-btn');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs.forEach(function(t) {
+    if ((tab === 'chat' && t.textContent.indexOf('Chat') !== -1) ||
+        (tab === 'activity' && t.textContent.indexOf('Atividade') !== -1) ||
+        (tab === 'quiz' && t.textContent.indexOf('Quiz') !== -1)) {
       t.classList.add('active');
     }
   });
-
-  hide('chatContent');
-  hide('activityContent');
-  hide('quizContent');
-
+  hide('chatContent'); hide('activityContent'); hide('quizContent');
   if (tab === 'chat') show('chatContent');
   else if (tab === 'activity') show('activityContent');
   else if (tab === 'quiz') show('quizContent');
@@ -1070,9 +1472,8 @@ function getGradeLabel() {
 }
 
 function getSystemPrompt(mode) {
-  const grade = getGradeLabel();
-  const subject = state.currentSubject;
-
+  var grade = getGradeLabel();
+  var subject = state.currentSubject;
   if (mode === 'chat') {
     return 'Você é um tutor educacional amigável e paciente para alunos do ' + grade +
       ' no Brasil. Responda dúvidas sobre ' + subject +
@@ -1099,14 +1500,10 @@ function getChatKey() {
 }
 
 function loadChatHistory() {
-  const key = getChatKey();
-  if (!state.chatHistories[key]) {
-    state.chatHistories[key] = [];
-  }
-
-  const container = $('chatMessages');
+  var key = getChatKey();
+  if (!state.chatHistories[key]) state.chatHistories[key] = [];
+  var container = $('chatMessages');
   container.innerHTML = '';
-
   if (state.chatHistories[key].length === 0) {
     container.innerHTML =
       '<div class="text-center py-8 anim-fade-in">' +
@@ -1118,37 +1515,26 @@ function loadChatHistory() {
       '</div>';
     return;
   }
-
-  state.chatHistories[key].forEach(msg => {
-    addChatBubble(msg.role, msg.content, false);
-  });
+  state.chatHistories[key].forEach(function(msg) { addChatBubble(msg.role, msg.content, false); });
   scrollChatToBottom();
 }
 
 function addChatBubble(role, content, animate) {
-  const container = $('chatMessages');
-  // Remove empty state
-  const emptyState = container.querySelector('.text-center');
+  var container = $('chatMessages');
+  var emptyState = container.querySelector('.text-center');
   if (emptyState) emptyState.remove();
-
-  const bubble = document.createElement('div');
+  var bubble = document.createElement('div');
   bubble.className = 'chat-bubble ' + (role === 'user' ? 'user' : 'bot');
   if (!animate) bubble.style.animation = 'none';
-
-  if (role === 'user') {
-    bubble.textContent = content;
-  } else {
-    bubble.classList.add('md-content');
-    bubble.innerHTML = marked.parse(content);
-  }
-
+  if (role === 'user') { bubble.textContent = content; }
+  else { bubble.classList.add('md-content'); bubble.innerHTML = marked.parse(content); }
   container.appendChild(bubble);
   return bubble;
 }
 
 function addTypingIndicator() {
-  const container = $('chatMessages');
-  const typing = document.createElement('div');
+  var container = $('chatMessages');
+  var typing = document.createElement('div');
   typing.className = 'chat-bubble bot typing-indicator';
   typing.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
   container.appendChild(typing);
@@ -1157,71 +1543,47 @@ function addTypingIndicator() {
 }
 
 function scrollChatToBottom() {
-  const container = $('chatMessages');
+  var container = $('chatMessages');
   container.scrollTop = container.scrollHeight;
 }
 
 async function sendChatMessage() {
-  const input = $('chatInput');
-  const text = input.value.trim();
+  var input = $('chatInput');
+  var text = input.value.trim();
   if (!text || state.isStreaming) return;
-
   input.value = '';
   state.isStreaming = true;
   $('chatSendBtn').disabled = true;
-
-  const key = getChatKey();
+  var key = getChatKey();
   state.chatHistories[key].push({ role: 'user', content: text });
   addChatBubble('user', text, true);
   scrollChatToBottom();
-
-  const typing = addTypingIndicator();
-
-  // Build messages for API
-  const apiMessages = [
-    { role: 'system', content: getSystemPrompt('chat') }
-  ];
-  // Include last 10 messages for context
-  const history = state.chatHistories[key].slice(-10);
-  history.forEach(m => {
-    apiMessages.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content });
-  });
-
-  let responseBubble = null;
-
-  await callAPI(
-    apiMessages,
-    // onChunk
-    (fullContent) => {
+  var typing = addTypingIndicator();
+  var apiMessages = [{ role: 'system', content: getSystemPrompt('chat') }];
+  var history = state.chatHistories[key].slice(-10);
+  history.forEach(function(m) { apiMessages.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content }); });
+  var responseBubble = null;
+  await callAPI(apiMessages,
+    function(fullContent) {
       if (typing.parentNode) typing.remove();
-      if (!responseBubble) {
-        responseBubble = addChatBubble('assistant', fullContent, true);
-      } else {
-        responseBubble.innerHTML = marked.parse(fullContent);
-      }
+      if (!responseBubble) { responseBubble = addChatBubble('assistant', fullContent, true); }
+      else { responseBubble.innerHTML = marked.parse(fullContent); }
       scrollChatToBottom();
     },
-    // onDone
-    (fullContent) => {
+    function(fullContent) {
       if (typing.parentNode) typing.remove();
-      if (!responseBubble) {
-        responseBubble = addChatBubble('assistant', fullContent || 'Desculpe, não consegui gerar uma resposta.', true);
-      } else {
-        responseBubble.innerHTML = marked.parse(fullContent || 'Desculpe, não consegui gerar uma resposta.');
-      }
-      if (fullContent) {
-        state.chatHistories[key].push({ role: 'assistant', content: fullContent });
-      }
+      var c = fullContent || 'Desculpe, não consegui gerar uma resposta.';
+      if (!responseBubble) { responseBubble = addChatBubble('assistant', c, true); }
+      else { responseBubble.innerHTML = marked.parse(c); }
+      if (fullContent) state.chatHistories[key].push({ role: 'assistant', content: fullContent });
       scrollChatToBottom();
     },
-    // onError
-    (error) => {
+    function(error) {
       if (typing.parentNode) typing.remove();
       addChatBubble('assistant', '❌ Erro: ' + error, true);
       scrollChatToBottom();
     }
   );
-
   state.isStreaming = false;
   $('chatSendBtn').disabled = false;
   $('chatInput').focus();
@@ -1229,41 +1591,26 @@ async function sendChatMessage() {
 
 // ===== ACTIVITY FUNCTIONS =====
 async function sendActivity() {
-  const input = $('activityInput');
-  const text = input.value.trim();
+  var input = $('activityInput');
+  var text = input.value.trim();
   if (!text || state.isStreaming) return;
-
   state.isStreaming = true;
-  const btn = $('activitySendBtn');
-  const originalHTML = btn.innerHTML;
+  var btn = $('activitySendBtn');
+  var originalHTML = btn.innerHTML;
   btn.innerHTML = '<div class="spinner"></div> Analisando...';
   btn.disabled = true;
-
-  const responseDiv = $('activityResponse');
+  var responseDiv = $('activityResponse');
   show(responseDiv);
   responseDiv.innerHTML = '<div class="typing-dots" style="padding:8px 0;"><span></span><span></span><span></span></div>';
-
-  const apiMessages = [
+  var apiMessages = [
     { role: 'system', content: getSystemPrompt('activity') },
     { role: 'user', content: text }
   ];
-
-  await callAPI(
-    apiMessages,
-    // onChunk
-    (fullContent) => {
-      responseDiv.innerHTML = marked.parse(fullContent);
-    },
-    // onDone
-    (fullContent) => {
-      responseDiv.innerHTML = marked.parse(fullContent || 'Desculpe, não consegui analisar a atividade.');
-    },
-    // onError
-    (error) => {
-      responseDiv.innerHTML = '<p style="color:var(--error);">❌ Erro: ' + error + '</p>';
-    }
+  await callAPI(apiMessages,
+    function(fullContent) { responseDiv.innerHTML = marked.parse(fullContent); },
+    function(fullContent) { responseDiv.innerHTML = marked.parse(fullContent || 'Desculpe, não consegui analisar a atividade.'); },
+    function(error) { responseDiv.innerHTML = '<p style="color:var(--error);">❌ Erro: ' + error + '</p>'; }
   );
-
   btn.innerHTML = originalHTML;
   btn.disabled = false;
   state.isStreaming = false;
@@ -1272,130 +1619,81 @@ async function sendActivity() {
 // ===== QUIZ FUNCTIONS =====
 async function startQuiz() {
   state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false };
-
-  hide('quizStart');
-  hide('quizActive');
-  hide('quizResults');
-  show('quizLoading');
-
-  const apiMessages = [
+  hide('quizStart'); hide('quizActive'); hide('quizResults'); show('quizLoading');
+  var apiMessages = [
     { role: 'system', content: getSystemPrompt('quiz') },
     { role: 'user', content: 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.' }
   ];
-
-  const result = await callAPI(apiMessages, null, null, (error) => {
+  var result = await callAPI(apiMessages, null, null, function(error) {
     showToast('Erro ao gerar quiz: ' + error);
-    hide('quizLoading');
-    show('quizStart');
+    hide('quizLoading'); show('quizStart');
   });
-
   if (!result) return;
-
-  const parsed = parseQuizJSON(result);
+  var parsed = parseQuizJSON(result);
   if (!parsed || !parsed.questions || parsed.questions.length === 0) {
     showToast('Erro ao processar quiz. Tente novamente.');
-    hide('quizLoading');
-    show('quizStart');
+    hide('quizLoading'); show('quizStart');
     return;
   }
-
   state.quiz.questions = parsed.questions.slice(0, 5);
-  hide('quizLoading');
-  show('quizActive');
+  hide('quizLoading'); show('quizActive');
   showQuestion();
 }
 
 function parseQuizJSON(text) {
-  // Try direct parse
-  try {
-    return JSON.parse(text);
-  } catch (_e) { /* fallthrough */ }
-
-  // Try extracting JSON object
-  const match = text.match(/\{[\s\S]*\}/);
-  if (match) {
-    try {
-      return JSON.parse(match[0]);
-    } catch (_e) { /* fallthrough */ }
-  }
-
+  try { return JSON.parse(text); } catch (_e) { /* fallthrough */ }
+  var match = text.match(/\{[\s\S]*\}/);
+  if (match) { try { return JSON.parse(match[0]); } catch (_e) { /* fallthrough */ } }
   return null;
 }
 
 function showQuestion() {
-  const q = state.quiz.questions[state.quiz.currentIndex];
+  var q = state.quiz.questions[state.quiz.currentIndex];
   if (!q) return;
-
   state.quiz.answered = false;
-
   $('quizProgress').textContent = (state.quiz.currentIndex + 1);
   $('quizScore').textContent = state.quiz.score;
   $('quizProgressBar').style.width = ((state.quiz.currentIndex + 1) / state.quiz.questions.length * 100) + '%';
-
-  if (state.quiz.streak > 1) {
-    show('quizStreak');
-    $('streakCount').textContent = state.quiz.streak;
-  } else {
-    hide('quizStreak');
-  }
-
+  if (state.quiz.streak > 1) { show('quizStreak'); $('streakCount').textContent = state.quiz.streak; }
+  else { hide('quizStreak'); }
   $('quizQuestion').textContent = q.question;
-
-  const optionsDiv = $('quizOptions');
+  var optionsDiv = $('quizOptions');
   optionsDiv.innerHTML = '';
-
-  q.options.forEach((opt, i) => {
-    const btn = document.createElement('button');
+  q.options.forEach(function(opt, i) {
+    var btn = document.createElement('button');
     btn.className = 'quiz-option anim-fade-up';
     btn.style.animationDelay = (i * 0.08) + 's';
     btn.style.opacity = '0';
     btn.textContent = opt;
-    btn.onclick = () => selectAnswer(i);
+    btn.onclick = function() { selectAnswer(i); };
     optionsDiv.appendChild(btn);
   });
-
-  hide('quizExplanation');
-  hide('quizNextBtn');
+  hide('quizExplanation'); hide('quizNextBtn');
 }
 
 function selectAnswer(index) {
   if (state.quiz.answered) return;
   state.quiz.answered = true;
-
-  const q = state.quiz.questions[state.quiz.currentIndex];
-  const correct = q.correct;
-  const options = $('quizOptions').querySelectorAll('.quiz-option');
-
-  options.forEach((btn, i) => {
+  var q = state.quiz.questions[state.quiz.currentIndex];
+  var correct = q.correct;
+  var options = $('quizOptions').querySelectorAll('.quiz-option');
+  options.forEach(function(btn, i) {
     btn.classList.add('disabled');
     if (i === correct) btn.classList.add('correct');
     if (i === index && i !== correct) btn.classList.add('wrong');
   });
-
   if (index === correct) {
     state.quiz.streak++;
     if (state.quiz.streak > state.quiz.maxStreak) state.quiz.maxStreak = state.quiz.streak;
-    const streakBonus = state.quiz.streak > 1 ? 5 : 0;
+    var streakBonus = state.quiz.streak > 1 ? 5 : 0;
     state.quiz.score += 10 + streakBonus;
     showToast('+' + (10 + streakBonus) + ' pontos! 🎉', 'success');
-  } else {
-    state.quiz.streak = 0;
-  }
-
+  } else { state.quiz.streak = 0; }
   $('quizScore').textContent = state.quiz.score;
-  if (state.quiz.streak > 1) {
-    show('quizStreak');
-    $('streakCount').textContent = state.quiz.streak;
-  } else {
-    hide('quizStreak');
-  }
-
-  // Show explanation
+  if (state.quiz.streak > 1) { show('quizStreak'); $('streakCount').textContent = state.quiz.streak; }
+  else { hide('quizStreak'); }
   $('quizExplanationText').textContent = q.explanation;
-  show('quizExplanation');
-  show('quizNextBtn');
-
-  // Change button text on last question
+  show('quizExplanation'); show('quizNextBtn');
   if (state.quiz.currentIndex >= state.quiz.questions.length - 1) {
     $('quizNextBtn').innerHTML = 'Ver Resultado <i class="fas fa-trophy ml-1"></i>';
   }
@@ -1403,54 +1701,38 @@ function selectAnswer(index) {
 
 function nextQuestion() {
   state.quiz.currentIndex++;
-  if (state.quiz.currentIndex >= state.quiz.questions.length) {
-    showQuizResults();
-  } else {
-    showQuestion();
-  }
+  if (state.quiz.currentIndex >= state.quiz.questions.length) showQuizResults();
+  else showQuestion();
 }
 
 function showQuizResults() {
-  hide('quizActive');
-  show('quizResults');
-
-  const total = state.quiz.questions.length;
-  const maxScore = total * 10 + (total - 1) * 5; // max possible with streaks
-  const pct = Math.round((state.quiz.score / (total * 15)) * 100);
-  const correctCount = Math.floor(state.quiz.score / 10); // approximate
-
+  hide('quizActive'); show('quizResults');
+  var total = state.quiz.questions.length;
+  var pct = Math.round((state.quiz.score / (total * 15)) * 100);
   $('resultsScore').textContent = state.quiz.score + ' pontos';
-
-  let icon, title, msg;
+  var icon, title, msg;
   if (pct >= 80) {
     icon = '<i class="fas fa-trophy text-4xl" style="color:var(--accent-3)"></i>';
-    title = 'Incrível! 🏆';
-    msg = 'Você mandou muito bem! Continue assim!';
+    title = 'Incrível! 🏆'; msg = 'Você mandou muito bem! Continue assim!';
     spawnConfetti();
   } else if (pct >= 50) {
     icon = '<i class="fas fa-star text-4xl" style="color:var(--accent-1)"></i>';
-    title = 'Muito Bom! ⭐';
-    msg = 'Está no caminho certo! Continue praticando!';
+    title = 'Muito Bom! ⭐'; msg = 'Está no caminho certo! Continue praticando!';
   } else {
     icon = '<i class="fas fa-book-open text-4xl" style="color:var(--accent-4)"></i>';
-    title = 'Continue Estudando! 📚';
-    msg = 'Não desista! Cada erro é uma oportunidade de aprender!';
+    title = 'Continue Estudando! 📚'; msg = 'Não desista! Cada erro é uma oportunidade de aprender!';
   }
-
   $('resultsIcon').innerHTML = icon;
   $('resultsIcon').style.background = 'var(--bg-input)';
   $('resultsTitle').textContent = title;
   $('resultsMsg').textContent = msg;
-
-  if (state.quiz.maxStreak > 1) {
-    $('resultsMsg').textContent += ' Melhor sequência: 🔥' + state.quiz.maxStreak;
-  }
+  if (state.quiz.maxStreak > 1) $('resultsMsg').textContent += ' Melhor sequência: 🔥' + state.quiz.maxStreak;
 }
 
 function spawnConfetti() {
-  const colors = ['#6C5CE7', '#FF6B6B', '#FECA57', '#00D2D3', '#A78BFA', '#FF9FF3', '#54A0FF'];
-  for (let i = 0; i < 40; i++) {
-    const piece = document.createElement('div');
+  var colors = ['#6C5CE7', '#FF6B6B', '#FECA57', '#00D2D3', '#A78BFA', '#FF9FF3', '#54A0FF'];
+  for (var i = 0; i < 40; i++) {
+    var piece = document.createElement('div');
     piece.className = 'confetti-piece';
     piece.style.left = Math.random() * 100 + 'vw';
     piece.style.background = colors[Math.floor(Math.random() * colors.length)];
@@ -1460,8 +1742,314 @@ function spawnConfetti() {
     piece.style.width = (6 + Math.random() * 8) + 'px';
     piece.style.height = (6 + Math.random() * 8) + 'px';
     document.body.appendChild(piece);
-    setTimeout(() => piece.remove(), 4000);
+    (function(p) { setTimeout(function() { p.remove(); }, 4000); })(piece);
   }
+}
+
+// ===== CALCULATOR FUNCTIONS =====
+function initCalcGrades() {
+  if (!state.grade) return;
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var saved = store.get('calcGrades', {});
+  var savedConfig = store.get('calcConfig', null);
+
+  if (savedConfig) {
+    state.calc.units = savedConfig.units || 4;
+    state.calc.minAvg = savedConfig.minAvg || 7;
+  }
+
+  subjects.forEach(function(name) {
+    if (saved[name] && saved[name].length) {
+      state.calc.grades[name] = saved[name].slice(0, state.calc.units);
+      while (state.calc.grades[name].length < state.calc.units) state.calc.grades[name].push(null);
+    } else {
+      state.calc.grades[name] = [];
+      for (var i = 0; i < state.calc.units; i++) state.calc.grades[name].push(null);
+    }
+  });
+
+  $('calcUnits').value = state.calc.units;
+  $('calcMinAvg').value = state.calc.minAvg;
+}
+
+function openCalcView() {
+  state.currentView = 'calc';
+  $('headerTitle').textContent = 'Calculadora de Média';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  show('calcView');
+  renderCalcSubjects();
+  updateCalcSummary();
+}
+
+function onCalcConfigChange() {
+  var newUnits = parseInt($('calcUnits').value) || 4;
+  var newMinAvg = parseFloat($('calcMinAvg').value);
+  if (isNaN(newMinAvg) || newMinAvg < 0) newMinAvg = 0;
+  if (newMinAvg > 10) newMinAvg = 10;
+
+  var oldUnits = state.calc.units;
+  state.calc.units = newUnits;
+  state.calc.minAvg = newMinAvg;
+
+  // Adjust grade arrays
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  subjects.forEach(function(name) {
+    var arr = state.calc.grades[name] || [];
+    if (newUnits > oldUnits) {
+      while (arr.length < newUnits) arr.push(null);
+    } else if (newUnits < oldUnits) {
+      arr = arr.slice(0, newUnits);
+    }
+    state.calc.grades[name] = arr;
+  });
+
+  saveCalcData();
+  renderCalcSubjects();
+  updateCalcSummary();
+}
+
+function renderCalcSubjects() {
+  var container = $('calcSubjects');
+  container.innerHTML = '';
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
+
+  subjects.forEach(function(name, si) {
+    var info = SUBJECTS[name];
+    var grades = state.calc.grades[name] || [];
+    var calcResult = calcSubjectStatus(grades);
+
+    var row = document.createElement('div');
+    row.className = 'calc-subject-row anim-fade-up';
+    row.style.animationDelay = (si * 0.04) + 's';
+    row.style.opacity = '0';
+
+    // Header with subject name + status badge
+    var headerHTML =
+      '<div class="flex items-center gap-2 mb-3">' +
+        '<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm" style="background:' + info.color + '">' +
+          '<i class="fas ' + info.icon + '"></i>' +
+        '</div>' +
+        '<span class="font-heading font-bold text-sm flex-1">' + name + '</span>' +
+        '<span class="status-badge ' + calcResult.badgeClass + '">' + calcResult.badgeIcon + ' ' + calcResult.badgeText + '</span>' +
+      '</div>';
+
+    // Grade inputs row
+    var inputsHTML = '<div class="grid gap-2 mb-2" style="grid-template-columns: repeat(' + state.calc.units + ', 1fr);">';
+    for (var u = 0; u < state.calc.units; u++) {
+      var val = grades[u] !== null && grades[u] !== undefined ? grades[u] : '';
+      inputsHTML +=
+        '<div class="text-center">' +
+          '<label class="block text-xs font-bold mb-1" style="color:var(--text-3);">Unid. ' + (u + 1) + '</label>' +
+          '<input type="number" min="0" max="10" step="0.1" class="calc-grade-input" placeholder="—" value="' + val + '" ' +
+            'data-subject="' + name + '" data-unit="' + u + '" onchange="onGradeInput(this)" oninput="onGradeInput(this)">' +
+        '</div>';
+    }
+    inputsHTML += '</div>';
+
+    // Info line
+    var infoHTML = '<div class="flex justify-between items-center text-xs font-bold" style="color:var(--text-2);">';
+    if (calcResult.filledCount > 0) {
+      infoHTML += '<span>Média atual: <span style="color:var(--accent-1);">' + calcResult.currentAvg.toFixed(1) + '</span></span>';
+      if (calcResult.remaining > 0) {
+        if (calcResult.needed <= 0) {
+          infoHTML += '<span style="color:var(--success);">Já aprovado! ✅</span>';
+        } else if (calcResult.needed <= 10) {
+          infoHTML += '<span>Precisa tirar: <span style="color:' + (calcResult.needed > 8 ? 'var(--error)' : calcResult.needed > 6 ? 'var(--accent-3)' : 'var(--success)') + ';">' + calcResult.needed.toFixed(1) + '</span> nas próximas ' + calcResult.remaining + ' unid.</span>';
+        } else {
+          infoHTML += '<span style="color:var(--error);">Impossível alcançar a média ❌</span>';
+        }
+      } else {
+        if (calcResult.currentAvg >= state.calc.minAvg) {
+          infoHTML += '<span style="color:var(--success);">Aprovado! ✅</span>';
+        } else {
+          infoHTML += '<span style="color:var(--error);">Reprovado ❌</span>';
+        }
+      }
+    } else {
+      infoHTML += '<span>Insira suas notas acima</span><span>Meta: ' + state.calc.minAvg.toFixed(1) + '</span>';
+    }
+    infoHTML += '</div>';
+
+    row.innerHTML = headerHTML + inputsHTML + infoHTML;
+    container.appendChild(row);
+  });
+}
+
+function calcSubjectStatus(grades) {
+  var filled = [];
+  var filledCount = 0;
+  grades.forEach(function(g) {
+    if (g !== null && g !== undefined && g !== '') {
+      filled.push(parseFloat(g));
+      filledCount++;
+    }
+  });
+
+  var total = state.calc.units;
+  var remaining = total - filledCount;
+  var sum = 0;
+  filled.forEach(function(v) { sum += v; });
+  var currentAvg = filledCount > 0 ? sum / filledCount : 0;
+  var needed = remaining > 0 ? (state.calc.minAvg * total - sum) / remaining : 0;
+
+  var badgeClass = 'status-none';
+  var badgeText = 'Sem notas';
+  var badgeIcon = '📝';
+
+  if (filledCount > 0) {
+    if (remaining === 0) {
+      if (currentAvg >= state.calc.minAvg) {
+        badgeClass = 'status-approved'; badgeText = 'Aprovado'; badgeIcon = '✅';
+      } else {
+        badgeClass = 'status-danger'; badgeText = 'Reprovado'; badgeIcon = '❌';
+      }
+    } else if (needed <= 0) {
+      badgeClass = 'status-approved'; badgeText = 'Aprovado'; badgeIcon = '✅';
+    } else if (needed <= 7) {
+      badgeClass = 'status-ontrack'; badgeText = 'No caminho'; badgeIcon = '📘';
+    } else if (needed <= 10) {
+      badgeClass = 'status-warning'; badgeText = 'Atenção'; badgeIcon = '⚠️';
+    } else {
+      badgeClass = 'status-danger'; badgeText = 'Impossível'; badgeIcon = '❌';
+    }
+  }
+
+  return {
+    filledCount: filledCount,
+    remaining: remaining,
+    currentAvg: currentAvg,
+    sum: sum,
+    needed: needed,
+    badgeClass: badgeClass,
+    badgeText: badgeText,
+    badgeIcon: badgeIcon
+  };
+}
+
+function onGradeInput(input) {
+  var subjectName = input.getAttribute('data-subject');
+  var unitIndex = parseInt(input.getAttribute('data-unit'));
+  var val = input.value.trim();
+
+  if (val === '') {
+    state.calc.grades[subjectName][unitIndex] = null;
+  } else {
+    var num = parseFloat(val);
+    if (num < 0) num = 0;
+    if (num > 10) num = 10;
+    state.calc.grades[subjectName][unitIndex] = num;
+  }
+
+  saveCalcData();
+  renderCalcSubjects();
+  updateCalcSummary();
+}
+
+function updateCalcSummary() {
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var approved = 0;
+  var atRisk = 0;
+  var impossible = 0;
+  var hasData = false;
+
+  subjects.forEach(function(name) {
+    var grades = state.calc.grades[name] || [];
+    var result = calcSubjectStatus(grades);
+    if (result.filledCount > 0) hasData = true;
+    if (result.badgeText === 'Aprovado') approved++;
+    else if (result.badgeText === 'Atenção') atRisk++;
+    else if (result.badgeText === 'Impossível' || result.badgeText === 'Reprovado') impossible++;
+  });
+
+  var total = subjects.length;
+  var pct = hasData ? Math.round((approved / total) * 100) : 0;
+
+  // Update ring
+  var circumference = 2 * Math.PI * 34; // r=34
+  var offset = circumference - (pct / 100) * circumference;
+  var ringCircle = $('calcRingCircle');
+  ringCircle.setAttribute('stroke-dashoffset', offset);
+
+  if (pct >= 70) ringCircle.setAttribute('stroke', 'var(--success)');
+  else if (pct >= 40) ringCircle.setAttribute('stroke', 'var(--accent-3)');
+  else if (hasData) ringCircle.setAttribute('stroke', 'var(--error)');
+  else ringCircle.setAttribute('stroke', 'var(--accent-1)');
+
+  $('calcRingPct').textContent = pct + '%';
+
+  if (hasData) {
+    $('calcSummaryTitle').textContent = approved + ' de ' + total + ' matérias aprovadas';
+    var parts = [];
+    if (atRisk > 0) parts.push('⚠️ ' + atRisk + ' precisam de atenção');
+    if (impossible > 0) parts.push('❌ ' + impossible + ' em situação crítica');
+    if (parts.length === 0 && approved === total) parts.push('🎉 Parabéns! Tudo em dia!');
+    if (parts.length === 0) parts.push('Continue inserindo suas notas');
+    $('calcSummaryText').textContent = parts.join('  •  ');
+  } else {
+    $('calcSummaryTitle').textContent = 'Resumo das Notas';
+    $('calcSummaryText').textContent = 'Insira suas notas abaixo para ver o resumo';
+  }
+}
+
+function updateCalcCardSummary() {
+  if (!state.grade) return;
+  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var approved = 0;
+  var hasData = false;
+  subjects.forEach(function(name) {
+    var grades = state.calc.grades[name] || [];
+    var result = calcSubjectStatus(grades);
+    if (result.filledCount > 0) hasData = true;
+    if (result.badgeText === 'Aprovado') approved++;
+  });
+  if (hasData) {
+    $('calcCardSummary').textContent = '✅ ' + approved + '/' + subjects.length + ' aprovadas — Toque para ver detalhes';
+  } else {
+    $('calcCardSummary').textContent = 'Acompanhe suas notas e veja quanto precisa tirar';
+  }
+}
+
+function saveCalcData() {
+  store.set('calcGrades', state.calc.grades);
+  store.set('calcConfig', { units: state.calc.units, minAvg: state.calc.minAvg });
+}
+
+// ===== RESTORE SESSION =====
+function tryRestoreSession() {
+  var savedKey = store.get('apiKey', '');
+  var savedModel = store.get('model', 'GPT-5.2');
+  var savedName = store.get('studentName', '');
+  var savedGrade = store.get('grade', null);
+
+  if (savedKey && savedName && savedGrade) {
+    state.apiKey = savedKey;
+    state.model = savedModel;
+    state.studentName = savedName;
+    state.grade = savedGrade;
+
+    // Update model select
+    $('modelSelect').value = savedModel;
+
+    hide('apiKeyScreen');
+    hide('setupScreen');
+    show('mainScreen');
+    show('helpFab');
+
+    initCalcGrades();
+    initDashboard();
+    showToast('Bem-vindo de volta, ' + savedName + '! 👋', 'success');
+    return true;
+  }
+
+  // Partial restore: key only
+  if (savedKey) {
+    $('apiKeyInput').value = savedKey;
+    $('modelSelect').value = savedModel;
+  }
+
+  return false;
 }
 
 // ===== ENTER KEY SUPPORT =====
@@ -1474,6 +2062,7 @@ $('nameInput').addEventListener('keydown', function(e) {
 
 // ===== INIT =====
 initSetup();
+tryRestoreSession();
 </script>
 </body>
 </html>
