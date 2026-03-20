@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EstudAI - Plataforma de Estudos</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        brand: ['Fredoka', 'sans-serif'],
+        heading: ['Sora', 'sans-serif'],
+        body: ['Nunito', 'sans-serif'],
+      }
+    }
+  }
+};
+</script>
+<style>
+:root {
+  --bg-main: #F5F0FF;
+  --bg-card: #FFFFFF;
+  --bg-input: #F0EBF8;
+  --text-1: #1a1040;
+  --text-2: #5c5680;
+  --text-3: #8a84a6;
+  --accent-1: #6C5CE7;
+  --accent-2: #FF6B6B;
+  --accent-3: #FECA57;
+  --accent-4: #00D2D3;
+  --border: #E0D8F0;
+  --shadow: 0 4px 24px rgba(108,92,231,0.08);
+  --chat-user: #6C5CE7;
+  --chat-bot: #F0EBF8;
+  --success: #00B894;
+  --error: #FF6B6B;
+}
+.dark {
+  --bg-main: #0D0B14;
+  --bg-card: #161225;
+  --bg-input: #1E1833;
+  --text-1: #EDE8FF;
+  --text-2: #A89EC8;
+  --text-3: #6E6590;
+  --accent-1: #A78BFA;
+  --accent-2: #FF8A80;
+  --accent-3: #FFD93D;
+  --accent-4: #64FFDA;
+  --border: #2A2340;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --chat-user: #7C3AED;
+  --chat-bot: #1E1833;
+  --success: #34D399;
+  --error: #FF6B6B;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-1);
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+input, textarea, select, button { font-family: 'Nunito', sans-serif; }
+input, textarea { font-size: 16px; }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ===== Animations ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(108,92,231,0.2); }
+  50% { box-shadow: 0 0 40px rgba(108,92,231,0.4); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+@keyframes typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+@keyframes bounce-in {
+  0% { transform: scale(0.8); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.anim-fade-up { animation: fadeUp 0.5s ease-out forwards; }
+.anim-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+.anim-slide-down { animation: slideDown 0.3s ease-out forwards; }
+.anim-bounce-in { animation: bounce-in 0.4s ease-out forwards; }
+.anim-shake { animation: shake 0.4s ease-out; }
+
+/* ===== Floating shapes (login bg) ===== */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+  animation: float 6s ease-in-out infinite;
+}
+.dark .floating-shape { opacity: 0.04; }
+
+/* ===== View transitions ===== */
+.view-hidden { display: none !important; }
+
+/* ===== Subject card ===== */
+.subject-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.subject-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--card-accent);
+}
+.subject-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(108,92,231,0.15);
+}
+.dark .subject-card:hover {
+  box-shadow: 0 8px 32px rgba(167,139,250,0.15);
+}
+
+/* ===== Mode buttons inside cards ===== */
+.mode-btn {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.mode-btn:hover {
+  background: var(--accent-1);
+  color: white;
+  border-color: var(--accent-1);
+}
+
+/* ===== Tabs ===== */
+.tab-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  background: transparent;
+  color: var(--text-3);
+}
+.tab-btn.active {
+  background: var(--accent-1);
+  color: white;
+  border-color: var(--accent-1);
+}
+.tab-btn:not(.active):hover {
+  background: var(--bg-input);
+  color: var(--text-1);
+}
+
+/* ===== Chat ===== */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  line-height: 1.6;
+  animation: fadeUp 0.3s ease-out;
+  word-break: break-word;
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--chat-user);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble.bot {
+  align-self: flex-start;
+  background: var(--chat-bot);
+  color: var(--text-1);
+  border-bottom-left-radius: 4px;
+}
+.typing-dots span {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--text-3);
+  animation: typing 1s infinite;
+  margin: 0 2px;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ===== Quiz ===== */
+.quiz-option {
+  padding: 14px 18px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  background: var(--bg-card);
+  text-align: left;
+  width: 100%;
+}
+.quiz-option:hover:not(.disabled) {
+  border-color: var(--accent-1);
+  background: var(--bg-input);
+}
+.quiz-option.correct {
+  border-color: var(--success);
+  background: rgba(0,184,148,0.1);
+  color: var(--success);
+}
+.quiz-option.wrong {
+  border-color: var(--error);
+  background: rgba(255,107,107,0.1);
+  color: var(--error);
+  animation: shake 0.4s;
+}
+.quiz-option.disabled { cursor: default; opacity: 0.7; }
+.quiz-option.disabled:hover { border-color: var(--border); background: var(--bg-card); }
+
+/* ===== Toast ===== */
+.toast-container {
+  position: fixed; top: 20px; right: 20px;
+  z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  transform: translateX(120%);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.toast.show { transform: translateX(0); }
+.toast.error { background: var(--error); color: white; }
+.toast.success { background: var(--success); color: white; }
+.toast.info { background: var(--accent-1); color: white; }
+
+/* ===== Markdown ===== */
+.md-content h1, .md-content h2, .md-content h3 { font-family: 'Sora', sans-serif; margin: 12px 0 6px; font-weight: 700; }
+.md-content h1 { font-size: 1.3em; }
+.md-content h2 { font-size: 1.15em; }
+.md-content h3 { font-size: 1.05em; }
+.md-content p { margin: 6px 0; }
+.md-content ul, .md-content ol { padding-left: 1.5em; margin: 6px 0; }
+.md-content li { margin: 3px 0; }
+.md-content code {
+  background: var(--bg-input);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.md-content pre {
+  background: var(--bg-input);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.md-content pre code { background: none; padding: 0; }
+.md-content blockquote {
+  border-left: 3px solid var(--accent-1);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--text-2);
+}
+.md-content strong { color: var(--accent-1); }
+.md-content table { border-collapse: collapse; width: 100%; margin: 8px 0; }
+.md-content th, .md-content td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+.md-content th { background: var(--bg-input); font-weight: 700; }
+
+/* ===== Confetti ===== */
+.confetti-piece {
+  position: fixed;
+  width: 10px; height: 10px;
+  z-index: 9999;
+  animation: confetti-fall 3s linear forwards;
+}
+
+/* ===== Grade button ===== */
+.grade-btn {
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-1);
+}
+.grade-btn:hover { border-color: var(--accent-1); background: var(--bg-input); }
+.grade-btn.selected { border-color: var(--accent-1); background: var(--accent-1); color: white; }
+
+/* ===== Primary button ===== */
+.btn-primary {
+  background: var(--accent-1);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ===== Gradient text ===== */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== Spinner ===== */
+.spinner {
+  width: 20px; height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Score bar ===== */
+.score-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-4));
+  transition: width 0.5s ease;
+}
+
+/* ===== Streak fire ===== */
+.streak-fire { color: var(--accent-2); font-size: 1.3em; }
+
+/* ===== Activity response area ===== */
+.activity-response {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 100px;
+  box-shadow: var(--shadow);
+}
+
+/* ===== Logo pulse ===== */
+.logo-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+@media (max-width: 640px) {
+  .tab-btn { padding: 8px 14px; font-size: 12px; }
+  .subject-card { padding: 1rem; }
+}
+</style>
+</head>
+<body class="font-body">
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== API KEY SCREEN ===== -->
+<section id="apiKeyScreen" class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+  <!-- Floating decorative shapes -->
+  <div class="floating-shape bg-purple-500" style="width:200px;height:200px;top:10%;left:5%;animation-delay:0s;"></div>
+  <div class="floating-shape bg-pink-500" style="width:150px;height:150px;top:60%;right:10%;animation-delay:2s;"></div>
+  <div class="floating-shape bg-cyan-400" style="width:100px;height:100px;bottom:15%;left:20%;animation-delay:4s;"></div>
+  <div class="floating-shape bg-yellow-400" style="width:120px;height:120px;top:20%;right:25%;animation-delay:1s;"></div>
+
+  <div class="relative z-10 w-full max-w-md anim-fade-up">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-4 logo-glow">
+        <i class="fas fa-graduation-cap text-white text-3xl"></i>
+      </div>
+      <h1 class="font-brand text-4xl font-bold gradient-text mb-2">EstudAI</h1>
+      <p class="font-heading text-sm" style="color:var(--text-2)">Sua plataforma inteligente de estudos</p>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow);">
+      <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)">
+        <i class="fas fa-key mr-1"></i> Chave da API Poe
+      </label>
+      <input
+        id="apiKeyInput"
+        type="password"
+        placeholder="Cole sua chave API aqui..."
+        class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all"
+        style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+        onfocus="this.style.borderColor='var(--accent-1)'"
+        onblur="this.style.borderColor='var(--border)'"
+      >
+      <p class="text-xs mt-2" style="color:var(--text-3)">
+        Obtenha sua chave em <span style="color:var(--accent-1);font-weight:700;">poe.com/api_key</span>
+      </p>
+
+      <label class="block font-heading font-semibold text-sm mb-2 mt-4" style="color:var(--text-2)">
+        <i class="fas fa-robot mr-1"></i> Modelo da IA
+      </label>
+      <select
+        id="modelSelect"
+        class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all"
+        style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+      >
+        <option value="GPT-5.2">GPT-5.2 (Recomendado)</option>
+        <option value="Gemini-3-Flash">Gemini 3 Flash (Rápido)</option>
+        <option value="Claude-Sonnet-4.5">Claude Sonnet 4.5</option>
+        <option value="Grok-4.1-Fast-Non-Reasoning">Grok 4.1 Fast</option>
+      </select>
+
+      <button id="apiKeySubmit" class="btn-primary w-full mt-5 justify-center" onclick="validateApiKey()">
+        <i class="fas fa-arrow-right"></i> Entrar
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SETUP SCREEN ===== -->
+<section id="setupScreen" class="view-hidden min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-lg anim-fade-up">
+    <div class="text-center mb-6">
+      <h2 class="font-brand text-3xl font-bold gradient-text">Bem-vindo! 🎉</h2>
+      <p class="font-heading text-sm mt-1" style="color:var(--text-2)">Nos conte um pouco sobre você</p>
+    </div>
+
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:2rem;box-shadow:var(--shadow);">
+      <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)">
+        <i class="fas fa-user mr-1"></i> Seu nome
+      </label>
+      <input
+        id="nameInput"
+        type="text"
+        placeholder="Como você se chama?"
+        class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-5"
+        style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+        onfocus="this.style.borderColor='var(--accent-1)'"
+        onblur="this.style.borderColor='var(--border)'"
+      >
+
+      <label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)">
+        <i class="fas fa-school mr-1"></i> Sua série
+      </label>
+
+      <!-- Fundamental I -->
+      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1)">
+        <i class="fas fa-seedling mr-1"></i> Ensino Fundamental I
+      </p>
+      <div class="grid grid-cols-5 gap-2 mb-4" id="gradeGridF1"></div>
+
+      <!-- Fundamental II -->
+      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2)">
+        <i class="fas fa-leaf mr-1"></i> Ensino Fundamental II
+      </p>
+      <div class="grid grid-cols-4 gap-2 mb-4" id="gradeGridF2"></div>
+
+      <!-- Ensino Médio -->
+      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4)">
+        <i class="fas fa-tree mr-1"></i> Ensino Médio
+      </p>
+      <div class="grid grid-cols-3 gap-2 mb-5" id="gradeGridEM"></div>
+
+      <button class="btn-primary w-full justify-center" onclick="completeSetup()">
+        <i class="fas fa-rocket"></i> Começar a Estudar!
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN SCREEN ===== -->
+<section id="mainScreen" class="view-hidden min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="sticky top-0 z-40 px-4 py-3 flex items-center gap-3"
+    style="background:var(--bg-card);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,0.05);">
+    <button id="backBtn" class="view-hidden w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+      style="background:var(--bg-input);color:var(--text-2);" onclick="goBack()"
+      onmouseenter="this.style.background='var(--accent-1)';this.style.color='white'"
+      onmouseleave="this.style.background='var(--bg-input)';this.style.color='var(--text-2)'">
+      <i class="fas fa-arrow-left text-sm"></i>
+    </button>
+    <div class="flex items-center gap-2 flex-1">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+        <i class="fas fa-graduation-cap text-white text-xs"></i>
+      </div>
+      <span class="font-brand text-lg font-bold gradient-text" id="headerTitle">EstudAI</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:var(--bg-input);color:var(--text-2);" id="headerGrade"></span>
+      <span class="text-sm font-bold" style="color:var(--text-2);" id="headerName"></span>
+    </div>
+  </header>
+
+  <!-- Dashboard View -->
+  <div id="dashboardView" class="flex-1 p-4 max-w-5xl mx-auto w-full">
+    <div class="mb-6 anim-fade-up">
+      <h2 class="font-heading text-2xl font-bold" id="welcomeMsg"></h2>
+      <p class="text-sm mt-1" style="color:var(--text-2);">Escolha uma matéria para começar</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="subjectGrid"></div>
+  </div>
+
+  <!-- Subject View -->
+  <div id="subjectView" class="view-hidden flex-1 flex flex-col">
+    <!-- Subject header + tabs -->
+    <div class="px-4 pt-3 pb-2" style="background:var(--bg-card);border-bottom:1px solid var(--border);">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" id="subjectIcon"></div>
+        <h3 class="font-heading text-xl font-bold" id="subjectTitle"></h3>
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-1" id="tabBar">
+        <button class="tab-btn active" onclick="switchTab('chat')">
+          <i class="fas fa-comments mr-1"></i> Chat
+        </button>
+        <button class="tab-btn" onclick="switchTab('activity')">
+          <i class="fas fa-clipboard-list mr-1"></i> Atividades
+        </button>
+        <button class="tab-btn" onclick="switchTab('quiz')">
+          <i class="fas fa-gamepad mr-1"></i> Quiz
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Content -->
+    <div id="chatContent" class="flex-1 flex flex-col" style="min-height:0;">
+      <div class="chat-messages flex-1" id="chatMessages">
+        <div class="text-center py-8 anim-fade-in">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:var(--bg-input);">
+            <i class="fas fa-robot text-2xl" style="color:var(--accent-1)"></i>
+          </div>
+          <p class="font-heading font-bold" style="color:var(--text-2);">Pergunte qualquer coisa!</p>
+          <p class="text-xs" style="color:var(--text-3);">Tire suas dúvidas sobre a matéria</p>
+        </div>
+      </div>
+      <div class="p-3 flex gap-2" style="background:var(--bg-card);border-top:1px solid var(--border);">
+        <input
+          id="chatInput"
+          type="text"
+          placeholder="Digite sua dúvida..."
+          class="flex-1 px-4 py-3 rounded-xl border-2 outline-none transition-all"
+          style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+          onfocus="this.style.borderColor='var(--accent-1)'"
+          onblur="this.style.borderColor='var(--border)'"
+          onkeydown="if(event.key==='Enter')sendChatMessage()"
+        >
+        <button class="btn-primary px-4" onclick="sendChatMessage()" id="chatSendBtn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Activity Content -->
+    <div id="activityContent" class="view-hidden flex-1 flex flex-col p-4 gap-4" style="overflow-y:auto;">
+      <div class="anim-fade-up">
+        <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2);">
+          <i class="fas fa-paste mr-1"></i> Cole sua atividade aqui
+        </label>
+        <textarea
+          id="activityInput"
+          rows="5"
+          placeholder="Cole a questão ou atividade que precisa de ajuda..."
+          class="w-full px-4 py-3 rounded-xl border-2 outline-none transition-all resize-y"
+          style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);min-height:100px;"
+          onfocus="this.style.borderColor='var(--accent-1)'"
+          onblur="this.style.borderColor='var(--border)'"
+        ></textarea>
+        <button class="btn-primary mt-3" onclick="sendActivity()" id="activitySendBtn">
+          <i class="fas fa-wand-magic-sparkles"></i> Pedir Ajuda
+        </button>
+      </div>
+      <div id="activityResponse" class="activity-response md-content view-hidden"></div>
+    </div>
+
+    <!-- Quiz Content -->
+    <div id="quizContent" class="view-hidden flex-1 flex flex-col p-4" style="overflow-y:auto;">
+      <!-- Quiz Start -->
+      <div id="quizStart" class="flex-1 flex flex-col items-center justify-center text-center anim-fade-up">
+        <div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg, var(--accent-1), var(--accent-4));">
+          <i class="fas fa-brain text-white text-4xl"></i>
+        </div>
+        <h3 class="font-heading text-xl font-bold mb-2">Teste seus conhecimentos!</h3>
+        <p class="text-sm mb-6" style="color:var(--text-2);max-width:300px;">5 perguntas geradas pela IA sobre o conteúdo da sua série</p>
+        <button class="btn-primary" onclick="startQuiz()" id="quizStartBtn">
+          <i class="fas fa-play"></i> Iniciar Quiz
+        </button>
+      </div>
+
+      <!-- Quiz Active -->
+      <div id="quizActive" class="view-hidden flex-1 flex flex-col">
+        <!-- Score bar -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex-1">
+            <div class="flex justify-between text-xs font-bold mb-1" style="color:var(--text-2);">
+              <span>Pergunta <span id="quizProgress">1</span>/5</span>
+              <span><i class="fas fa-star" style="color:var(--accent-3)"></i> <span id="quizScore">0</span> pts</span>
+            </div>
+            <div class="score-bar"><div class="score-bar-fill" id="quizProgressBar" style="width:20%"></div></div>
+          </div>
+          <div id="quizStreak" class="view-hidden text-sm font-bold" style="color:var(--accent-2);">
+            <span class="streak-fire">🔥</span><span id="streakCount">0</span>
+          </div>
+        </div>
+
+        <!-- Question card -->
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;box-shadow:var(--shadow);" class="mb-4">
+          <p class="font-heading font-bold text-base" id="quizQuestion"></p>
+        </div>
+
+        <!-- Options -->
+        <div class="flex flex-col gap-2 mb-4" id="quizOptions"></div>
+
+        <!-- Explanation -->
+        <div id="quizExplanation" class="view-hidden p-4 rounded-xl mb-4 anim-slide-down" style="background:var(--bg-input);border:1px solid var(--border);">
+          <p class="text-xs font-bold uppercase tracking-wider mb-1" style="color:var(--accent-1);">
+            <i class="fas fa-lightbulb mr-1"></i> Explicação
+          </p>
+          <p class="text-sm" id="quizExplanationText" style="color:var(--text-2);"></p>
+        </div>
+
+        <!-- Next button -->
+        <button id="quizNextBtn" class="view-hidden btn-primary self-end" onclick="nextQuestion()">
+          Próxima <i class="fas fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+
+      <!-- Quiz Results -->
+      <div id="quizResults" class="view-hidden flex-1 flex flex-col items-center justify-center text-center anim-bounce-in">
+        <div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center" id="resultsIcon"></div>
+        <h3 class="font-heading text-2xl font-bold mb-1" id="resultsTitle"></h3>
+        <p class="text-lg font-bold mb-1" style="color:var(--accent-1);" id="resultsScore"></p>
+        <p class="text-sm mb-6" style="color:var(--text-2);" id="resultsMsg"></p>
+        <div class="flex gap-3">
+          <button class="btn-primary" onclick="startQuiz()">
+            <i class="fas fa-redo"></i> Jogar de Novo
+          </button>
+          <button class="btn-primary" style="background:var(--accent-4);" onclick="switchTab('chat')">
+            <i class="fas fa-comments"></i> Estudar Mais
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Loading -->
+      <div id="quizLoading" class="view-hidden flex-1 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:var(--bg-input);">
+          <div class="spinner" style="border-color:var(--border);border-top-color:var(--accent-1);width:32px;height:32px;"></div>
+        </div>
+        <p class="font-heading font-bold" style="color:var(--text-2);">Gerando perguntas...</p>
+        <p class="text-xs" style="color:var(--text-3);">A IA está preparando seu quiz</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+ 
+
+// ===== MARKED CONFIG =====
+marked.setOptions({ breaks: true, gfm: true });
+
+// ===== DARK MODE =====
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.classList.add('dark');
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+  if (event.matches) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+});
+
+// ===== STATE =====
+const state = {
+  apiKey: '',
+  model: 'GPT-5.2',
+  studentName: '',
+  grade: null,
+  currentView: 'dashboard',
+  currentSubject: null,
+  currentTab: 'chat',
+  chatHistories: {},
+  isStreaming: false,
+  quiz: {
+    questions: [],
+    currentIndex: 0,
+    score: 0,
+    streak: 0,
+    maxStreak: 0,
+    answered: false
+  }
+};
+
+// ===== CONSTANTS =====
+const GRADES = [
+  { id: '1f', label: '1º Ano', level: 'f1' },
+  { id: '2f', label: '2º Ano', level: 'f1' },
+  { id: '3f', label: '3º Ano', level: 'f1' },
+  { id: '4f', label: '4º Ano', level: 'f1' },
+  { id: '5f', label: '5º Ano', level: 'f1' },
+  { id: '6f', label: '6º Ano', level: 'f2' },
+  { id: '7f', label: '7º Ano', level: 'f2' },
+  { id: '8f', label: '8º Ano', level: 'f2' },
+  { id: '9f', label: '9º Ano', level: 'f2' },
+  { id: '1m', label: '1ª Série EM', level: 'em' },
+  { id: '2m', label: '2ª Série EM', level: 'em' },
+  { id: '3m', label: '3ª Série EM', level: 'em' },
+];
+
+const SUBJECTS = {
+  'Português':   { icon: 'fa-book-open',      color: '#6366F1' },
+  'Matemática':  { icon: 'fa-calculator',      color: '#EC4899' },
+  'Ciências':    { icon: 'fa-flask',           color: '#10B981' },
+  'Física':      { icon: 'fa-atom',            color: '#F59E0B' },
+  'Química':     { icon: 'fa-vial',            color: '#8B5CF6' },
+  'Biologia':    { icon: 'fa-dna',             color: '#14B8A6' },
+  'História':    { icon: 'fa-landmark',        color: '#F97316' },
+  'Geografia':   { icon: 'fa-earth-americas',  color: '#3B82F6' },
+  'Inglês':      { icon: 'fa-language',        color: '#EF4444' },
+  'Filosofia':   { icon: 'fa-lightbulb',       color: '#A855F7' },
+  'Sociologia':  { icon: 'fa-users',           color: '#06B6D4' },
+  'Artes':       { icon: 'fa-palette',         color: '#E11D48' },
+};
+
+const LEVEL_SUBJECTS = {
+  f1: ['Português', 'Matemática', 'Ciências', 'História', 'Geografia', 'Artes'],
+  f2: ['Português', 'Matemática', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes'],
+  em: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
+};
+
+// ===== DOM HELPERS =====
+function $(id) { return document.getElementById(id); }
+function show(el) { if (typeof el === 'string') el = $(el); el.classList.remove('view-hidden'); }
+function hide(el) { if (typeof el === 'string') el = $(el); el.classList.add('view-hidden'); }
+
+// ===== TOAST =====
+function showToast(message, type = 'error') {
+  const container = $('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = message;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 3500);
+}
+
+// ===== API FUNCTIONS =====
+async function callAPI(messages, onChunk, onDone, onError) {
+  const body = {
+    model: state.model,
+    messages: messages,
+    stream: !!onChunk,
+    temperature: 0.7
+  };
+
+  try {
+    const response = await fetch('https://api.poe.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + state.apiKey
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Chave API inválida ou sem permissão.');
+      }
+      throw new Error('Erro da API: ' + response.status + ' ' + errText);
+    }
+
+    if (onChunk) {
+      // Streaming
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('data: ')) {
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') {
+              if (onDone) onDone(fullContent);
+              return fullContent;
+            }
+            try {
+              const json = JSON.parse(data);
+              const delta = json.choices && json.choices[0] && json.choices[0].delta;
+              if (delta && delta.content) {
+                fullContent += delta.content;
+                onChunk(fullContent);
+              }
+            } catch (_e) { /* skip non-json lines */ }
+          }
+        }
+      }
+      if (onDone) onDone(fullContent);
+      return fullContent;
+    } else {
+      // Non-streaming
+      const data = await response.json();
+      const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      if (onDone) onDone(content || '');
+      return content || '';
+    }
+  } catch (err) {
+    if (onError) onError(err.message);
+    else showToast(err.message);
+    return null;
+  }
+}
+
+// ===== API KEY VALIDATION =====
+async function validateApiKey() {
+  const key = $('apiKeyInput').value.trim();
+  if (!key) {
+    showToast('Digite sua chave API');
+    return;
+  }
+
+  const btn = $('apiKeySubmit');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '<div class="spinner"></div> Verificando...';
+  btn.disabled = true;
+
+  state.apiKey = key;
+  state.model = $('modelSelect').value;
+
+  try {
+    const response = await fetch('https://api.poe.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: state.model,
+        messages: [{ role: 'user', content: 'Diga apenas: OK' }],
+        stream: false
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Chave inválida');
+    }
+
+    await response.json();
+    showToast('Chave válida! ✅', 'success');
+    setTimeout(() => {
+      hide('apiKeyScreen');
+      show('setupScreen');
+    }, 500);
+  } catch (_err) {
+    showToast('Chave API inválida. Verifique e tente novamente.');
+    state.apiKey = '';
+  }
+
+  btn.innerHTML = originalHTML;
+  btn.disabled = false;
+}
+
+// ===== SETUP =====
+function initSetup() {
+  const f1 = $('gradeGridF1');
+  const f2 = $('gradeGridF2');
+  const em = $('gradeGridEM');
+
+  GRADES.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'grade-btn';
+    btn.textContent = g.label;
+    btn.onclick = () => selectGrade(g, btn);
+    if (g.level === 'f1') f1.appendChild(btn);
+    else if (g.level === 'f2') f2.appendChild(btn);
+    else em.appendChild(btn);
+  });
+}
+
+function selectGrade(grade, btn) {
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state.grade = grade;
+}
+
+function completeSetup() {
+  const name = $('nameInput').value.trim();
+  if (!name) {
+    showToast('Digite seu nome');
+    return;
+  }
+  if (!state.grade) {
+    showToast('Selecione sua série');
+    return;
+  }
+
+  state.studentName = name;
+  hide('setupScreen');
+  show('mainScreen');
+  initDashboard();
+}
+
+// ===== DASHBOARD =====
+function initDashboard() {
+  $('headerName').textContent = state.studentName;
+  $('headerGrade').textContent = state.grade.label;
+  $('welcomeMsg').textContent = 'Olá, ' + state.studentName + '! 👋';
+
+  const grid = $('subjectGrid');
+  grid.innerHTML = '';
+  const subjects = LEVEL_SUBJECTS[state.grade.level];
+
+  subjects.forEach((name, i) => {
+    const info = SUBJECTS[name];
+    const card = document.createElement('div');
+    card.className = 'subject-card anim-fade-up';
+    card.style.setProperty('--card-accent', info.color);
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.opacity = '0';
+    card.innerHTML =
+      '<div class="flex items-center gap-3 mb-3">' +
+        '<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" style="background:' + info.color + '">' +
+          '<i class="fas ' + info.icon + '"></i>' +
+        '</div>' +
+        '<span class="font-heading font-bold text-sm">' + name + '</span>' +
+      '</div>' +
+      '<div class="flex gap-2 flex-wrap">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'chat\')">' +
+          '<i class="fas fa-comments"></i> Chat</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'activity\')">' +
+          '<i class="fas fa-clipboard-list"></i> Atividade</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'quiz\')">' +
+          '<i class="fas fa-gamepad"></i> Quiz</button>' +
+      '</div>';
+    card.onclick = () => openSubject(name, 'chat');
+    grid.appendChild(card);
+  });
+}
+
+// ===== SUBJECT VIEW =====
+function openSubject(name, mode) {
+  state.currentSubject = name;
+  const info = SUBJECTS[name];
+
+  $('subjectIcon').style.background = info.color;
+  $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
+  $('subjectTitle').textContent = name;
+
+  $('headerTitle').textContent = name;
+  show('backBtn');
+  hide('dashboardView');
+  show('subjectView');
+  state.currentView = 'subject';
+
+  switchTab(mode || 'chat');
+  loadChatHistory();
+}
+
+function goBack() {
+  if (state.isStreaming) return;
+  hide('subjectView');
+  show('dashboardView');
+  hide('backBtn');
+  $('headerTitle').textContent = 'EstudAI';
+  state.currentView = 'dashboard';
+  state.currentSubject = null;
+}
+
+function switchTab(tab) {
+  state.currentTab = tab;
+  const tabs = $('tabBar').querySelectorAll('.tab-btn');
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs.forEach(t => {
+    if ((tab === 'chat' && t.textContent.includes('Chat')) ||
+        (tab === 'activity' && t.textContent.includes('Atividade')) ||
+        (tab === 'quiz' && t.textContent.includes('Quiz'))) {
+      t.classList.add('active');
+    }
+  });
+
+  hide('chatContent');
+  hide('activityContent');
+  hide('quizContent');
+
+  if (tab === 'chat') show('chatContent');
+  else if (tab === 'activity') show('activityContent');
+  else if (tab === 'quiz') show('quizContent');
+}
+
+// ===== CHAT FUNCTIONS =====
+function getGradeLabel() {
+  if (!state.grade) return '';
+  return state.grade.label;
+}
+
+function getSystemPrompt(mode) {
+  const grade = getGradeLabel();
+  const subject = state.currentSubject;
+
+  if (mode === 'chat') {
+    return 'Você é um tutor educacional amigável e paciente para alunos do ' + grade +
+      ' no Brasil. Responda dúvidas sobre ' + subject +
+      ' de forma clara, didática e adequada para a idade e nível escolar do aluno. ' +
+      'Use exemplos práticos, linguagem acessível e emojis para tornar a explicação mais divertida. ' +
+      'Se necessário, pesquise informações atualizadas. Responda em português do Brasil.';
+  } else if (mode === 'activity') {
+    return 'Você é um tutor educacional para alunos do ' + grade + ' no Brasil. ' +
+      'O aluno precisa de ajuda com uma atividade de ' + subject + '. ' +
+      'Ajude o aluno a ENTENDER e resolver a atividade passo a passo. ' +
+      'NÃO dê a resposta diretamente - guie o aluno para que ele compreenda o raciocínio e chegue à resposta sozinho. ' +
+      'Use explicações claras, adequadas para a idade, com exemplos quando possível. Responda em português do Brasil.';
+  } else {
+    return 'Você é um gerador de quizzes educacionais para alunos do ' + grade + ' no Brasil. ' +
+      'Gere 5 perguntas de múltipla escolha sobre ' + subject + ' adequadas para o nível escolar do aluno. ' +
+      'Retorne APENAS um JSON válido sem texto adicional, no formato:\n' +
+      '{"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}\n' +
+      'O campo "correct" é o índice (0-3) da opção correta. As perguntas devem ser variadas e educativas.';
+  }
+}
+
+function getChatKey() {
+  return state.currentSubject + '_' + state.grade.id;
+}
+
+function loadChatHistory() {
+  const key = getChatKey();
+  if (!state.chatHistories[key]) {
+    state.chatHistories[key] = [];
+  }
+
+  const container = $('chatMessages');
+  container.innerHTML = '';
+
+  if (state.chatHistories[key].length === 0) {
+    container.innerHTML =
+      '<div class="text-center py-8 anim-fade-in">' +
+        '<div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:var(--bg-input);">' +
+          '<i class="fas fa-robot text-2xl" style="color:var(--accent-1)"></i>' +
+        '</div>' +
+        '<p class="font-heading font-bold" style="color:var(--text-2);">Pergunte qualquer coisa!</p>' +
+        '<p class="text-xs" style="color:var(--text-3);">Tire suas dúvidas sobre ' + state.currentSubject + '</p>' +
+      '</div>';
+    return;
+  }
+
+  state.chatHistories[key].forEach(msg => {
+    addChatBubble(msg.role, msg.content, false);
+  });
+  scrollChatToBottom();
+}
+
+function addChatBubble(role, content, animate) {
+  const container = $('chatMessages');
+  // Remove empty state
+  const emptyState = container.querySelector('.text-center');
+  if (emptyState) emptyState.remove();
+
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble ' + (role === 'user' ? 'user' : 'bot');
+  if (!animate) bubble.style.animation = 'none';
+
+  if (role === 'user') {
+    bubble.textContent = content;
+  } else {
+    bubble.classList.add('md-content');
+    bubble.innerHTML = marked.parse(content);
+  }
+
+  container.appendChild(bubble);
+  return bubble;
+}
+
+function addTypingIndicator() {
+  const container = $('chatMessages');
+  const typing = document.createElement('div');
+  typing.className = 'chat-bubble bot typing-indicator';
+  typing.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  container.appendChild(typing);
+  scrollChatToBottom();
+  return typing;
+}
+
+function scrollChatToBottom() {
+  const container = $('chatMessages');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const input = $('chatInput');
+  const text = input.value.trim();
+  if (!text || state.isStreaming) return;
+
+  input.value = '';
+  state.isStreaming = true;
+  $('chatSendBtn').disabled = true;
+
+  const key = getChatKey();
+  state.chatHistories[key].push({ role: 'user', content: text });
+  addChatBubble('user', text, true);
+  scrollChatToBottom();
+
+  const typing = addTypingIndicator();
+
+  // Build messages for API
+  const apiMessages = [
+    { role: 'system', content: getSystemPrompt('chat') }
+  ];
+  // Include last 10 messages for context
+  const history = state.chatHistories[key].slice(-10);
+  history.forEach(m => {
+    apiMessages.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content });
+  });
+
+  let responseBubble = null;
+
+  await callAPI(
+    apiMessages,
+    // onChunk
+    (fullContent) => {
+      if (typing.parentNode) typing.remove();
+      if (!responseBubble) {
+        responseBubble = addChatBubble('assistant', fullContent, true);
+      } else {
+        responseBubble.innerHTML = marked.parse(fullContent);
+      }
+      scrollChatToBottom();
+    },
+    // onDone
+    (fullContent) => {
+      if (typing.parentNode) typing.remove();
+      if (!responseBubble) {
+        responseBubble = addChatBubble('assistant', fullContent || 'Desculpe, não consegui gerar uma resposta.', true);
+      } else {
+        responseBubble.innerHTML = marked.parse(fullContent || 'Desculpe, não consegui gerar uma resposta.');
+      }
+      if (fullContent) {
+        state.chatHistories[key].push({ role: 'assistant', content: fullContent });
+      }
+      scrollChatToBottom();
+    },
+    // onError
+    (error) => {
+      if (typing.parentNode) typing.remove();
+      addChatBubble('assistant', '❌ Erro: ' + error, true);
+      scrollChatToBottom();
+    }
+  );
+
+  state.isStreaming = false;
+  $('chatSendBtn').disabled = false;
+  $('chatInput').focus();
+}
+
+// ===== ACTIVITY FUNCTIONS =====
+async function sendActivity() {
+  const input = $('activityInput');
+  const text = input.value.trim();
+  if (!text || state.isStreaming) return;
+
+  state.isStreaming = true;
+  const btn = $('activitySendBtn');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '<div class="spinner"></div> Analisando...';
+  btn.disabled = true;
+
+  const responseDiv = $('activityResponse');
+  show(responseDiv);
+  responseDiv.innerHTML = '<div class="typing-dots" style="padding:8px 0;"><span></span><span></span><span></span></div>';
+
+  const apiMessages = [
+    { role: 'system', content: getSystemPrompt('activity') },
+    { role: 'user', content: text }
+  ];
+
+  await callAPI(
+    apiMessages,
+    // onChunk
+    (fullContent) => {
+      responseDiv.innerHTML = marked.parse(fullContent);
+    },
+    // onDone
+    (fullContent) => {
+      responseDiv.innerHTML = marked.parse(fullContent || 'Desculpe, não consegui analisar a atividade.');
+    },
+    // onError
+    (error) => {
+      responseDiv.innerHTML = '<p style="color:var(--error);">❌ Erro: ' + error + '</p>';
+    }
+  );
+
+  btn.innerHTML = originalHTML;
+  btn.disabled = false;
+  state.isStreaming = false;
+}
+
+// ===== QUIZ FUNCTIONS =====
+async function startQuiz() {
+  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false };
+
+  hide('quizStart');
+  hide('quizActive');
+  hide('quizResults');
+  show('quizLoading');
+
+  const apiMessages = [
+    { role: 'system', content: getSystemPrompt('quiz') },
+    { role: 'user', content: 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.' }
+  ];
+
+  const result = await callAPI(apiMessages, null, null, (error) => {
+    showToast('Erro ao gerar quiz: ' + error);
+    hide('quizLoading');
+    show('quizStart');
+  });
+
+  if (!result) return;
+
+  const parsed = parseQuizJSON(result);
+  if (!parsed || !parsed.questions || parsed.questions.length === 0) {
+    showToast('Erro ao processar quiz. Tente novamente.');
+    hide('quizLoading');
+    show('quizStart');
+    return;
+  }
+
+  state.quiz.questions = parsed.questions.slice(0, 5);
+  hide('quizLoading');
+  show('quizActive');
+  showQuestion();
+}
+
+function parseQuizJSON(text) {
+  // Try direct parse
+  try {
+    return JSON.parse(text);
+  } catch (_e) { /* fallthrough */ }
+
+  // Try extracting JSON object
+  const match = text.match(/\{[\s\S]*\}/);
+  if (match) {
+    try {
+      return JSON.parse(match[0]);
+    } catch (_e) { /* fallthrough */ }
+  }
+
+  return null;
+}
+
+function showQuestion() {
+  const q = state.quiz.questions[state.quiz.currentIndex];
+  if (!q) return;
+
+  state.quiz.answered = false;
+
+  $('quizProgress').textContent = (state.quiz.currentIndex + 1);
+  $('quizScore').textContent = state.quiz.score;
+  $('quizProgressBar').style.width = ((state.quiz.currentIndex + 1) / state.quiz.questions.length * 100) + '%';
+
+  if (state.quiz.streak > 1) {
+    show('quizStreak');
+    $('streakCount').textContent = state.quiz.streak;
+  } else {
+    hide('quizStreak');
+  }
+
+  $('quizQuestion').textContent = q.question;
+
+  const optionsDiv = $('quizOptions');
+  optionsDiv.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option anim-fade-up';
+    btn.style.animationDelay = (i * 0.08) + 's';
+    btn.style.opacity = '0';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optionsDiv.appendChild(btn);
+  });
+
+  hide('quizExplanation');
+  hide('quizNextBtn');
+}
+
+function selectAnswer(index) {
+  if (state.quiz.answered) return;
+  state.quiz.answered = true;
+
+  const q = state.quiz.questions[state.quiz.currentIndex];
+  const correct = q.correct;
+  const options = $('quizOptions').querySelectorAll('.quiz-option');
+
+  options.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === correct) btn.classList.add('correct');
+    if (i === index && i !== correct) btn.classList.add('wrong');
+  });
+
+  if (index === correct) {
+    state.quiz.streak++;
+    if (state.quiz.streak > state.quiz.maxStreak) state.quiz.maxStreak = state.quiz.streak;
+    const streakBonus = state.quiz.streak > 1 ? 5 : 0;
+    state.quiz.score += 10 + streakBonus;
+    showToast('+' + (10 + streakBonus) + ' pontos! 🎉', 'success');
+  } else {
+    state.quiz.streak = 0;
+  }
+
+  $('quizScore').textContent = state.quiz.score;
+  if (state.quiz.streak > 1) {
+    show('quizStreak');
+    $('streakCount').textContent = state.quiz.streak;
+  } else {
+    hide('quizStreak');
+  }
+
+  // Show explanation
+  $('quizExplanationText').textContent = q.explanation;
+  show('quizExplanation');
+  show('quizNextBtn');
+
+  // Change button text on last question
+  if (state.quiz.currentIndex >= state.quiz.questions.length - 1) {
+    $('quizNextBtn').innerHTML = 'Ver Resultado <i class="fas fa-trophy ml-1"></i>';
+  }
+}
+
+function nextQuestion() {
+  state.quiz.currentIndex++;
+  if (state.quiz.currentIndex >= state.quiz.questions.length) {
+    showQuizResults();
+  } else {
+    showQuestion();
+  }
+}
+
+function showQuizResults() {
+  hide('quizActive');
+  show('quizResults');
+
+  const total = state.quiz.questions.length;
+  const maxScore = total * 10 + (total - 1) * 5; // max possible with streaks
+  const pct = Math.round((state.quiz.score / (total * 15)) * 100);
+  const correctCount = Math.floor(state.quiz.score / 10); // approximate
+
+  $('resultsScore').textContent = state.quiz.score + ' pontos';
+
+  let icon, title, msg;
+  if (pct >= 80) {
+    icon = '<i class="fas fa-trophy text-4xl" style="color:var(--accent-3)"></i>';
+    title = 'Incrível! 🏆';
+    msg = 'Você mandou muito bem! Continue assim!';
+    spawnConfetti();
+  } else if (pct >= 50) {
+    icon = '<i class="fas fa-star text-4xl" style="color:var(--accent-1)"></i>';
+    title = 'Muito Bom! ⭐';
+    msg = 'Está no caminho certo! Continue praticando!';
+  } else {
+    icon = '<i class="fas fa-book-open text-4xl" style="color:var(--accent-4)"></i>';
+    title = 'Continue Estudando! 📚';
+    msg = 'Não desista! Cada erro é uma oportunidade de aprender!';
+  }
+
+  $('resultsIcon').innerHTML = icon;
+  $('resultsIcon').style.background = 'var(--bg-input)';
+  $('resultsTitle').textContent = title;
+  $('resultsMsg').textContent = msg;
+
+  if (state.quiz.maxStreak > 1) {
+    $('resultsMsg').textContent += ' Melhor sequência: 🔥' + state.quiz.maxStreak;
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#6C5CE7', '#FF6B6B', '#FECA57', '#00D2D3', '#A78BFA', '#FF9FF3', '#54A0FF'];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = (Math.random() * 2) + 's';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ===== ENTER KEY SUPPORT =====
+$('apiKeyInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') validateApiKey();
+});
+$('nameInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') completeSetup();
+});
+
+// ===== INIT =====
+initSetup();
+</script>
+</body>
+</html>
