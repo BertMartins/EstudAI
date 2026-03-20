@@ -23,6 +23,7 @@
         <!-- Apple Touch Icon -->
         <link rel="apple-touch-icon" sizes="180x180"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -537,6 +538,9 @@ input, textarea { font-size: 16px; }
 }
 .dark .lang-level-card:hover { box-shadow: 0 8px 28px rgba(167,139,250,0.15); }
 .lang-selected { border-color: var(--accent-1) !important; box-shadow: 0 0 0 3px rgba(108,92,231,0.2) !important; }
+/* ===== Subject manager icon/color picker ===== */
+#smIconPicker button:hover, #smColorPicker button:hover { transform: scale(1.15); }
+#smIconPicker button, #smColorPicker button { transition: all 0.15s ease; }
 .calc-subject-row {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -672,7 +676,11 @@ input, textarea { font-size: 16px; }
       <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4)">
         <i class="fas fa-tree mr-1"></i> Ensino Médio
       </p>
-      <div class="grid grid-cols-3 gap-2 mb-5" id="gradeGridEM"></div>
+      <div class="grid grid-cols-3 gap-2 mb-4" id="gradeGridEM"></div>
+      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-2)">
+        <i class="fas fa-graduation-cap mr-1"></i> Já Formado
+      </p>
+      <div class="grid grid-cols-1 gap-2 mb-5" id="gradeGridEMC"></div>
       <button class="btn-primary w-full justify-center" onclick="completeSetup()">
         <i class="fas fa-rocket"></i> Começar a Estudar!
       </button>
@@ -714,7 +722,14 @@ input, textarea { font-size: 16px; }
   <div id="dashboardView" class="flex-1 p-4 max-w-5xl mx-auto w-full" style="overflow-y:auto;">
     <div class="mb-5 anim-fade-up">
       <h2 class="font-heading text-2xl font-bold" id="welcomeMsg"></h2>
-      <p class="text-sm mt-1" style="color:var(--text-2);">Escolha uma matéria para começar</p>
+      <div class="flex items-center justify-between mt-1">
+        <p class="text-sm" style="color:var(--text-2);">Escolha uma matéria para começar</p>
+        <button onclick="openSubjectManagerModal()" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--bg-input);color:var(--accent-1);border:1px solid var(--border);cursor:pointer;"
+          onmouseenter="this.style.background='var(--accent-1)';this.style.color='white';this.style.borderColor='var(--accent-1)'"
+          onmouseleave="this.style.background='var(--bg-input)';this.style.color='var(--accent-1)';this.style.borderColor='var(--border)'">
+          <i class="fas fa-pen text-xs"></i> Matérias
+        </button>
+      </div>
     </div>
     <!-- Calculator Card -->
     <div class="calc-card mb-5 anim-fade-up" style="animation-delay:0.05s" onclick="openCalcView()">
@@ -1000,6 +1015,8 @@ const state = {
   langMode: false,
   currentLanguage: null,
   currentLangLevel: null,
+  userSubjects: [],
+  customSubjectDefs: {},
   calc: {
     units: 4,
     minAvg: 7,
@@ -1021,6 +1038,7 @@ const GRADES = [
   { id: '1m', label: '1ª Série EM', level: 'em' },
   { id: '2m', label: '2ª Série EM', level: 'em' },
   { id: '3m', label: '3ª Série EM', level: 'em' },
+  { id: 'emc', label: 'EM Completo', level: 'emc' },
 ];
 
 const SUBJECTS = {
@@ -1042,17 +1060,28 @@ const LEVEL_SUBJECTS = {
   f1: ['Português', 'Matemática', 'Ciências', 'História', 'Geografia', 'Artes'],
   f2: ['Português', 'Matemática', 'Ciências', 'História', 'Geografia', 'Inglês', 'Artes'],
   em: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
+  emc: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
 };
 
 const LANGUAGES = {
-  'Inglês':   { icon: 'fa-flag-usa',    color: '#3B82F6', flag: '🇺🇸' },
-  'Espanhol': { icon: 'fa-guitar',      color: '#EF4444', flag: '🇪🇸' },
-  'Francês':  { icon: 'fa-wine-glass',  color: '#6366F1', flag: '🇫🇷' },
-  'Alemão':   { icon: 'fa-beer-mug-empty', color: '#F59E0B', flag: '🇩🇪' },
-  'Italiano': { icon: 'fa-pizza-slice', color: '#10B981', flag: '🇮🇹' },
-  'Japonês':  { icon: 'fa-torii-gate',  color: '#EC4899', flag: '🇯🇵' },
-  'Coreano':  { icon: 'fa-yin-yang',    color: '#8B5CF6', flag: '🇰🇷' },
-  'Mandarim': { icon: 'fa-dragon',      color: '#F97316', flag: '🇨🇳' },
+  'Inglês':    { icon: 'fa-flag-usa',       color: '#3B82F6', flag: '🇺🇸' },
+  'Espanhol':  { icon: 'fa-guitar',         color: '#EF4444', flag: '🇪🇸' },
+  'Francês':   { icon: 'fa-wine-glass',     color: '#6366F1', flag: '🇫🇷' },
+  'Alemão':    { icon: 'fa-beer-mug-empty', color: '#F59E0B', flag: '🇩🇪' },
+  'Italiano':  { icon: 'fa-pizza-slice',    color: '#10B981', flag: '🇮🇹' },
+  'Japonês':   { icon: 'fa-torii-gate',     color: '#EC4899', flag: '🇯🇵' },
+  'Coreano':   { icon: 'fa-yin-yang',       color: '#8B5CF6', flag: '🇰🇷' },
+  'Mandarim':  { icon: 'fa-dragon',         color: '#F97316', flag: '🇨🇳' },
+  'Russo':     { icon: 'fa-star',           color: '#DC2626', flag: '🇷🇺' },
+  'Árabe':     { icon: 'fa-mosque',         color: '#059669', flag: '🇸🇦' },
+  'Hindi':     { icon: 'fa-om',             color: '#D97706', flag: '🇮🇳' },
+  'Turco':     { icon: 'fa-moon',           color: '#E11D48', flag: '🇹🇷' },
+  'Holandês':  { icon: 'fa-wind',           color: '#F97316', flag: '🇳🇱' },
+  'Polonês':   { icon: 'fa-chess-rook',     color: '#7C3AED', flag: '🇵🇱' },
+  'Grego':     { icon: 'fa-building-columns', color: '#0891B2', flag: '🇬🇷' },
+  'Sueco':     { icon: 'fa-crown',          color: '#2563EB', flag: '🇸🇪' },
+  'Hebraico':  { icon: 'fa-star-of-david',  color: '#1D4ED8', flag: '🇮🇱' },
+  'Tailandês': { icon: 'fa-gopuram',        color: '#B45309', flag: '🇹🇭' },
 };
 
 const LANG_LEVELS = [
@@ -1061,10 +1090,44 @@ const LANG_LEVELS = [
   { id: 'advanced', label: 'Avançado', icon: 'fa-tree', desc: 'Bom domínio, quer aperfeiçoar' },
 ];
 
+const AVAILABLE_ICONS = [
+  'fa-book-open', 'fa-calculator', 'fa-flask', 'fa-atom', 'fa-vial', 'fa-dna',
+  'fa-landmark', 'fa-earth-americas', 'fa-language', 'fa-lightbulb', 'fa-users',
+  'fa-palette', 'fa-music', 'fa-futbol', 'fa-heart-pulse', 'fa-laptop-code',
+  'fa-gavel', 'fa-chart-bar', 'fa-microscope', 'fa-pen-fancy', 'fa-masks-theater',
+  'fa-brain', 'fa-code', 'fa-robot', 'fa-leaf', 'fa-globe', 'fa-camera',
+  'fa-paint-brush', 'fa-film', 'fa-building-columns', 'fa-seedling', 'fa-cross',
+  'fa-dollar-sign', 'fa-stethoscope', 'fa-scale-balanced', 'fa-hammer', 'fa-utensils',
+];
+
+const AVAILABLE_COLORS = [
+  '#6366F1', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6', '#14B8A6',
+  '#F97316', '#3B82F6', '#EF4444', '#A855F7', '#06B6D4', '#E11D48',
+  '#84CC16', '#F43F5E', '#0EA5E9', '#D946EF', '#059669', '#DC2626',
+];
+
 // ===== DOM HELPERS =====
 function $(id) { return document.getElementById(id); }
 function show(el) { if (typeof el === 'string') el = $(el); if (el) el.classList.remove('view-hidden'); }
 function hide(el) { if (typeof el === 'string') el = $(el); if (el) el.classList.add('view-hidden'); }
+
+// ===== SUBJECT HELPERS =====
+function getUserSubjects() {
+  if (state.userSubjects && state.userSubjects.length > 0) return state.userSubjects;
+  if (state.grade && LEVEL_SUBJECTS[state.grade.level]) return LEVEL_SUBJECTS[state.grade.level];
+  return [];
+}
+
+function getSubjectInfo(name) {
+  if (state.customSubjectDefs && state.customSubjectDefs[name]) return state.customSubjectDefs[name];
+  if (SUBJECTS[name]) return SUBJECTS[name];
+  return { icon: 'fa-book', color: '#6C5CE7' };
+}
+
+function saveUserSubjects() {
+  store.set('userSubjects', state.userSubjects);
+  store.set('customSubjectDefs', state.customSubjectDefs);
+}
 
 // ===== TOAST =====
 function showToast(message, type) {
@@ -1109,6 +1172,8 @@ function openHelpModal() {
           'Configure quantas unidades sua escola tem e qual é a média. Insira suas notas em cada matéria e veja automaticamente quanto precisa tirar nas próximas unidades para ser aprovado.') +
         helpItem('fa-globe', '#EC4899', 'Cursos de Idiomas',
           'Aprenda idiomas como Inglês, Espanhol, Francês, Japonês e mais! Escolha seu nível (Iniciante, Mediano ou Avançado) e use o Chat, Atividades e Quiz para praticar. A IA adapta o conteúdo ao seu nível! 🌍') +
+        helpItem('fa-pen', 'var(--accent-1)', 'Gerenciar Matérias',
+          'Adicione, edite ou remova matérias da sua lista! Escolha ícones e cores personalizados. Se selecionou "EM Completo", pode adicionar qualquer matéria que quiser.') +
         helpItem('fa-brain', 'var(--accent-3)', 'IA com Pesquisa',
           'A inteligência artificial busca informações atualizadas para dar respostas precisas e confiáveis sobre o conteúdo escolar.') +
         helpItem('fa-save', '#A78BFA', 'Dados Salvos',
@@ -1135,6 +1200,238 @@ function helpItem(icon, color, title, desc) {
       '<p class="text-xs" style="color:var(--text-2);line-height:1.5;">' + desc + '</p>' +
     '</div>' +
   '</div>';
+}
+
+// ===== SUBJECT MANAGER MODAL =====
+var _editingSubjectOriginalName = null;
+
+function openSubjectManagerModal() {
+  var existing = document.getElementById('subjectManagerModal');
+  if (existing) existing.remove();
+
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'subjectManagerModal';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+  var html = '<div class="modal-box" style="max-width:560px;">' +
+    '<div class="flex items-center justify-between mb-4">' +
+      '<h2 class="font-heading text-xl font-bold gradient-text"><i class="fas fa-book-open mr-2"></i>Gerenciar Matérias</h2>' +
+      '<button onclick="document.getElementById(\'subjectManagerModal\').remove()" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all" style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;font-size:14px;">' +
+        '<i class="fas fa-times"></i>' +
+      '</button>' +
+    '</div>';
+
+  // Subject list
+  html += '<div class="flex flex-col gap-2 mb-4" id="smSubjectList">';
+  getUserSubjects().forEach(function(name) {
+    var info = getSubjectInfo(name);
+    var escapedName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    html += '<div class="flex items-center gap-2 p-2.5 rounded-xl" style="background:var(--bg-input);">' +
+      '<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm flex-shrink-0" style="background:' + info.color + '">' +
+        '<i class="fas ' + info.icon + '"></i>' +
+      '</div>' +
+      '<span class="flex-1 font-heading font-bold text-sm" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + name + '</span>' +
+      '<button onclick="smEditSubject(\'' + escapedName + '\')" class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--bg-card);color:var(--accent-1);border:1px solid var(--border);cursor:pointer;font-size:11px;" title="Editar">' +
+        '<i class="fas fa-pen"></i>' +
+      '</button>' +
+      '<button onclick="smDeleteSubject(\'' + escapedName + '\')" class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--bg-card);color:var(--error);border:1px solid var(--border);cursor:pointer;font-size:11px;" title="Remover">' +
+        '<i class="fas fa-trash"></i>' +
+      '</button>' +
+    '</div>';
+  });
+  html += '</div>';
+
+  // Add/Edit form
+  html += '<div style="border-top:1px solid var(--border);padding-top:1rem;">' +
+    '<p class="font-heading font-bold text-sm mb-3" style="color:var(--text-1);" id="smFormTitle"><i class="fas fa-plus-circle mr-1" style="color:var(--accent-1);"></i> Adicionar Matéria</p>' +
+    '<input id="smNameInput" type="text" placeholder="Nome da matéria" class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-3" style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;" onfocus="this.style.borderColor=\'var(--accent-1)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+    '<p class="text-xs font-bold mb-2" style="color:var(--text-2);"><i class="fas fa-icons mr-1"></i> Ícone:</p>' +
+    '<div class="flex flex-wrap gap-1.5 mb-3" id="smIconPicker"></div>' +
+    '<p class="text-xs font-bold mb-2" style="color:var(--text-2);"><i class="fas fa-droplet mr-1"></i> Cor:</p>' +
+    '<div class="flex flex-wrap gap-1.5 mb-4" id="smColorPicker"></div>' +
+    '<button class="btn-primary w-full justify-center" id="smFormBtn" onclick="smSaveSubject()">' +
+      '<i class="fas fa-plus"></i> Adicionar Matéria' +
+    '</button>' +
+  '</div>';
+
+  html += '</div>';
+  overlay.innerHTML = html;
+  document.body.appendChild(overlay);
+
+  _editingSubjectOriginalName = null;
+  renderSmIconPicker('fa-book');
+  renderSmColorPicker('#6366F1');
+}
+
+function renderSmIconPicker(selectedIcon) {
+  var picker = document.getElementById('smIconPicker');
+  if (!picker) return;
+  picker.innerHTML = '';
+  AVAILABLE_ICONS.forEach(function(icon) {
+    var btn = document.createElement('button');
+    btn.className = 'w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all';
+    btn.style.cssText = 'cursor:pointer;border:2px solid ' + (icon === selectedIcon ? 'var(--accent-1)' : 'var(--border)') + ';background:' + (icon === selectedIcon ? 'var(--accent-1)' : 'var(--bg-card)') + ';color:' + (icon === selectedIcon ? 'white' : 'var(--text-2)') + ';';
+    btn.innerHTML = '<i class="fas ' + icon + '"></i>';
+    btn.onclick = function() { renderSmIconPicker(icon); };
+    btn.setAttribute('data-icon', icon);
+    picker.appendChild(btn);
+  });
+  picker.setAttribute('data-selected', selectedIcon);
+}
+
+function renderSmColorPicker(selectedColor) {
+  var picker = document.getElementById('smColorPicker');
+  if (!picker) return;
+  picker.innerHTML = '';
+  AVAILABLE_COLORS.forEach(function(color) {
+    var btn = document.createElement('button');
+    btn.className = 'w-8 h-8 rounded-lg transition-all';
+    var isSel = color === selectedColor;
+    btn.style.cssText = 'cursor:pointer;background:' + color + ';border:3px solid ' + (isSel ? 'var(--text-1)' : 'transparent') + ';' + (isSel ? 'box-shadow:0 0 0 2px ' + color + '40;transform:scale(1.15);' : '');
+    btn.onclick = function() { renderSmColorPicker(color); };
+    btn.setAttribute('data-color', color);
+    picker.appendChild(btn);
+  });
+  picker.setAttribute('data-selected', selectedColor);
+}
+
+function smEditSubject(name) {
+  _editingSubjectOriginalName = name;
+  var info = getSubjectInfo(name);
+  var nameInput = document.getElementById('smNameInput');
+  if (nameInput) nameInput.value = name;
+  var title = document.getElementById('smFormTitle');
+  if (title) title.innerHTML = '<i class="fas fa-pen mr-1" style="color:var(--accent-1);"></i> Editando: ' + name;
+  var btn = document.getElementById('smFormBtn');
+  if (btn) btn.innerHTML = '<i class="fas fa-check"></i> Salvar Alterações';
+  renderSmIconPicker(info.icon);
+  renderSmColorPicker(info.color);
+  // Scroll to form
+  if (nameInput) nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (nameInput) nameInput.focus();
+}
+
+function smSaveSubject() {
+  var nameInput = document.getElementById('smNameInput');
+  var newName = nameInput ? nameInput.value.trim() : '';
+  if (!newName) { showToast('Digite o nome da matéria'); return; }
+
+  var iconPicker = document.getElementById('smIconPicker');
+  var colorPicker = document.getElementById('smColorPicker');
+  var selectedIcon = iconPicker ? iconPicker.getAttribute('data-selected') : 'fa-book';
+  var selectedColor = colorPicker ? colorPicker.getAttribute('data-selected') : '#6366F1';
+
+  if (_editingSubjectOriginalName) {
+    // Editing existing subject
+    var oldName = _editingSubjectOriginalName;
+    var idx = state.userSubjects.indexOf(oldName);
+    if (idx === -1) { showToast('Matéria não encontrada'); return; }
+
+    // Check duplicate (if name changed)
+    if (newName !== oldName && state.userSubjects.indexOf(newName) !== -1) {
+      showToast('Já existe uma matéria com esse nome'); return;
+    }
+
+    // Update name in array
+    state.userSubjects[idx] = newName;
+
+    // Update custom defs
+    if (state.customSubjectDefs[oldName]) delete state.customSubjectDefs[oldName];
+    state.customSubjectDefs[newName] = { icon: selectedIcon, color: selectedColor };
+
+    // Update calc grades key if name changed
+    if (newName !== oldName && state.calc.grades[oldName]) {
+      state.calc.grades[newName] = state.calc.grades[oldName];
+      delete state.calc.grades[oldName];
+    }
+
+    // Update chat histories key
+    if (newName !== oldName) {
+      var oldChatKey = oldName + '_' + state.grade.id;
+      var newChatKey = newName + '_' + state.grade.id;
+      if (state.chatHistories[oldChatKey]) {
+        state.chatHistories[newChatKey] = state.chatHistories[oldChatKey];
+        delete state.chatHistories[oldChatKey];
+      }
+    }
+
+    showToast('Matéria atualizada! ✅', 'success');
+  } else {
+    // Adding new subject
+    if (state.userSubjects.indexOf(newName) !== -1) {
+      showToast('Já existe uma matéria com esse nome'); return;
+    }
+    state.userSubjects.push(newName);
+    state.customSubjectDefs[newName] = { icon: selectedIcon, color: selectedColor };
+
+    // Init calc grades for new subject
+    state.calc.grades[newName] = [];
+    for (var i = 0; i < state.calc.units; i++) state.calc.grades[newName].push(null);
+
+    showToast('Matéria adicionada! ✅', 'success');
+  }
+
+  saveUserSubjects();
+  saveCalcData();
+  initDashboard();
+
+  // Refresh the modal
+  openSubjectManagerModal();
+}
+
+function smDeleteSubject(name) {
+  // Create confirmation modal
+  var existing = document.getElementById('smDeleteConfirm');
+  if (existing) existing.remove();
+
+  var escapedName = name.replace(/'/g, "\\'");
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'smDeleteConfirm';
+  overlay.style.zIndex = '150';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  overlay.innerHTML =
+    '<div class="modal-box" style="max-width:380px;">' +
+      '<div class="text-center mb-4">' +
+        '<div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:rgba(255,107,107,0.15);">' +
+          '<i class="fas fa-trash text-xl" style="color:var(--error);"></i>' +
+        '</div>' +
+        '<h3 class="font-heading font-bold text-lg">Remover matéria?</h3>' +
+        '<p class="text-sm mt-1" style="color:var(--text-2);">Isso removerá <strong>' + name + '</strong> da sua lista, incluindo notas da calculadora e histórico de chat.</p>' +
+      '</div>' +
+      '<div class="flex gap-3">' +
+        '<button class="btn-primary flex-1 justify-center" style="background:var(--bg-input);color:var(--text-2);" onclick="document.getElementById(\'smDeleteConfirm\').remove()">Cancelar</button>' +
+        '<button class="btn-primary flex-1 justify-center" style="background:var(--error);" onclick="smConfirmDelete(\'' + escapedName + '\')">Remover</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function smConfirmDelete(name) {
+  var idx = state.userSubjects.indexOf(name);
+  if (idx !== -1) state.userSubjects.splice(idx, 1);
+
+  // Clean up custom defs
+  if (state.customSubjectDefs[name]) delete state.customSubjectDefs[name];
+
+  // Clean up calc grades
+  if (state.calc.grades[name]) delete state.calc.grades[name];
+
+  // Clean up chat history
+  var chatKey = name + '_' + state.grade.id;
+  if (state.chatHistories[chatKey]) delete state.chatHistories[chatKey];
+
+  saveUserSubjects();
+  saveCalcData();
+  initDashboard();
+
+  // Close confirm and refresh manager
+  var confirm = document.getElementById('smDeleteConfirm');
+  if (confirm) confirm.remove();
+
+  showToast('Matéria removida', 'info');
+  openSubjectManagerModal();
 }
 
 // ===== SETTINGS MODAL =====
@@ -1189,7 +1486,11 @@ function openSettingsModal() {
 
       '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4);">' +
         '<i class="fas fa-tree mr-1"></i> Ensino Médio</p>' +
-      '<div class="grid grid-cols-3 gap-2 mb-4">' + gradeButtons('em') + '</div>' +
+      '<div class="grid grid-cols-3 gap-2 mb-3">' + gradeButtons('em') + '</div>' +
+
+      '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-2);">' +
+        '<i class="fas fa-graduation-cap mr-1"></i> Já Formado</p>' +
+      '<div class="grid grid-cols-1 gap-2 mb-4">' + gradeButtons('emc') + '</div>' +
 
       '<div class="flex gap-3">' +
         '<button class="btn-primary flex-1 justify-center" onclick="saveSettings()">' +
@@ -1236,9 +1537,12 @@ function saveSettings() {
   store.set('studentName', newName);
   store.set('grade', newGrade);
 
-  // If grade changed, rebuild calc grades (preserve grades for subjects that still exist)
+  // If grade changed, rebuild subjects and calc grades
   if (gradeChanged) {
-    var newSubjects = LEVEL_SUBJECTS[newGrade.level];
+    state.userSubjects = [].concat(LEVEL_SUBJECTS[newGrade.level] || []);
+    state.customSubjectDefs = {};
+    saveUserSubjects();
+    var newSubjects = state.userSubjects;
     var oldGrades = state.calc.grades;
     state.calc.grades = {};
     newSubjects.forEach(function(name) {
@@ -1302,6 +1606,8 @@ function confirmResetAll() {
   store.remove('grade');
   store.remove('calcGrades');
   store.remove('calcConfig');
+  store.remove('userSubjects');
+  store.remove('customSubjectDefs');
 
   // Reset state
   state.apiKey = '';
@@ -1312,6 +1618,8 @@ function confirmResetAll() {
   state.langMode = false;
   state.currentLanguage = null;
   state.currentLangLevel = null;
+  state.userSubjects = [];
+  state.customSubjectDefs = {};
   state.calc = { units: 4, minAvg: 7, grades: {} };
 
   // Close modals
@@ -1450,6 +1758,7 @@ function initSetup() {
   var f1 = $('gradeGridF1');
   var f2 = $('gradeGridF2');
   var em = $('gradeGridEM');
+  var emc = $('gradeGridEMC');
 
   GRADES.forEach(function(g) {
     var btn = document.createElement('button');
@@ -1458,6 +1767,7 @@ function initSetup() {
     btn.onclick = function() { selectGrade(g, btn); };
     if (g.level === 'f1') f1.appendChild(btn);
     else if (g.level === 'f2') f2.appendChild(btn);
+    else if (g.level === 'emc') emc.appendChild(btn);
     else em.appendChild(btn);
   });
 }
@@ -1477,6 +1787,11 @@ function completeSetup() {
   store.set('studentName', name);
   store.set('grade', state.grade);
 
+  // Initialize user subjects from defaults
+  state.userSubjects = [].concat(LEVEL_SUBJECTS[state.grade.level] || []);
+  state.customSubjectDefs = {};
+  saveUserSubjects();
+
   hide('setupScreen');
   show('mainScreen');
   show('helpFab');
@@ -1492,10 +1807,11 @@ function initDashboard() {
 
   var grid = $('subjectGrid');
   grid.innerHTML = '';
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
 
   subjects.forEach(function(name, i) {
-    var info = SUBJECTS[name];
+    var info = getSubjectInfo(name);
+    var safeName = name.replace(/'/g, "\\'");
     var card = document.createElement('div');
     card.className = 'subject-card anim-fade-up';
     card.style.setProperty('--card-accent', info.color);
@@ -1509,11 +1825,11 @@ function initDashboard() {
         '<span class="font-heading font-bold text-sm">' + name + '</span>' +
       '</div>' +
       '<div class="flex gap-2 flex-wrap">' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'chat\')">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'chat\')">' +
           '<i class="fas fa-comments"></i> Chat</button>' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'activity\')">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'activity\')">' +
           '<i class="fas fa-clipboard-list"></i> Atividade</button>' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + name + '\',\'quiz\')">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'quiz\')">' +
           '<i class="fas fa-gamepad"></i> Quiz</button>' +
       '</div>';
     card.onclick = function() { openSubject(name, 'chat'); };
@@ -1527,7 +1843,7 @@ function initDashboard() {
 function openSubject(name, mode) {
   state.currentSubject = name;
   state.langMode = false;
-  var info = SUBJECTS[name];
+  var info = getSubjectInfo(name);
 
   $('subjectIcon').style.background = info.color;
   $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
@@ -1918,7 +2234,7 @@ function spawnConfetti() {
 // ===== CALCULATOR FUNCTIONS =====
 function initCalcGrades() {
   if (!state.grade) return;
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
   var saved = store.get('calcGrades', {});
   var savedConfig = store.get('calcConfig', null);
 
@@ -2081,7 +2397,7 @@ function onCalcConfigChange() {
   state.calc.minAvg = newMinAvg;
 
   // Adjust grade arrays
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
   subjects.forEach(function(name) {
     var arr = state.calc.grades[name] || [];
     if (newUnits > oldUnits) {
@@ -2100,10 +2416,10 @@ function onCalcConfigChange() {
 function renderCalcSubjects() {
   var container = $('calcSubjects');
   container.innerHTML = '';
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
 
   subjects.forEach(function(name, si) {
-    var info = SUBJECTS[name];
+    var info = getSubjectInfo(name);
     var grades = state.calc.grades[name] || [];
     var calcResult = calcSubjectStatus(grades);
 
@@ -2235,7 +2551,7 @@ function onGradeInput(input) {
 }
 
 function updateCalcSummary() {
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
   var approved = 0;
   var atRisk = 0;
   var impossible = 0;
@@ -2282,7 +2598,7 @@ function updateCalcSummary() {
 
 function updateCalcCardSummary() {
   if (!state.grade) return;
-  var subjects = LEVEL_SUBJECTS[state.grade.level];
+  var subjects = getUserSubjects();
   var approved = 0;
   var hasData = false;
   subjects.forEach(function(name) {
@@ -2315,6 +2631,16 @@ function tryRestoreSession() {
     state.model = savedModel;
     state.studentName = savedName;
     state.grade = savedGrade;
+
+    // Restore user subjects
+    var savedUS = store.get('userSubjects', null);
+    var savedCD = store.get('customSubjectDefs', null);
+    if (savedUS && savedUS.length > 0) {
+      state.userSubjects = savedUS;
+    } else {
+      state.userSubjects = [].concat(LEVEL_SUBJECTS[savedGrade.level] || []);
+    }
+    if (savedCD) state.customSubjectDefs = savedCD;
 
     // Update model select
     $('modelSelect').value = savedModel;
