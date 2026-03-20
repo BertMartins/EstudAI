@@ -7,23 +7,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Favicon SVG -->
-        <link rel="icon" type="image/svg+xml"
-            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0f0c'/%3E%3Ctext x='50' y='32' font-size='18' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M50 38 C38 38 34 48 34 54 C34 66 46 70 50 78 C54 70 66 66 66 54 C66 48 62 38 50 38 Z' fill='url(%23g)'/%3E%3Crect x='47' y='70' width='6' height='10' rx='2' fill='%238b5a2b'/%3E%3C/svg%3E">
-
-        <!-- Atalho iPhone -->
-        <link rel="apple-touch-icon" sizes="180x180"
-            href="img/LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="32x32"
-            href="img/LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="16x16"
-            href="img/LOGO_ATALHO.png">
-
-        <!-- Apple Touch Icon -->
-        <link rel="apple-touch-icon" sizes="180x180"
-            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -541,6 +524,34 @@ input, textarea { font-size: 16px; }
 /* ===== Subject manager icon/color picker ===== */
 #smIconPicker button:hover, #smColorPicker button:hover { transform: scale(1.15); }
 #smIconPicker button, #smColorPicker button { transition: all 0.15s ease; }
+
+/* ===== Feature cards ===== */
+.feature-card {
+  border-radius: 16px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card:hover { transform: translateY(-3px); }
+.feature-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.college-card { background: linear-gradient(135deg, #3B82F6, #6366F1); }
+.college-card:hover { box-shadow: 0 8px 28px rgba(59,130,246,0.3); }
+.concurso-card { background: linear-gradient(135deg, #F59E0B, #F97316); }
+.concurso-card:hover { box-shadow: 0 8px 28px rgba(245,158,11,0.3); }
+.random-quiz-card { background: linear-gradient(135deg, var(--accent-2), #A855F7, var(--accent-1)); }
+.random-quiz-card:hover { box-shadow: 0 8px 28px rgba(168,85,247,0.3); }
+.ctx-subject-grid .subject-card { margin-bottom: 0; }
+
 .calc-subject-row {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -757,6 +768,45 @@ input, textarea { font-size: 16px; }
         <i class="fas fa-chevron-right opacity-60"></i>
       </div>
     </div>
+    <!-- College Card -->
+    <div class="feature-card college-card mb-5 anim-fade-up" style="animation-delay:0.15s" onclick="openCollegeView()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-university text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Faculdade</p>
+          <p class="text-xs opacity-80" id="collegeCardSummary">Estude as matérias do seu curso universitário</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
+    <!-- Concurso Card -->
+    <div class="feature-card concurso-card mb-5 anim-fade-up" style="animation-delay:0.2s" onclick="openConcursoView()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-file-contract text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Concursos</p>
+          <p class="text-xs opacity-80">Prepare-se para concursos públicos</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
+    <!-- Random Quiz Card -->
+    <div class="feature-card random-quiz-card mb-5 anim-fade-up" style="animation-delay:0.25s" onclick="startRandomQuiz()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-shuffle text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Quiz Aleatório</p>
+          <p class="text-xs opacity-80">20 perguntas de matérias variadas 🎲</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
     <!-- Subject Grid -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" id="subjectGrid"></div>
   </div>
@@ -826,7 +876,7 @@ input, textarea { font-size: 16px; }
         <div class="flex items-center gap-3 mb-4">
           <div class="flex-1">
             <div class="flex justify-between text-xs font-bold mb-1" style="color:var(--text-2);">
-              <span>Pergunta <span id="quizProgress">1</span>/5</span>
+              <span id="quizProgressText">Pergunta 1/5</span>
               <span><i class="fas fa-star" style="color:var(--accent-3)"></i> <span id="quizScore">0</span> pts</span>
             </div>
             <div class="score-bar"><div class="score-bar-fill" id="quizProgressBar" style="width:20%"></div></div>
@@ -929,6 +979,71 @@ input, textarea { font-size: 16px; }
       <div class="flex flex-col gap-3" id="calcSubjects"></div>
     </div>
   </div>
+
+  <!-- College View -->
+  <div id="collegeView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <!-- Setup phase -->
+      <div id="collegeSetup" class="anim-fade-up">
+        <div class="text-center mb-6">
+          <div class="w-20 h-20 rounded-2xl mx-auto mb-3 flex items-center justify-center" style="background:linear-gradient(135deg, #3B82F6, #6366F1);">
+            <i class="fas fa-university text-white text-3xl"></i>
+          </div>
+          <h2 class="font-heading text-2xl font-bold">🎓 Faculdade</h2>
+          <p class="text-sm mt-1" style="color:var(--text-2);">Informe seu curso para começar</p>
+        </div>
+        <input id="courseNameInput" type="text" placeholder="Ex: Engenharia, Direito, Medicina..."
+          class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-4"
+          style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"
+          onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"
+          onkeydown="if(event.key==='Enter')saveCourseName()">
+        <button class="btn-primary w-full justify-center" onclick="saveCourseName()">
+          <i class="fas fa-arrow-right"></i> Continuar
+        </button>
+      </div>
+      <!-- Subject grid phase -->
+      <div id="collegeSubjects" class="view-hidden">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h2 class="font-heading text-xl font-bold">🎓 <span id="courseNameDisplay"></span></h2>
+            <p class="text-sm" style="color:var(--text-2);">Suas matérias da faculdade</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="editCourseName()" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--bg-input);color:var(--text-2);border:1px solid var(--border);cursor:pointer;">
+              <i class="fas fa-pen text-xs"></i> Curso
+            </button>
+            <button onclick="openSubjectManagerModal('college')" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--accent-1);color:white;border:1px solid var(--accent-1);cursor:pointer;">
+              <i class="fas fa-plus text-xs"></i> Matéria
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 ctx-subject-grid" id="collegeSubjectGrid"></div>
+        <div id="collegeEmptyMsg" class="view-hidden text-center py-8 anim-fade-in">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:var(--bg-input);">
+            <i class="fas fa-plus-circle text-2xl" style="color:var(--accent-1)"></i>
+          </div>
+          <p class="font-heading font-bold" style="color:var(--text-2);">Nenhuma matéria ainda</p>
+          <p class="text-xs" style="color:var(--text-3);">Clique em "+ Matéria" para adicionar</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concurso View -->
+  <div id="concursoView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div>
+          <h2 class="font-heading text-xl font-bold">📋 Concursos Públicos</h2>
+          <p class="text-sm" style="color:var(--text-2);">Matérias mais cobradas em concursos</p>
+        </div>
+        <button onclick="openSubjectManagerModal('concurso')" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--accent-1);color:white;border:1px solid var(--accent-1);cursor:pointer;">
+          <i class="fas fa-plus text-xs"></i> Matéria
+        </button>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 ctx-subject-grid" id="concursoSubjectGrid"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ===== HELP FLOATING BUTTON ===== -->
@@ -1011,12 +1126,15 @@ const state = {
   currentTab: 'chat',
   chatHistories: {},
   isStreaming: false,
-  quiz: { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false },
+  quiz: { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: false },
   langMode: false,
   currentLanguage: null,
   currentLangLevel: null,
+  currentContext: 'school',
   userSubjects: [],
   customSubjectDefs: {},
+  college: { courseName: '', subjects: [], customDefs: {} },
+  concurso: { subjects: [], customDefs: {} },
   calc: {
     units: 4,
     minAvg: 7,
@@ -1106,6 +1224,19 @@ const AVAILABLE_COLORS = [
   '#84CC16', '#F43F5E', '#0EA5E9', '#D946EF', '#059669', '#DC2626',
 ];
 
+const CONCURSO_DEFAULT_SUBJECTS = {
+  'Português': { icon: 'fa-book-open', color: '#6366F1' },
+  'Matemática': { icon: 'fa-calculator', color: '#EC4899' },
+  'Raciocínio Lógico': { icon: 'fa-brain', color: '#8B5CF6' },
+  'Direito Constitucional': { icon: 'fa-scale-balanced', color: '#F97316' },
+  'Direito Administrativo': { icon: 'fa-gavel', color: '#3B82F6' },
+  'Informática': { icon: 'fa-laptop-code', color: '#06B6D4' },
+  'Atualidades': { icon: 'fa-newspaper', color: '#10B981' },
+  'Administração Pública': { icon: 'fa-building-columns', color: '#F59E0B' },
+  'Redação Oficial': { icon: 'fa-pen-fancy', color: '#E11D48' },
+  'Ética no Serviço Público': { icon: 'fa-handshake', color: '#14B8A6' },
+};
+
 // ===== DOM HELPERS =====
 function $(id) { return document.getElementById(id); }
 function show(el) { if (typeof el === 'string') el = $(el); if (el) el.classList.remove('view-hidden'); }
@@ -1120,8 +1251,19 @@ function getUserSubjects() {
 
 function getSubjectInfo(name) {
   if (state.customSubjectDefs && state.customSubjectDefs[name]) return state.customSubjectDefs[name];
+  if (state.college.customDefs && state.college.customDefs[name]) return state.college.customDefs[name];
+  if (state.concurso.customDefs && state.concurso.customDefs[name]) return state.concurso.customDefs[name];
   if (SUBJECTS[name]) return SUBJECTS[name];
+  if (CONCURSO_DEFAULT_SUBJECTS[name]) return CONCURSO_DEFAULT_SUBJECTS[name];
   return { icon: 'fa-book', color: '#6C5CE7' };
+}
+
+function getCtxSubjectInfo(name, ctx) {
+  if (ctx === 'college' && state.college.customDefs[name]) return state.college.customDefs[name];
+  if (ctx === 'concurso' && state.concurso.customDefs[name]) return state.concurso.customDefs[name];
+  if (SUBJECTS[name]) return SUBJECTS[name];
+  if (CONCURSO_DEFAULT_SUBJECTS[name]) return CONCURSO_DEFAULT_SUBJECTS[name];
+  return getSubjectInfo(name);
 }
 
 function saveUserSubjects() {
@@ -1174,6 +1316,12 @@ function openHelpModal() {
           'Aprenda idiomas como Inglês, Espanhol, Francês, Japonês e mais! Escolha seu nível (Iniciante, Mediano ou Avançado) e use o Chat, Atividades e Quiz para praticar. A IA adapta o conteúdo ao seu nível! 🌍') +
         helpItem('fa-pen', 'var(--accent-1)', 'Gerenciar Matérias',
           'Adicione, edite ou remova matérias da sua lista! Escolha ícones e cores personalizados. Se selecionou "EM Completo", pode adicionar qualquer matéria que quiser.') +
+        helpItem('fa-university', '#3B82F6', 'Faculdade',
+          'Para quem está na faculdade! Informe seu curso, adicione suas matérias universitárias e use o Chat, Atividades e Quiz com prompts adaptados para o nível superior. 🎓') +
+        helpItem('fa-file-contract', '#F97316', 'Concursos Públicos',
+          'Prepare-se para concursos! Vem com matérias padrão (Português, Matemática, Direito, Raciocínio Lógico...) e você pode personalizar. Questões no estilo de bancas reais! 📋') +
+        helpItem('fa-shuffle', '#A855F7', 'Quiz Aleatório',
+          '20 perguntas de matérias variadas! A IA gera um quiz misturando todas as suas matérias cadastradas. Cada pergunta mostra de qual matéria é. 🎲') +
         helpItem('fa-brain', 'var(--accent-3)', 'IA com Pesquisa',
           'A inteligência artificial busca informações atualizadas para dar respostas precisas e confiáveis sobre o conteúdo escolar.') +
         helpItem('fa-save', '#A78BFA', 'Dados Salvos',
@@ -1183,7 +1331,7 @@ function openHelpModal() {
       '</div>' +
       '<div class="mt-5 pt-4" style="border-top:1px solid var(--border);">' +
         '<p class="text-xs text-center" style="color:var(--text-3);">' +
-          'EstudAI — Feito para estudantes do Ensino Fundamental ao Médio 🎓' +
+          'EstudAI — Do Ensino Fundamental à Faculdade e Concursos 🎓' +
         '</p>' +
       '</div>' +
     '</div>';
@@ -1203,9 +1351,11 @@ function helpItem(icon, color, title, desc) {
 }
 
 // ===== SUBJECT MANAGER MODAL =====
+var _smContext = 'school';
 var _editingSubjectOriginalName = null;
 
-function openSubjectManagerModal() {
+function openSubjectManagerModal(context) {
+  _smContext = context || 'school';
   var existing = document.getElementById('subjectManagerModal');
   if (existing) existing.remove();
 
@@ -1224,8 +1374,9 @@ function openSubjectManagerModal() {
 
   // Subject list
   html += '<div class="flex flex-col gap-2 mb-4" id="smSubjectList">';
-  getUserSubjects().forEach(function(name) {
-    var info = getSubjectInfo(name);
+  var smSubjects = _smContext === 'college' ? state.college.subjects : _smContext === 'concurso' ? state.concurso.subjects : getUserSubjects();
+  smSubjects.forEach(function(name) {
+    var info = getCtxSubjectInfo(name, _smContext);
     var escapedName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     html += '<div class="flex items-center gap-2 p-2.5 rounded-xl" style="background:var(--bg-input);">' +
       '<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm flex-shrink-0" style="background:' + info.color + '">' +
@@ -1298,7 +1449,7 @@ function renderSmColorPicker(selectedColor) {
 
 function smEditSubject(name) {
   _editingSubjectOriginalName = name;
-  var info = getSubjectInfo(name);
+  var info = getCtxSubjectInfo(name, _smContext);
   var nameInput = document.getElementById('smNameInput');
   if (nameInput) nameInput.value = name;
   var title = document.getElementById('smFormTitle');
@@ -1322,62 +1473,58 @@ function smSaveSubject() {
   var selectedIcon = iconPicker ? iconPicker.getAttribute('data-selected') : 'fa-book';
   var selectedColor = colorPicker ? colorPicker.getAttribute('data-selected') : '#6366F1';
 
-  if (_editingSubjectOriginalName) {
-    // Editing existing subject
-    var oldName = _editingSubjectOriginalName;
-    var idx = state.userSubjects.indexOf(oldName);
-    if (idx === -1) { showToast('Matéria não encontrada'); return; }
+  var subjectList, customDefs;
+  if (_smContext === 'college') { subjectList = state.college.subjects; customDefs = state.college.customDefs; }
+  else if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  else { subjectList = state.userSubjects; customDefs = state.customSubjectDefs; }
 
-    // Check duplicate (if name changed)
-    if (newName !== oldName && state.userSubjects.indexOf(newName) !== -1) {
+  if (_editingSubjectOriginalName) {
+    var oldName = _editingSubjectOriginalName;
+    var idx = subjectList.indexOf(oldName);
+    if (idx === -1) { showToast('Matéria não encontrada'); return; }
+    if (newName !== oldName && subjectList.indexOf(newName) !== -1) {
       showToast('Já existe uma matéria com esse nome'); return;
     }
+    subjectList[idx] = newName;
+    if (customDefs[oldName]) delete customDefs[oldName];
+    customDefs[newName] = { icon: selectedIcon, color: selectedColor };
 
-    // Update name in array
-    state.userSubjects[idx] = newName;
-
-    // Update custom defs
-    if (state.customSubjectDefs[oldName]) delete state.customSubjectDefs[oldName];
-    state.customSubjectDefs[newName] = { icon: selectedIcon, color: selectedColor };
-
-    // Update calc grades key if name changed
-    if (newName !== oldName && state.calc.grades[oldName]) {
-      state.calc.grades[newName] = state.calc.grades[oldName];
-      delete state.calc.grades[oldName];
-    }
-
-    // Update chat histories key
-    if (newName !== oldName) {
-      var oldChatKey = oldName + '_' + state.grade.id;
-      var newChatKey = newName + '_' + state.grade.id;
-      if (state.chatHistories[oldChatKey]) {
-        state.chatHistories[newChatKey] = state.chatHistories[oldChatKey];
-        delete state.chatHistories[oldChatKey];
+    // For school context, also handle calc grades and chat histories
+    if (_smContext === 'school') {
+      if (newName !== oldName && state.calc.grades[oldName]) {
+        state.calc.grades[newName] = state.calc.grades[oldName];
+        delete state.calc.grades[oldName];
+      }
+      if (newName !== oldName) {
+        var oldChatKey = oldName + '_' + state.grade.id;
+        var newChatKey = newName + '_' + state.grade.id;
+        if (state.chatHistories[oldChatKey]) {
+          state.chatHistories[newChatKey] = state.chatHistories[oldChatKey];
+          delete state.chatHistories[oldChatKey];
+        }
       }
     }
-
     showToast('Matéria atualizada! ✅', 'success');
   } else {
-    // Adding new subject
-    if (state.userSubjects.indexOf(newName) !== -1) {
+    if (subjectList.indexOf(newName) !== -1) {
       showToast('Já existe uma matéria com esse nome'); return;
     }
-    state.userSubjects.push(newName);
-    state.customSubjectDefs[newName] = { icon: selectedIcon, color: selectedColor };
+    subjectList.push(newName);
+    customDefs[newName] = { icon: selectedIcon, color: selectedColor };
 
-    // Init calc grades for new subject
-    state.calc.grades[newName] = [];
-    for (var i = 0; i < state.calc.units; i++) state.calc.grades[newName].push(null);
-
+    if (_smContext === 'school') {
+      state.calc.grades[newName] = [];
+      for (var i = 0; i < state.calc.units; i++) state.calc.grades[newName].push(null);
+    }
     showToast('Matéria adicionada! ✅', 'success');
   }
 
-  saveUserSubjects();
-  saveCalcData();
-  initDashboard();
+  // Save based on context
+  if (_smContext === 'college') { store.set('college', state.college); renderCollegeGrid(); }
+  else if (_smContext === 'concurso') { store.set('concurso', state.concurso); renderConcursoGrid(); }
+  else { saveUserSubjects(); saveCalcData(); initDashboard(); }
 
-  // Refresh the modal
-  openSubjectManagerModal();
+  openSubjectManagerModal(_smContext);
 }
 
 function smDeleteSubject(name) {
@@ -1409,29 +1556,34 @@ function smDeleteSubject(name) {
 }
 
 function smConfirmDelete(name) {
-  var idx = state.userSubjects.indexOf(name);
-  if (idx !== -1) state.userSubjects.splice(idx, 1);
+  var subjectList, customDefs;
+  if (_smContext === 'college') { subjectList = state.college.subjects; customDefs = state.college.customDefs; }
+  else if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  else { subjectList = state.userSubjects; customDefs = state.customSubjectDefs; }
 
-  // Clean up custom defs
-  if (state.customSubjectDefs[name]) delete state.customSubjectDefs[name];
+  var idx = subjectList.indexOf(name);
+  if (idx !== -1) subjectList.splice(idx, 1);
+  if (customDefs[name]) delete customDefs[name];
 
-  // Clean up calc grades
-  if (state.calc.grades[name]) delete state.calc.grades[name];
+  if (_smContext === 'school') {
+    if (state.calc.grades[name]) delete state.calc.grades[name];
+    var chatKey = name + '_' + state.grade.id;
+    if (state.chatHistories[chatKey]) delete state.chatHistories[chatKey];
+    saveUserSubjects();
+    saveCalcData();
+    initDashboard();
+  } else if (_smContext === 'college') {
+    store.set('college', state.college);
+    renderCollegeGrid();
+  } else if (_smContext === 'concurso') {
+    store.set('concurso', state.concurso);
+    renderConcursoGrid();
+  }
 
-  // Clean up chat history
-  var chatKey = name + '_' + state.grade.id;
-  if (state.chatHistories[chatKey]) delete state.chatHistories[chatKey];
-
-  saveUserSubjects();
-  saveCalcData();
-  initDashboard();
-
-  // Close confirm and refresh manager
   var confirm = document.getElementById('smDeleteConfirm');
   if (confirm) confirm.remove();
-
   showToast('Matéria removida', 'info');
-  openSubjectManagerModal();
+  openSubjectManagerModal(_smContext);
 }
 
 // ===== SETTINGS MODAL =====
@@ -1608,6 +1760,8 @@ function confirmResetAll() {
   store.remove('calcConfig');
   store.remove('userSubjects');
   store.remove('customSubjectDefs');
+  store.remove('college');
+  store.remove('concurso');
 
   // Reset state
   state.apiKey = '';
@@ -1620,6 +1774,9 @@ function confirmResetAll() {
   state.currentLangLevel = null;
   state.userSubjects = [];
   state.customSubjectDefs = {};
+  state.college = { courseName: '', subjects: [], customDefs: {} };
+  state.concurso = { subjects: [], customDefs: {} };
+  state.currentContext = 'school';
   state.calc = { units: 4, minAvg: 7, grades: {} };
 
   // Close modals
@@ -1840,10 +1997,11 @@ function initDashboard() {
 }
 
 // ===== SUBJECT VIEW =====
-function openSubject(name, mode) {
+function openSubject(name, mode, context) {
   state.currentSubject = name;
   state.langMode = false;
-  var info = getSubjectInfo(name);
+  state.currentContext = context || 'school';
+  var info = (context === 'college' || context === 'concurso') ? getCtxSubjectInfo(name, context) : getSubjectInfo(name);
 
   $('subjectIcon').style.background = info.color;
   $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
@@ -1854,6 +2012,8 @@ function openSubject(name, mode) {
   hide('dashboardView');
   hide('calcView');
   hide('langSelectView');
+  hide('collegeView');
+  hide('concursoView');
   show('subjectView');
   state.currentView = 'subject';
 
@@ -1863,6 +2023,50 @@ function openSubject(name, mode) {
 
 function goBack() {
   if (state.isStreaming) return;
+
+  state.quiz.isRandom = false;
+
+  // From subject in college/concurso → back to their view
+  if (!state.langMode && state.currentContext === 'college' && state.currentView === 'subject') {
+    hide('subjectView');
+    show('collegeView');
+    state.currentView = 'college';
+    state.currentContext = 'school';
+    state.currentSubject = null;
+    $('headerTitle').textContent = 'Faculdade';
+    return;
+  }
+  if (!state.langMode && state.currentContext === 'concurso' && state.currentView === 'subject') {
+    hide('subjectView');
+    show('concursoView');
+    state.currentView = 'concurso';
+    state.currentContext = 'school';
+    state.currentSubject = null;
+    $('headerTitle').textContent = 'Concursos';
+    return;
+  }
+
+  // From college view → dashboard
+  if (state.currentView === 'college') {
+    hide('collegeView');
+    show('dashboardView');
+    hide('backBtn');
+    $('headerTitle').textContent = 'EstudAI';
+    state.currentView = 'dashboard';
+    updateCalcCardSummary();
+    return;
+  }
+
+  // From concurso view → dashboard
+  if (state.currentView === 'concurso') {
+    hide('concursoView');
+    show('dashboardView');
+    hide('backBtn');
+    $('headerTitle').textContent = 'EstudAI';
+    state.currentView = 'dashboard';
+    updateCalcCardSummary();
+    return;
+  }
 
   // From language subject → back to language select
   if (state.langMode && state.currentView === 'subject') {
@@ -1952,6 +2156,29 @@ function getLangSystemPrompt(mode) {
 
 function getSystemPrompt(mode) {
   if (state.langMode) return getLangSystemPrompt(mode);
+
+  if (state.currentContext === 'college') {
+    var courseName = state.college.courseName || 'Ensino Superior';
+    var subjectCollege = state.currentSubject;
+    if (mode === 'chat') {
+      return 'Você é um professor universitário de ' + subjectCollege + ' para um aluno do curso de ' + courseName + ' no Brasil. Responda dúvidas de forma aprofundada, técnica porém didática. Use exemplos acadêmicos e referências quando relevante. Responda em português do Brasil.';
+    } else if (mode === 'activity') {
+      return 'Você é um professor universitário de ' + subjectCollege + ' para um aluno do curso de ' + courseName + '. O aluno precisa de ajuda com uma atividade acadêmica. Guie-o passo a passo com rigor conceitual. Responda em português do Brasil.';
+    } else {
+      return 'Gere 5 perguntas de múltipla escolha de nível universitário sobre ' + subjectCollege + ' (curso de ' + courseName + '). Retorne APENAS um JSON válido: {"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
+    }
+  }
+  if (state.currentContext === 'concurso') {
+    var subjectConcurso = state.currentSubject;
+    if (mode === 'chat') {
+      return 'Você é um professor preparatório para concursos públicos no Brasil, especialista em ' + subjectConcurso + '. Responda de forma objetiva e completa, citando legislação, jurisprudência e doutrina quando aplicável. Foque no que é mais cobrado em provas. Responda em português do Brasil.';
+    } else if (mode === 'activity') {
+      return 'Você é um professor preparatório para concursos públicos, especialista em ' + subjectConcurso + '. Ajude o aluno a resolver questões de concurso passo a passo, explicando o raciocínio e as pegadinhas comuns. Responda em português do Brasil.';
+    } else {
+      return 'Gere 5 perguntas de múltipla escolha no estilo de concursos públicos sobre ' + subjectConcurso + '. Use o formato de bancas como CESPE, FCC e FGV. Retorne APENAS JSON: {"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
+    }
+  }
+
   var grade = getGradeLabel();
   var subject = state.currentSubject;
   if (mode === 'chat') {
@@ -1979,6 +2206,8 @@ function getChatKey() {
   if (state.langMode) {
     return 'lang_' + state.currentLanguage + '_' + state.currentLangLevel;
   }
+  if (state.currentContext === 'college') return 'col_' + state.currentSubject;
+  if (state.currentContext === 'concurso') return 'conc_' + state.currentSubject;
   return state.currentSubject + '_' + state.grade.id;
 }
 
@@ -2101,14 +2330,27 @@ async function sendActivity() {
 
 // ===== QUIZ FUNCTIONS =====
 async function startQuiz() {
-  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false };
+  var isRandom = state.quiz.isRandom || false;
+  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: isRandom };
   hide('quizStart'); hide('quizActive'); hide('quizResults'); show('quizLoading');
-  var apiMessages = [
-    { role: 'system', content: getSystemPrompt('quiz') },
-    { role: 'user', content: state.langMode
+
+  var numQ = state.quiz.isRandom ? 20 : 5;
+  var sysPrompt, userMsg;
+  if (state.quiz.isRandom) {
+    var allSubjects = getUserSubjects();
+    sysPrompt = 'Você é um gerador de quizzes educacionais. Gere ' + numQ + ' perguntas de múltipla escolha variadas, cobrindo as seguintes matérias: ' + allSubjects.join(', ') + '. Distribua as perguntas entre as matérias. Retorne APENAS JSON: {"questions":[{"subject":"nome da matéria","question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
+    userMsg = 'Gere ' + numQ + ' perguntas variadas para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.';
+  } else {
+    sysPrompt = getSystemPrompt('quiz');
+    userMsg = state.langMode
       ? 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno de nível ' + (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || {label:'Iniciante'}).label + '. Retorne apenas JSON.'
-      : 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.' }
+      : 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.';
+  }
+  var apiMessages = [
+    { role: 'system', content: sysPrompt },
+    { role: 'user', content: userMsg }
   ];
+
   var result = await callAPI(apiMessages, null, null, function(error) {
     showToast('Erro ao gerar quiz: ' + error);
     hide('quizLoading'); show('quizStart');
@@ -2120,7 +2362,7 @@ async function startQuiz() {
     hide('quizLoading'); show('quizStart');
     return;
   }
-  state.quiz.questions = parsed.questions.slice(0, 5);
+  state.quiz.questions = parsed.questions.slice(0, numQ);
   hide('quizLoading'); show('quizActive');
   showQuestion();
 }
@@ -2136,12 +2378,18 @@ function showQuestion() {
   var q = state.quiz.questions[state.quiz.currentIndex];
   if (!q) return;
   state.quiz.answered = false;
-  $('quizProgress').textContent = (state.quiz.currentIndex + 1);
+  $('quizProgressText').textContent = 'Pergunta ' + (state.quiz.currentIndex + 1) + '/' + state.quiz.questions.length;
   $('quizScore').textContent = state.quiz.score;
   $('quizProgressBar').style.width = ((state.quiz.currentIndex + 1) / state.quiz.questions.length * 100) + '%';
   if (state.quiz.streak > 1) { show('quizStreak'); $('streakCount').textContent = state.quiz.streak; }
   else { hide('quizStreak'); }
-  $('quizQuestion').textContent = q.question;
+
+  if (state.quiz.isRandom && q.subject) {
+    $('quizQuestion').innerHTML = '<span class="text-xs font-bold px-2 py-0.5 rounded-full inline-block mb-2" style="background:var(--accent-1);color:white;">' + q.subject + '</span><br>' + q.question;
+  } else {
+    $('quizQuestion').textContent = q.question;
+  }
+
   var optionsDiv = $('quizOptions');
   optionsDiv.innerHTML = '';
   q.options.forEach(function(opt, i) {
@@ -2265,6 +2513,8 @@ function openLangSelectView() {
   hide('dashboardView');
   hide('subjectView');
   hide('calcView');
+  hide('collegeView');
+  hide('concursoView');
   show('langSelectView');
   renderLangGrid();
   hide('langLevelSection');
@@ -2367,11 +2617,193 @@ function openLangSubject(langName, levelId) {
   hide('dashboardView');
   hide('calcView');
   hide('langSelectView');
+  hide('collegeView');
+  hide('concursoView');
   show('subjectView');
   state.currentView = 'subject';
 
   switchTab('chat');
   loadChatHistory();
+}
+
+// ===== COLLEGE FUNCTIONS =====
+function openCollegeView() {
+  state.currentView = 'college';
+  $('headerTitle').textContent = 'Faculdade';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  hide('calcView');
+  hide('langSelectView');
+  hide('concursoView');
+  show('collegeView');
+
+  if (state.college.courseName) {
+    hide('collegeSetup');
+    show('collegeSubjects');
+    $('courseNameDisplay').textContent = state.college.courseName;
+    renderCollegeGrid();
+  } else {
+    show('collegeSetup');
+    hide('collegeSubjects');
+    $('courseNameInput').value = '';
+  }
+}
+
+function saveCourseName() {
+  var input = $('courseNameInput');
+  var name = input ? input.value.trim() : '';
+  if (!name) { showToast('Digite o nome do curso'); return; }
+
+  state.college.courseName = name;
+  store.set('college', state.college);
+
+  hide('collegeSetup');
+  show('collegeSubjects');
+  $('courseNameDisplay').textContent = name;
+  renderCollegeGrid();
+  showToast('Curso salvo! Agora adicione suas matérias.', 'success');
+}
+
+function editCourseName() {
+  show('collegeSetup');
+  hide('collegeSubjects');
+  $('courseNameInput').value = state.college.courseName || '';
+  $('courseNameInput').focus();
+}
+
+function renderCollegeGrid() {
+  var grid = $('collegeSubjectGrid');
+  grid.innerHTML = '';
+  var subjects = state.college.subjects;
+
+  if (!subjects || subjects.length === 0) {
+    show('collegeEmptyMsg');
+    return;
+  }
+  hide('collegeEmptyMsg');
+
+  subjects.forEach(function(name, i) {
+    var info = getCtxSubjectInfo(name, 'college');
+    var safeName = name.replace(/'/g, "\\'");
+    var card = document.createElement('div');
+    card.className = 'subject-card anim-fade-up';
+    card.style.setProperty('--card-accent', info.color);
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.opacity = '0';
+    card.innerHTML =
+      '<div class="flex items-center gap-3 mb-3">' +
+        '<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" style="background:' + info.color + '">' +
+          '<i class="fas ' + info.icon + '"></i>' +
+        '</div>' +
+        '<span class="font-heading font-bold text-sm">' + name + '</span>' +
+      '</div>' +
+      '<div class="flex gap-2 flex-wrap">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'chat\',\'college\')">' +
+          '<i class="fas fa-comments"></i> Chat</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'activity\',\'college\')">' +
+          '<i class="fas fa-clipboard-list"></i> Atividade</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'quiz\',\'college\')">' +
+          '<i class="fas fa-gamepad"></i> Quiz</button>' +
+      '</div>';
+    card.onclick = function() { openSubject(name, 'chat', 'college'); };
+    grid.appendChild(card);
+  });
+
+  // Update dashboard summary
+  var summary = $('collegeCardSummary');
+  if (summary) {
+    if (state.college.courseName) {
+      summary.textContent = state.college.courseName + ' — ' + subjects.length + ' matéria(s)';
+    }
+  }
+}
+
+// ===== CONCURSO FUNCTIONS =====
+function openConcursoView() {
+  state.currentView = 'concurso';
+  $('headerTitle').textContent = 'Concursos';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  hide('calcView');
+  hide('langSelectView');
+  hide('collegeView');
+  show('concursoView');
+
+  // Initialize with defaults if empty
+  if (!state.concurso.subjects || state.concurso.subjects.length === 0) {
+    state.concurso.subjects = Object.keys(CONCURSO_DEFAULT_SUBJECTS);
+    state.concurso.customDefs = {};
+    Object.keys(CONCURSO_DEFAULT_SUBJECTS).forEach(function(k) {
+      state.concurso.customDefs[k] = CONCURSO_DEFAULT_SUBJECTS[k];
+    });
+    store.set('concurso', state.concurso);
+  }
+
+  renderConcursoGrid();
+}
+
+function renderConcursoGrid() {
+  var grid = $('concursoSubjectGrid');
+  grid.innerHTML = '';
+  var subjects = state.concurso.subjects;
+
+  subjects.forEach(function(name, i) {
+    var info = getCtxSubjectInfo(name, 'concurso');
+    var safeName = name.replace(/'/g, "\\'");
+    var card = document.createElement('div');
+    card.className = 'subject-card anim-fade-up';
+    card.style.setProperty('--card-accent', info.color);
+    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.opacity = '0';
+    card.innerHTML =
+      '<div class="flex items-center gap-3 mb-3">' +
+        '<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" style="background:' + info.color + '">' +
+          '<i class="fas ' + info.icon + '"></i>' +
+        '</div>' +
+        '<span class="font-heading font-bold text-sm">' + name + '</span>' +
+      '</div>' +
+      '<div class="flex gap-2 flex-wrap">' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'chat\',\'concurso\')">' +
+          '<i class="fas fa-comments"></i> Chat</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'activity\',\'concurso\')">' +
+          '<i class="fas fa-clipboard-list"></i> Atividade</button>' +
+        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'quiz\',\'concurso\')">' +
+          '<i class="fas fa-gamepad"></i> Quiz</button>' +
+      '</div>';
+    card.onclick = function() { openSubject(name, 'chat', 'concurso'); };
+    grid.appendChild(card);
+  });
+}
+
+// ===== RANDOM QUIZ =====
+function startRandomQuiz() {
+  var subjects = getUserSubjects();
+  if (subjects.length === 0) { showToast('Adicione matérias primeiro'); return; }
+
+  state.currentSubject = 'Quiz Aleatório';
+  state.langMode = false;
+  state.currentContext = 'school';
+  state.quiz.isRandom = true;
+
+  $('subjectIcon').style.background = 'linear-gradient(135deg, var(--accent-2), #A855F7)';
+  $('subjectIcon').innerHTML = '<i class="fas fa-shuffle"></i>';
+  $('subjectTitle').textContent = 'Quiz Aleatório';
+
+  $('headerTitle').textContent = 'Quiz Aleatório';
+  show('backBtn');
+  hide('dashboardView');
+  hide('calcView');
+  hide('langSelectView');
+  hide('collegeView');
+  hide('concursoView');
+  show('subjectView');
+  state.currentView = 'subject';
+
+  switchTab('quiz');
+  // Auto-start
+  startQuiz();
 }
 
 function openCalcView() {
@@ -2381,6 +2813,8 @@ function openCalcView() {
   hide('dashboardView');
   hide('subjectView');
   hide('langSelectView');
+  hide('collegeView');
+  hide('concursoView');
   show('calcView');
   renderCalcSubjects();
   updateCalcSummary();
@@ -2641,6 +3075,11 @@ function tryRestoreSession() {
       state.userSubjects = [].concat(LEVEL_SUBJECTS[savedGrade.level] || []);
     }
     if (savedCD) state.customSubjectDefs = savedCD;
+
+    var savedCollege = store.get('college', null);
+    if (savedCollege) state.college = savedCollege;
+    var savedConcurso = store.get('concurso', null);
+    if (savedConcurso) state.concurso = savedConcurso;
 
     // Update model select
     $('modelSelect').value = savedModel;
