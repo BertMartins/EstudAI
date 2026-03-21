@@ -7,23 +7,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-      <!-- Favicon SVG -->
-        <link rel="icon" type="image/svg+xml"
-            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0f0c'/%3E%3Ctext x='50' y='32' font-size='18' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M50 38 C38 38 34 48 34 54 C34 66 46 70 50 78 C54 70 66 66 66 54 C66 48 62 38 50 38 Z' fill='url(%23g)'/%3E%3Crect x='47' y='70' width='6' height='10' rx='2' fill='%238b5a2b'/%3E%3C/svg%3E">
-
-        <!-- Atalho iPhone -->
-        <link rel="apple-touch-icon" sizes="180x180"
-            href="img/LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="32x32"
-            href="img/LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="16x16"
-            href="img/LOGO_ATALHO.png">
-
-        <!-- Apple Touch Icon -->
-        <link rel="apple-touch-icon" sizes="180x180"
-            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
-   
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -673,12 +656,50 @@ input, textarea { font-size: 16px; }
   border-radius: 12px;
   padding: 1rem 1.25rem;
   margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
   animation: slideDown 0.3s ease;
+  max-height: 55vh;
+  overflow-y: auto;
 }
 .topic-explanation-box .md-content { font-size: 0.88rem; line-height: 1.7; color: var(--text-2); }
 .topics-loading-unit {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 1.5rem; color: var(--text-3); font-size: 0.85rem;
+}
+.quiz-unit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 400px;
+}
+.quiz-unit-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-1);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+}
+.quiz-unit-btn:hover {
+  border-color: var(--accent-1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108,92,231,0.15);
+}
+.quiz-unit-btn .qu-num {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; color: white;
+  flex-shrink: 0;
 }
 .topics-unit-count-bar {
   display: flex; align-items: center; gap: 0.75rem;
@@ -1025,13 +1046,14 @@ input, textarea { font-size: 16px; }
     </div>
     <!-- Quiz Content -->
     <div id="quizContent" class="view-hidden flex-1 flex flex-col p-4" style="overflow-y:auto;">
-      <div id="quizStart" class="flex-1 flex flex-col items-center justify-center text-center anim-fade-up">
-        <div class="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center" style="background:linear-gradient(135deg, var(--accent-1), var(--accent-4));">
-          <i class="fas fa-brain text-white text-4xl"></i>
+      <div id="quizStart" class="flex-1 flex flex-col items-center justify-center text-center anim-fade-up" style="overflow-y:auto;padding-bottom:1rem;">
+        <div class="w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:linear-gradient(135deg, var(--accent-1), var(--accent-4));">
+          <i class="fas fa-brain text-white text-3xl"></i>
         </div>
-        <h3 class="font-heading text-xl font-bold mb-2">Teste seus conhecimentos!</h3>
-        <p class="text-sm mb-6" style="color:var(--text-2);max-width:300px;">5 perguntas geradas pela IA sobre o conteúdo da sua série</p>
-        <button class="btn-primary" onclick="startQuiz()" id="quizStartBtn"><i class="fas fa-play"></i> Iniciar Quiz</button>
+        <h3 class="font-heading text-lg font-bold mb-1">Escolha a unidade do quiz</h3>
+        <p class="text-xs mb-4" style="color:var(--text-2);max-width:300px;">5 perguntas geradas pela IA sobre o conteúdo de cada unidade</p>
+        <div class="quiz-unit-grid mb-4" id="quizUnitGrid"></div>
+        <button class="btn-primary" style="background:linear-gradient(135deg, var(--accent-2), #A855F7);" onclick="startQuiz(0)" id="quizStartBtn"><i class="fas fa-shuffle mr-1"></i> Quiz Geral (todas unidades)</button>
       </div>
       <div id="quizActive" class="view-hidden flex-1 flex flex-col">
         <div class="flex items-center gap-3 mb-4">
@@ -1062,7 +1084,7 @@ input, textarea { font-size: 16px; }
         <p class="text-lg font-bold mb-1" style="color:var(--accent-1);" id="resultsScore"></p>
         <p class="text-sm mb-6" style="color:var(--text-2);" id="resultsMsg"></p>
         <div class="flex gap-3">
-          <button class="btn-primary" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar de Novo</button>
+          <button class="btn-primary" onclick="startQuiz(state.quiz.unitNum || 0)"><i class="fas fa-redo"></i> Jogar de Novo</button>
           <button class="btn-primary" style="background:var(--accent-4);" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Estudar Mais</button>
         </div>
       </div>
@@ -1077,17 +1099,8 @@ input, textarea { font-size: 16px; }
     <!-- Topics/Content -->
     <div id="topicsContent" class="view-hidden flex-1 flex flex-col p-4" style="overflow-y:auto;">
       <div class="topics-unit-count-bar anim-fade-up">
-        <label><i class="fas fa-layer-group mr-1"></i> Unidades:</label>
-        <select id="topicsUnitCount" onchange="setTopicsUnits(parseInt(this.value))">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4" selected>4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
-        </select>
+        <i class="fas fa-layer-group" style="color:var(--accent-1);"></i>
+        <span class="font-heading font-bold text-sm" id="topicsUnitLabel" style="color:var(--text-2);"></span>
         <span class="text-xs" style="color:var(--text-3);flex:1;">Clique na unidade para carregar os tópicos via IA</span>
       </div>
       <div id="topicsUnitList"></div>
@@ -1814,6 +1827,26 @@ function openSettingsModal() {
         ' style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"' +
         ' onfocus="this.style.borderColor=\'var(--accent-1)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
 
+      '<label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2);">' +
+        '<i class="fas fa-layer-group mr-1"></i> Número de Unidades' +
+      '</label>' +
+      '<p class="text-xs mb-2" style="color:var(--text-3);">Usado na calculadora de média, conteúdo por tópicos e quiz por unidade</p>' +
+      '<div class="flex items-center gap-3 mb-4">' +
+        '<select id="settingsUnitsSelect" class="px-3 py-2 rounded-xl border-2 outline-none font-body font-bold transition-all"' +
+          ' style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"' +
+          ' onfocus="this.style.borderColor=\'var(--accent-1)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+          '<option value="1"' + (state.calc.units === 1 ? ' selected' : '') + '>1</option>' +
+          '<option value="2"' + (state.calc.units === 2 ? ' selected' : '') + '>2</option>' +
+          '<option value="3"' + (state.calc.units === 3 ? ' selected' : '') + '>3</option>' +
+          '<option value="4"' + (state.calc.units === 4 ? ' selected' : '') + '>4</option>' +
+          '<option value="5"' + (state.calc.units === 5 ? ' selected' : '') + '>5</option>' +
+          '<option value="6"' + (state.calc.units === 6 ? ' selected' : '') + '>6</option>' +
+          '<option value="7"' + (state.calc.units === 7 ? ' selected' : '') + '>7</option>' +
+          '<option value="8"' + (state.calc.units === 8 ? ' selected' : '') + '>8</option>' +
+        '</select>' +
+        '<span class="text-sm" style="color:var(--text-3);">unidade(s)</span>' +
+      '</div>' +
+
       '<label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2);">' +
         '<i class="fas fa-school mr-1"></i> Sua série' +
       '</label>' +
@@ -1872,6 +1905,29 @@ function saveSettings() {
   var newGrade = _settingsSelectedGrade || state.grade;
   if (!newGrade) { showToast('Selecione sua série'); return; }
 
+  // Update global units
+  var unitsSelect = document.getElementById('settingsUnitsSelect');
+  var newUnits = unitsSelect ? parseInt(unitsSelect.value) || 4 : state.calc.units;
+  var oldUnits = state.calc.units;
+  if (newUnits !== oldUnits) {
+    state.calc.units = newUnits;
+    // Adjust calc grade arrays
+    var curSubjects = getUserSubjects();
+    curSubjects.forEach(function(name) {
+      var arr = state.calc.grades[name] || [];
+      if (newUnits > oldUnits) {
+        while (arr.length < newUnits) arr.push(null);
+      } else {
+        arr = arr.slice(0, newUnits);
+      }
+      state.calc.grades[name] = arr;
+    });
+    saveCalcData();
+    // Sync calc view selector if open
+    var calcUnitsEl = $('calcUnits');
+    if (calcUnitsEl) calcUnitsEl.value = newUnits;
+  }
+
   var gradeChanged = !state.grade || state.grade.id !== newGrade.id;
 
   state.studentName = newName;
@@ -1903,10 +1959,8 @@ function saveSettings() {
 
   // Re-render
   initDashboard();
-  if (state.currentView === 'calc') {
-    renderCalcSubjects();
-    updateCalcSummary();
-  }
+  renderCalcSubjects();
+  updateCalcSummary();
 
   _settingsSelectedGrade = null;
   modal.remove();
@@ -2324,7 +2378,7 @@ function switchTab(tab) {
   hide('chatContent'); hide('activityContent'); hide('quizContent'); hide('topicsContent');
   if (tab === 'chat') show('chatContent');
   else if (tab === 'activity') show('activityContent');
-  else if (tab === 'quiz') show('quizContent');
+  else if (tab === 'quiz') { show('quizContent'); renderQuizUnitGrid(); }
   else if (tab === 'topics') { show('topicsContent'); initTopicsView(); }
 }
 
@@ -2440,21 +2494,33 @@ function getTopicsKey() {
 function getTopicsData() {
   var key = getTopicsKey();
   if (!state.topicsData[key]) {
-    state.topicsData[key] = { numUnits: 4, units: {} };
+    state.topicsData[key] = { units: {} };
   }
   return state.topicsData[key];
 }
 
+function getGlobalUnits() {
+  return state.calc.units || 4;
+}
+
 function initTopicsView() {
-  var data = getTopicsData();
-  $('topicsUnitCount').value = data.numUnits;
+  $('topicsUnitLabel').textContent = getGlobalUnits() + ' Unidades';
   renderUnitsAccordion();
 }
 
-function setTopicsUnits(n) {
-  var data = getTopicsData();
-  data.numUnits = n;
-  renderUnitsAccordion();
+function renderQuizUnitGrid() {
+  var grid = $('quizUnitGrid');
+  if (!grid) return;
+  var n = getGlobalUnits();
+  var html = '';
+  for (var i = 0; i < n; i++) {
+    var color = getUnitColor(i);
+    html += '<button class="quiz-unit-btn" onclick="startQuiz(' + (i + 1) + ')">';
+    html += '<div class="qu-num" style="background:' + color + ';">' + (i + 1) + '</div>';
+    html += 'Unidade ' + (i + 1);
+    html += '</button>';
+  }
+  grid.innerHTML = html;
 }
 
 function getUnitColor(idx) {
@@ -2465,8 +2531,9 @@ function getUnitColor(idx) {
 function renderUnitsAccordion() {
   var data = getTopicsData();
   var container = $('topicsUnitList');
+  var numUnits = getGlobalUnits();
   var html = '';
-  for (var i = 0; i < data.numUnits; i++) {
+  for (var i = 0; i < numUnits; i++) {
     var unitData = data.units[i];
     var hasTopics = unitData && unitData.topics && unitData.topics.length > 0;
     var isOpen = unitData && unitData._open;
@@ -2537,7 +2604,7 @@ async function loadUnitTopics(unitIdx) {
 
   var subject = state.currentSubject;
   var unitNum = unitIdx + 1;
-  var totalUnits = data.numUnits;
+  var totalUnits = getGlobalUnits();
   var sysPrompt, userMsg;
 
   if (state.langMode) {
@@ -2791,22 +2858,25 @@ async function sendActivity() {
 }
 
 // ===== QUIZ FUNCTIONS =====
-async function startQuiz() {
+async function startQuiz(unitNum) {
+  // unitNum: 0 or undefined = general (all units), 1+ = specific unit
   var isRandom = state.quiz.isRandom || false;
-  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: isRandom };
+  state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: isRandom, unitNum: unitNum || 0 };
   hide('quizStart'); hide('quizActive'); hide('quizResults'); show('quizLoading');
 
   var numQ = state.quiz.isRandom ? 20 : 5;
   var sysPrompt, userMsg;
+  var unitHint = (unitNum && unitNum > 0) ? ' O quiz deve ser focado APENAS no conteúdo da Unidade ' + unitNum + ' de ' + getGlobalUnits() + ' unidades.' : '';
+
   if (state.quiz.isRandom) {
     var allSubjects = getUserSubjects();
     sysPrompt = 'Você é um gerador de quizzes educacionais. Gere ' + numQ + ' perguntas de múltipla escolha variadas, cobrindo as seguintes matérias: ' + allSubjects.join(', ') + '. Distribua as perguntas entre as matérias. Retorne APENAS JSON: {"questions":[{"subject":"nome da matéria","question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
     userMsg = 'Gere ' + numQ + ' perguntas variadas para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.';
   } else {
-    sysPrompt = getSystemPrompt('quiz');
+    sysPrompt = getSystemPrompt('quiz') + unitHint;
     userMsg = state.langMode
-      ? 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno de nível ' + (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || {label:'Iniciante'}).label + '. Retorne apenas JSON.'
-      : 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '. Retorne apenas JSON.';
+      ? 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno de nível ' + (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || {label:'Iniciante'}).label + '.' + (unitHint ? ' Foco na Unidade ' + unitNum + '.' : '') + ' Retorne apenas JSON.'
+      : 'Gere 5 perguntas de ' + state.currentSubject + ' para um aluno do ' + getGradeLabel() + '.' + (unitHint ? ' Foco na Unidade ' + unitNum + '.' : '') + ' Retorne apenas JSON.';
   }
   var apiMessages = [
     { role: 'system', content: sysPrompt },
@@ -2840,7 +2910,8 @@ function showQuestion() {
   var q = state.quiz.questions[state.quiz.currentIndex];
   if (!q) return;
   state.quiz.answered = false;
-  $('quizProgressText').textContent = 'Pergunta ' + (state.quiz.currentIndex + 1) + '/' + state.quiz.questions.length;
+  var unitLabel = (state.quiz.unitNum && state.quiz.unitNum > 0 && !state.quiz.isRandom) ? ' (Unidade ' + state.quiz.unitNum + ')' : '';
+  $('quizProgressText').textContent = 'Pergunta ' + (state.quiz.currentIndex + 1) + '/' + state.quiz.questions.length + unitLabel;
   $('quizScore').textContent = state.quiz.score;
   $('quizProgressBar').style.width = ((state.quiz.currentIndex + 1) / state.quiz.questions.length * 100) + '%';
   if (state.quiz.streak > 1) { show('quizStreak'); $('streakCount').textContent = state.quiz.streak; }
