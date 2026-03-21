@@ -7,6 +7,23 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+      <!-- Favicon SVG -->
+        <link rel="icon" type="image/svg+xml"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0f0c'/%3E%3Ctext x='50' y='32' font-size='18' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M50 38 C38 38 34 48 34 54 C34 66 46 70 50 78 C54 70 66 66 66 54 C66 48 62 38 50 38 Z' fill='url(%23g)'/%3E%3Crect x='47' y='70' width='6' height='10' rx='2' fill='%238b5a2b'/%3E%3C/svg%3E">
+
+        <!-- Atalho iPhone -->
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="img/LOGO_ATALHO.png">
+        <link rel="icon" type="image/png" sizes="32x32"
+            href="img/LOGO_ATALHO.png">
+        <link rel="icon" type="image/png" sizes="16x16"
+            href="img/LOGO_ATALHO.png">
+
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
+   
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -499,6 +516,57 @@ input, textarea { font-size: 16px; }
 }
 .dark .lang-level-card:hover { box-shadow: 0 8px 28px rgba(167,139,250,0.15); }
 .lang-selected { border-color: var(--accent-1) !important; box-shadow: 0 0 0 3px rgba(108,92,231,0.2) !important; }
+
+/* ===== Abrasileirado toggle ===== */
+.abr-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.85rem 1.1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  user-select: none;
+  box-shadow: var(--shadow);
+}
+.abr-toggle-bar:hover { border-color: #10B981; }
+.abr-toggle-bar.active { border-color: #10B981; background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(5,150,105,0.04)); }
+.abr-switch {
+  position: relative;
+  width: 44px; height: 24px;
+  background: var(--border);
+  border-radius: 12px;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.abr-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.abr-toggle-bar.active .abr-switch { background: #10B981; }
+.abr-toggle-bar.active .abr-switch::after { transform: translateX(20px); }
+.abr-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(16,185,129,0.15);
+  color: #10B981;
+  white-space: nowrap;
+}
+
 /* ===== Subject manager icon/color picker ===== */
 #smIconPicker button:hover, #smColorPicker button:hover { transform: scale(1.15); }
 #smIconPicker button, #smColorPicker button { transition: all 0.15s ease; }
@@ -1036,6 +1104,16 @@ input, textarea { font-size: 16px; }
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="langGrid"></div>
       <div id="langLevelSection" class="view-hidden mt-6 anim-fade-up">
         <h3 class="font-heading text-lg font-bold mb-3" id="langLevelTitle">Escolha o nível</h3>
+        <div class="abr-toggle-bar" id="abrToggleBar" onclick="toggleAbrasileirado()">
+          <div class="abr-switch" id="abrSwitch"></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <span style="font-size:1.2em;">🇧🇷</span>
+              <span class="font-heading font-bold text-sm">Modo Abrasileirado</span>
+            </div>
+            <p class="text-xs mt-0.5" style="color:var(--text-3);">Mostra como pronunciar as palavras do jeito brasileiro</p>
+          </div>
+        </div>
         <div class="flex flex-col gap-3" id="langLevelGrid"></div>
       </div>
     </div>
@@ -1238,6 +1316,7 @@ const state = {
   langMode: false,
   currentLanguage: null,
   currentLangLevel: null,
+  abrasileirado: false,
   currentContext: 'school',
   userSubjects: [],
   customSubjectDefs: {},
@@ -1873,6 +1952,7 @@ function confirmResetAll() {
   store.remove('customSubjectDefs');
   store.remove('college');
   store.remove('concurso');
+  store.remove('abrasileirado');
 
   // Reset state
   state.apiKey = '';
@@ -1883,6 +1963,7 @@ function confirmResetAll() {
   state.langMode = false;
   state.currentLanguage = null;
   state.currentLangLevel = null;
+  state.abrasileirado = false;
   state.userSubjects = [];
   state.customSubjectDefs = {};
   state.college = { courseName: '', subjects: [], customDefs: {} };
@@ -2257,27 +2338,40 @@ function getLangSystemPrompt(mode) {
   var lang = state.currentLanguage;
   var levelObj = LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; });
   var levelLabel = levelObj ? levelObj.label : 'Iniciante';
+  var abr = state.abrasileirado;
+
+  var abrChat = abr
+    ? ' IMPORTANTE - MODO ABRASILEIRADO ATIVADO: Sempre que escrever uma frase ou palavra em ' + lang + ', adicione logo abaixo a **pronúncia abrasileirada** entre parênteses — ou seja, como um brasileiro leigo leria/falaria aquela frase usando os sons do português do Brasil. Exemplo para inglês: "I can\'t help feeling" → 🇧🇷 *(ai kent helpi filin)*. Faça isso para TODA frase ou palavra em ' + lang + ' que aparecer na resposta. Use o emoji 🇧🇷 antes da pronúncia abrasileirada.'
+    : '';
+
+  var abrActivity = abr
+    ? ' IMPORTANTE - MODO ABRASILEIRADO ATIVADO: Sempre que aparecer texto em ' + lang + ', adicione a pronúncia abrasileirada entre parênteses — como um brasileiro falaria usando sons do português. Use 🇧🇷 antes da pronúncia. Exemplo: "Hello, how are you?" → 🇧🇷 *(relou, rau ar iú?)*'
+    : '';
+
+  var abrQuiz = abr
+    ? ' MODO ABRASILEIRADO: Em cada pergunta e em cada opção que contenha texto em ' + lang + ', adicione entre parênteses a pronúncia abrasileirada (como um brasileiro leria usando sons do português do Brasil). Use 🇧🇷 antes. Exemplo: "What time is it?" 🇧🇷 (uát táimi is it?). Aplique isso nas perguntas E nas opções de resposta.'
+    : '';
 
   if (mode === 'chat') {
     return 'Você é um professor particular de ' + lang + ' para um aluno brasileiro de nível ' + levelLabel + '. ' +
       'Ensine o idioma de forma divertida e interativa. Adapte a complexidade das explicações ao nível do aluno. ' +
       'Use exemplos práticos, frases do dia a dia, e explique gramática de forma simples. ' +
       'Quando der exemplos no idioma, sempre forneça a tradução para português. ' +
-      'Corrija erros com gentileza e incentive o aluno. Responda em português do Brasil, usando ' + lang + ' apenas para exemplos e exercícios.';
+      'Corrija erros com gentileza e incentive o aluno. Responda em português do Brasil, usando ' + lang + ' apenas para exemplos e exercícios.' + abrChat;
   } else if (mode === 'activity') {
     return 'Você é um professor de ' + lang + ' para um aluno brasileiro de nível ' + levelLabel + '. ' +
       'O aluno precisa de ajuda com uma atividade de ' + lang + '. ' +
       'Ajude o aluno a entender e resolver a atividade passo a passo. ' +
       'Explique regras gramaticais, vocabulário e contexto cultural quando relevante. ' +
       'NÃO dê a resposta diretamente - guie o aluno para que ele compreenda o raciocínio. ' +
-      'Responda em português do Brasil, usando ' + lang + ' apenas para os exemplos.';
+      'Responda em português do Brasil, usando ' + lang + ' apenas para os exemplos.' + abrActivity;
   } else {
     return 'Você é um gerador de quizzes para ensino de ' + lang + ' para alunos brasileiros de nível ' + levelLabel + '. ' +
       'Gere 5 perguntas de múltipla escolha sobre ' + lang + ' adequadas ao nível ' + levelLabel + '. ' +
       'Inclua perguntas sobre vocabulário, gramática, tradução e expressões comuns. ' +
       'Retorne APENAS um JSON válido sem texto adicional, no formato:\n' +
       '{"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}\n' +
-      'O campo "correct" é o índice (0-3) da opção correta. As perguntas devem ser variadas e educativas.';
+      'O campo "correct" é o índice (0-3) da opção correta. As perguntas devem ser variadas e educativas.' + abrQuiz;
   }
 }
 
@@ -2448,7 +2542,7 @@ async function loadUnitTopics(unitIdx) {
 
   if (state.langMode) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
-    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de um curso de ' + subject + '. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade.';
+    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de um curso de ' + subject + '. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade.' + (state.abrasileirado ? ' Se o tópico tiver termos em ' + subject + ', inclua a pronúncia abrasileirada 🇧🇷 entre parênteses.' : '');
     userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' do curso de ' + subject + ' nível ' + langLevel + '. Retorne apenas JSON.';
   } else if (state.currentContext === 'college') {
     var courseName = state.college.courseName || 'Ensino Superior';
@@ -2534,7 +2628,7 @@ async function showTopicExplanation(unitIdx, topicIdx, topicName) {
 
   if (state.langMode) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
-    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Explique de forma clara, didática e com exemplos o seguinte tópico: "' + topicName + '". Use markdown para formatar a resposta. Responda em português do Brasil.';
+    sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Explique de forma clara, didática e com exemplos o seguinte tópico: "' + topicName + '". Use markdown para formatar a resposta. Responda em português do Brasil.' + (state.abrasileirado ? ' MODO ABRASILEIRADO: Sempre que escrever palavras ou frases em ' + subject + ', adicione a pronúncia abrasileirada 🇧🇷 entre parênteses (como um brasileiro leigo falaria usando sons do português). Exemplo: "Thank you" → 🇧🇷 *(thenk iú)*' : '');
   } else if (state.currentContext === 'college') {
     var courseName = state.college.courseName || 'Ensino Superior';
     sysPrompt = 'Você é um professor universitário de ' + subject + ' do curso de ' + courseName + '. Explique de forma aprofundada e didática o seguinte tópico: "' + topicName + '". Use markdown, exemplos e referências. Responda em português do Brasil.';
@@ -2932,6 +3026,7 @@ function selectLanguageCard(name) {
   var info = LANGUAGES[name];
   $('langLevelTitle').innerHTML = '<span style="font-size:1.2em;">' + info.flag + '</span> Escolha o nível de ' + name;
   renderLangLevels(name);
+  syncAbrToggleUI();
   show('langLevelSection');
 
   // Scroll to levels
@@ -2939,6 +3034,25 @@ function selectLanguageCard(name) {
   setTimeout(function() {
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
+}
+
+function toggleAbrasileirado() {
+  state.abrasileirado = !state.abrasileirado;
+  var bar = $('abrToggleBar');
+  if (state.abrasileirado) {
+    bar.classList.add('active');
+  } else {
+    bar.classList.remove('active');
+  }
+  store.set('abrasileirado', state.abrasileirado ? 'true' : 'false');
+}
+
+function syncAbrToggleUI() {
+  var bar = $('abrToggleBar');
+  if (bar) {
+    if (state.abrasileirado) bar.classList.add('active');
+    else bar.classList.remove('active');
+  }
 }
 
 function renderLangLevels(langName) {
@@ -2982,7 +3096,12 @@ function openLangSubject(langName, levelId) {
 
   $('subjectIcon').style.background = info.color;
   $('subjectIcon').innerHTML = '<span style="font-size:1.1em;">' + info.flag + '</span>';
-  $('subjectTitle').textContent = langName + ' — ' + (levelObj ? levelObj.label : '');
+  var titleText = langName + ' — ' + (levelObj ? levelObj.label : '');
+  if (state.abrasileirado) {
+    $('subjectTitle').innerHTML = titleText + ' <span class="abr-badge">🇧🇷 Abrasileirado</span>';
+  } else {
+    $('subjectTitle').textContent = titleText;
+  }
 
   $('headerTitle').textContent = langName;
   show('backBtn');
@@ -3452,6 +3571,9 @@ function tryRestoreSession() {
     if (savedCollege) state.college = savedCollege;
     var savedConcurso = store.get('concurso', null);
     if (savedConcurso) state.concurso = savedConcurso;
+
+    var savedAbr = store.get('abrasileirado', null);
+    if (savedAbr === 'true') state.abrasileirado = true;
 
     // Update model select
     $('modelSelect').value = savedModel;
