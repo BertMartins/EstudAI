@@ -7,6 +7,22 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Favicon SVG -->
+        <link rel="icon" type="image/svg+xml"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0f0c'/%3E%3Ctext x='50' y='32' font-size='18' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M50 38 C38 38 34 48 34 54 C34 66 46 70 50 78 C54 70 66 66 66 54 C66 48 62 38 50 38 Z' fill='url(%23g)'/%3E%3Crect x='47' y='70' width='6' height='10' rx='2' fill='%238b5a2b'/%3E%3C/svg%3E">
+
+        <!-- Atalho iPhone -->
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="img/LOGO_ATALHO.png">
+        <link rel="icon" type="image/png" sizes="32x32"
+            href="img/LOGO_ATALHO.png">
+        <link rel="icon" type="image/png" sizes="16x16"
+            href="img/LOGO_ATALHO.png">
+
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
+  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -778,6 +794,46 @@ input, textarea { font-size: 16px; }
   .subject-card { padding: 1rem; }
 
 }
+
+/* ===== Role selection ===== */
+.role-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.role-card:hover { transform: translateY(-4px); border-color: var(--accent-1); }
+.role-card.selected { border-color: var(--accent-1); box-shadow: 0 0 0 3px rgba(108,92,231,0.2); background: linear-gradient(135deg, rgba(108,92,231,0.05), rgba(108,92,231,0.02)); }
+.role-card .role-icon {
+  width: 64px; height: 64px; border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 0.75rem; font-size: 28px; color: white;
+}
+.teacher-step { display: none; }
+.teacher-step.active { display: block; animation: fadeUp 0.3s ease; }
+.teacher-type-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.teacher-type-card:hover { border-color: var(--accent-1); transform: translateY(-2px); }
+.teacher-type-card.selected { border-color: var(--accent-1); background: rgba(108,92,231,0.06); }
+.teacher-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 6px;
+  background: rgba(14,165,233,0.15); color: #0EA5E9;
+}
 </style>
 </head>
 <body class="font-body">
@@ -833,8 +889,8 @@ input, textarea { font-size: 16px; }
 </section>
 
 <!-- ===== SETUP SCREEN ===== -->
-<section id="setupScreen" class="view-hidden min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-lg anim-fade-up">
+<section id="setupScreen" class="view-hidden min-h-screen flex items-center justify-center p-4" style="overflow-y:auto;">
+  <div class="w-full max-w-lg anim-fade-up" style="margin:2rem auto;">
     <div class="text-center mb-6">
       <h2 class="font-brand text-3xl font-bold gradient-text">Bem-vindo! 🎉</h2>
       <p class="font-heading text-sm mt-1" style="color:var(--text-2)">Nos conte um pouco sobre você</p>
@@ -847,28 +903,121 @@ input, textarea { font-size: 16px; }
         class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-5"
         style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
         onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
+
+      <!-- Role Selection -->
       <label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)">
-        <i class="fas fa-school mr-1"></i> Sua série
+        <i class="fas fa-users mr-1"></i> Você é:
       </label>
-      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1)">
-        <i class="fas fa-seedling mr-1"></i> Ensino Fundamental I
-      </p>
-      <div class="grid grid-cols-5 gap-2 mb-4" id="gradeGridF1"></div>
-      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2)">
-        <i class="fas fa-leaf mr-1"></i> Ensino Fundamental II
-      </p>
-      <div class="grid grid-cols-4 gap-2 mb-4" id="gradeGridF2"></div>
-      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4)">
-        <i class="fas fa-tree mr-1"></i> Ensino Médio
-      </p>
-      <div class="grid grid-cols-3 gap-2 mb-4" id="gradeGridEM"></div>
-      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-2)">
-        <i class="fas fa-graduation-cap mr-1"></i> Já Formado
-      </p>
-      <div class="grid grid-cols-1 gap-2 mb-5" id="gradeGridEMC"></div>
-      <button class="btn-primary w-full justify-center" onclick="completeSetup()">
-        <i class="fas fa-rocket"></i> Começar a Estudar!
-      </button>
+      <div class="grid grid-cols-2 gap-3 mb-5" id="roleSelection">
+        <div class="role-card" onclick="selectRole('aluno')">
+          <div class="role-icon" style="background:linear-gradient(135deg, #6C5CE7, #A78BFA);">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <p class="font-heading font-bold">Aluno(a)</p>
+          <p class="text-xs mt-1" style="color:var(--text-3);">Quero estudar</p>
+        </div>
+        <div class="role-card" onclick="selectRole('professor')">
+          <div class="role-icon" style="background:linear-gradient(135deg, #0EA5E9, #06B6D4);">
+            <i class="fas fa-chalkboard-teacher"></i>
+          </div>
+          <p class="font-heading font-bold">Professor(a)</p>
+          <p class="text-xs mt-1" style="color:var(--text-3);">Quero ensinar</p>
+        </div>
+      </div>
+
+      <!-- Student Setup (shown when aluno selected) -->
+      <div id="studentSetup" class="view-hidden">
+        <label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)">
+          <i class="fas fa-school mr-1"></i> Sua série
+        </label>
+        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1)">
+          <i class="fas fa-seedling mr-1"></i> Ensino Fundamental I
+        </p>
+        <div class="grid grid-cols-5 gap-2 mb-4" id="gradeGridF1"></div>
+        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2)">
+          <i class="fas fa-leaf mr-1"></i> Ensino Fundamental II
+        </p>
+        <div class="grid grid-cols-4 gap-2 mb-4" id="gradeGridF2"></div>
+        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4)">
+          <i class="fas fa-tree mr-1"></i> Ensino Médio
+        </p>
+        <div class="grid grid-cols-3 gap-2 mb-4" id="gradeGridEM"></div>
+        <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-2)">
+          <i class="fas fa-graduation-cap mr-1"></i> Já Formado
+        </p>
+        <div class="grid grid-cols-1 gap-2 mb-5" id="gradeGridEMC"></div>
+        <button class="btn-primary w-full justify-center" onclick="completeSetup()">
+          <i class="fas fa-rocket"></i> Começar a Estudar!
+        </button>
+      </div>
+
+      <!-- Teacher Setup (shown when professor selected) -->
+      <div id="teacherSetup" class="view-hidden">
+        <!-- Step 1: Type -->
+        <div class="teacher-step active" id="teacherStep1">
+          <label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)">
+            <i class="fas fa-building mr-1"></i> Onde você leciona?
+          </label>
+          <div class="flex flex-col gap-2 mb-4">
+            <div class="teacher-type-card" onclick="selectTeacherType('escola')">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:#6C5CE7;">
+                <i class="fas fa-school"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-heading font-bold text-sm">Escola</p>
+                <p class="text-xs" style="color:var(--text-3);">Ensino Fundamental ou Médio</p>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-3);"></i>
+            </div>
+            <div class="teacher-type-card" onclick="selectTeacherType('idioma')">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:#EC4899;">
+                <i class="fas fa-globe"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-heading font-bold text-sm">Curso de Idioma</p>
+                <p class="text-xs" style="color:var(--text-3);">Ensino de línguas estrangeiras</p>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-3);"></i>
+            </div>
+            <div class="teacher-type-card" onclick="selectTeacherType('faculdade')">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white" style="background:#3B82F6;">
+                <i class="fas fa-university"></i>
+              </div>
+              <div class="flex-1">
+                <p class="font-heading font-bold text-sm">Faculdade</p>
+                <p class="text-xs" style="color:var(--text-3);">Ensino Superior</p>
+              </div>
+              <i class="fas fa-chevron-right" style="color:var(--text-3);"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Grade/Language/Course (dynamic content) -->
+        <div class="teacher-step" id="teacherStep2">
+          <button class="text-xs font-bold mb-3 flex items-center gap-1" style="color:var(--accent-1);background:none;border:none;cursor:pointer;" onclick="teacherGoBackStep(1)">
+            <i class="fas fa-arrow-left"></i> Voltar
+          </button>
+          <div id="teacherStep2Content"></div>
+        </div>
+
+        <!-- Step 3: Subject name -->
+        <div class="teacher-step" id="teacherStep3">
+          <button class="text-xs font-bold mb-3 flex items-center gap-1" style="color:var(--accent-1);background:none;border:none;cursor:pointer;" onclick="teacherGoBackStep(2)">
+            <i class="fas fa-arrow-left"></i> Voltar
+          </button>
+          <label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)">
+            <i class="fas fa-book mr-1"></i> Qual matéria você leciona?
+          </label>
+          <input id="teacherSubjectInput" type="text" placeholder="Ex: Matemática, Física, Inglês..."
+            class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-2"
+            style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"
+            onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
+          <p class="text-xs mb-5" style="color:var(--text-3);" id="teacherSubjectHint">Digite o nome da matéria que você ensina</p>
+          <button class="btn-primary w-full justify-center" onclick="completeTeacherSetup()">
+            <i class="fas fa-chalkboard"></i> Começar a Ensinar!
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -916,7 +1065,7 @@ input, textarea { font-size: 16px; }
       <h2 class="font-heading text-2xl font-bold" id="welcomeMsg"></h2>
       <div class="flex items-center justify-between mt-1">
         <p class="text-sm" style="color:var(--text-2);">Escolha uma matéria para começar</p>
-        <button onclick="openSubjectManagerModal()" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--bg-input);color:var(--accent-1);border:1px solid var(--border);cursor:pointer;"
+        <button id="manageSubjectsBtn" onclick="openSubjectManagerModal()" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--bg-input);color:var(--accent-1);border:1px solid var(--border);cursor:pointer;"
           onmouseenter="this.style.background='var(--accent-1)';this.style.color='white';this.style.borderColor='var(--accent-1)'"
           onmouseleave="this.style.background='var(--bg-input)';this.style.color='var(--accent-1)';this.style.borderColor='var(--border)'">
           <i class="fas fa-pen text-xs"></i> Matérias
@@ -924,7 +1073,7 @@ input, textarea { font-size: 16px; }
       </div>
     </div>
     <!-- Calculator Card -->
-    <div class="calc-card mb-5 anim-fade-up" style="animation-delay:0.05s" onclick="openCalcView()">
+    <div class="calc-card mb-5 anim-fade-up" id="calcCardWrap" style="animation-delay:0.05s" onclick="openCalcView()">
       <div class="flex items-center gap-3 relative z-10">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
           <i class="fas fa-chart-line text-xl"></i>
@@ -937,7 +1086,7 @@ input, textarea { font-size: 16px; }
       </div>
     </div>
     <!-- Language Course Card -->
-    <div class="lang-card mb-5 anim-fade-up" style="animation-delay:0.1s" onclick="openLangSelectView()">
+    <div class="lang-card mb-5 anim-fade-up" id="langCardWrap" style="animation-delay:0.1s" onclick="openLangSelectView()">
       <div class="flex items-center gap-3 relative z-10">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
           <i class="fas fa-globe text-xl"></i>
@@ -976,7 +1125,7 @@ input, textarea { font-size: 16px; }
       </div>
     </div>
     <!-- Random Quiz Card -->
-    <div class="feature-card random-quiz-card mb-5 anim-fade-up" style="animation-delay:0.25s" onclick="startRandomQuiz()">
+    <div class="feature-card random-quiz-card mb-5 anim-fade-up" id="randomQuizCardWrap" style="animation-delay:0.25s" onclick="startRandomQuiz()">
       <div class="flex items-center gap-3 relative z-10">
         <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
           <i class="fas fa-shuffle text-xl"></i>
@@ -1101,7 +1250,7 @@ input, textarea { font-size: 16px; }
       <div class="topics-unit-count-bar anim-fade-up">
         <i class="fas fa-layer-group" style="color:var(--accent-1);"></i>
         <span class="font-heading font-bold text-sm" id="topicsUnitLabel" style="color:var(--text-2);"></span>
-        <span class="text-xs" style="color:var(--text-3);flex:1;">Clique na unidade para carregar os tópicos via IA</span>
+        <span class="text-xs" style="color:var(--text-3);flex:1;" id="topicsHint">Clique na unidade para carregar os tópicos via IA</span>
       </div>
       <div id="topicsUnitList"></div>
     </div>
@@ -1330,6 +1479,15 @@ const state = {
   currentLanguage: null,
   currentLangLevel: null,
   abrasileirado: false,
+  role: 'aluno', // 'aluno' | 'professor'
+  teacherConfig: {
+    type: '', // 'escola' | 'idioma' | 'faculdade'
+    grade: null,
+    subject: '',
+    language: null,
+    langLevel: null,
+    courseName: ''
+  },
   currentContext: 'school',
   userSubjects: [],
   customSubjectDefs: {},
@@ -2007,11 +2165,15 @@ function confirmResetAll() {
   store.remove('college');
   store.remove('concurso');
   store.remove('abrasileirado');
+  store.remove('role');
+  store.remove('teacherConfig');
 
   // Reset state
   state.apiKey = '';
   state.model = 'GPT-5.2';
   state.studentName = '';
+  state.role = 'aluno';
+  state.teacherConfig = { type: '', grade: null, subject: '', language: null, langLevel: null, courseName: '' };
   state.grade = null;
   state.chatHistories = {};
   state.langMode = false;
@@ -2181,14 +2343,182 @@ function selectGrade(grade, btn) {
   state.grade = grade;
 }
 
+// ===== ROLE SELECTION =====
+function selectRole(role) {
+  state.role = role;
+  var cards = $('roleSelection').querySelectorAll('.role-card');
+  cards.forEach(function(c, i) {
+    c.classList.toggle('selected', (i === 0 && role === 'aluno') || (i === 1 && role === 'professor'));
+  });
+  if (role === 'aluno') {
+    show('studentSetup');
+    hide('teacherSetup');
+  } else {
+    hide('studentSetup');
+    show('teacherSetup');
+    // Reset teacher steps
+    document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+    $('teacherStep1').classList.add('active');
+    state.teacherConfig = { type: '', grade: null, subject: '', language: null, langLevel: null, courseName: '' };
+  }
+}
+
+function selectTeacherType(type) {
+  state.teacherConfig.type = type;
+  var cards = $('teacherStep1').querySelectorAll('.teacher-type-card');
+  cards.forEach(function(c) { c.classList.remove('selected'); });
+  event.currentTarget.classList.add('selected');
+
+  // Move to step 2
+  document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+  $('teacherStep2').classList.add('active');
+
+  var content = $('teacherStep2Content');
+  if (type === 'escola') {
+    var html = '<label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)"><i class="fas fa-school mr-1"></i> Para qual série você leciona?</label>';
+    html += '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-1);"><i class="fas fa-seedling mr-1"></i> Ensino Fundamental I</p>';
+    html += '<div class="grid grid-cols-5 gap-2 mb-3">';
+    GRADES.filter(function(g){ return g.level === 'f1'; }).forEach(function(g) {
+      html += '<button class="grade-btn" onclick="selectTeacherGrade(\'' + g.id + '\', this)" data-grade-id="' + g.id + '">' + g.label + '</button>';
+    });
+    html += '</div>';
+    html += '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-2);"><i class="fas fa-leaf mr-1"></i> Ensino Fundamental II</p>';
+    html += '<div class="grid grid-cols-4 gap-2 mb-3">';
+    GRADES.filter(function(g){ return g.level === 'f2'; }).forEach(function(g) {
+      html += '<button class="grade-btn" onclick="selectTeacherGrade(\'' + g.id + '\', this)" data-grade-id="' + g.id + '">' + g.label + '</button>';
+    });
+    html += '</div>';
+    html += '<p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--accent-4);"><i class="fas fa-tree mr-1"></i> Ensino Médio</p>';
+    html += '<div class="grid grid-cols-3 gap-2 mb-4">';
+    GRADES.filter(function(g){ return g.level === 'em'; }).forEach(function(g) {
+      html += '<button class="grade-btn" onclick="selectTeacherGrade(\'' + g.id + '\', this)" data-grade-id="' + g.id + '">' + g.label + '</button>';
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  } else if (type === 'idioma') {
+    var html2 = '<label class="block font-heading font-semibold text-sm mb-3" style="color:var(--text-2)"><i class="fas fa-globe mr-1"></i> Qual idioma você ensina?</label>';
+    html2 += '<div class="grid grid-cols-3 gap-2 mb-4">';
+    Object.keys(LANGUAGES).forEach(function(langName) {
+      var info = LANGUAGES[langName];
+      html2 += '<button class="grade-btn" style="font-size:12px;" onclick="selectTeacherLang(\'' + langName + '\', this)">' + info.flag + ' ' + langName + '</button>';
+    });
+    html2 += '</div>';
+    html2 += '<div id="teacherLangLevelArea" class="view-hidden"><label class="block font-heading font-semibold text-xs mb-2" style="color:var(--text-2);">Nível:</label><div class="grid grid-cols-3 gap-2">';
+    LANG_LEVELS.forEach(function(lv) {
+      html2 += '<button class="grade-btn" style="font-size:12px;" onclick="selectTeacherLangLevel(\'' + lv.id + '\', this)">' + lv.label + '</button>';
+    });
+    html2 += '</div></div>';
+    content.innerHTML = html2;
+  } else if (type === 'faculdade') {
+    var html3 = '<label class="block font-heading font-semibold text-sm mb-2" style="color:var(--text-2)"><i class="fas fa-university mr-1"></i> Nome do curso</label>';
+    html3 += '<input id="teacherCourseInput" type="text" placeholder="Ex: Engenharia, Direito, Medicina..."';
+    html3 += ' class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-3"';
+    html3 += ' style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"';
+    html3 += ' onfocus="this.style.borderColor=\'var(--accent-1)\'" onblur="this.style.borderColor=\'var(--border)\'">';
+    html3 += '<button class="btn-primary w-full justify-center" onclick="confirmTeacherCourse()"><i class="fas fa-check mr-1"></i> Confirmar</button>';
+    content.innerHTML = html3;
+  }
+}
+
+function selectTeacherGrade(gradeId, btn) {
+  var g = GRADES.find(function(gr) { return gr.id === gradeId; });
+  if (!g) return;
+  state.teacherConfig.grade = g;
+  $('teacherStep2Content').querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  // Auto-advance to step 3
+  setTimeout(function() {
+    document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+    $('teacherStep3').classList.add('active');
+    $('teacherSubjectHint').textContent = 'Matéria para turma do ' + g.label;
+  }, 200);
+}
+
+function selectTeacherLang(langName, btn) {
+  state.teacherConfig.language = langName;
+  $('teacherStep2Content').querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  show('teacherLangLevelArea');
+}
+
+function selectTeacherLangLevel(levelId, btn) {
+  state.teacherConfig.langLevel = levelId;
+  $('teacherLangLevelArea').querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  // Auto-advance
+  setTimeout(function() {
+    document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+    $('teacherStep3').classList.add('active');
+    var lvLabel = (LANG_LEVELS.find(function(l) { return l.id === levelId; }) || {label:''}).label;
+    $('teacherSubjectInput').value = state.teacherConfig.language;
+    $('teacherSubjectHint').textContent = 'Idioma: ' + state.teacherConfig.language + ' — Nível: ' + lvLabel;
+  }, 200);
+}
+
+function confirmTeacherCourse() {
+  var name = $('teacherCourseInput').value.trim();
+  if (!name) { showToast('Digite o nome do curso'); return; }
+  state.teacherConfig.courseName = name;
+  document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+  $('teacherStep3').classList.add('active');
+  $('teacherSubjectHint').textContent = 'Curso: ' + name;
+}
+
+function teacherGoBackStep(step) {
+  document.querySelectorAll('.teacher-step').forEach(function(s) { s.classList.remove('active'); });
+  $('teacherStep' + step).classList.add('active');
+}
+
+function completeTeacherSetup() {
+  var name = $('nameInput').value.trim();
+  if (!name) { showToast('Digite seu nome'); return; }
+  var subject = $('teacherSubjectInput').value.trim();
+  if (!subject) { showToast('Digite a matéria que leciona'); return; }
+
+  var tc = state.teacherConfig;
+  if (tc.type === 'escola' && !tc.grade) { showToast('Selecione a série'); return; }
+  if (tc.type === 'idioma' && (!tc.language || !tc.langLevel)) { showToast('Selecione idioma e nível'); return; }
+  if (tc.type === 'faculdade' && !tc.courseName) { showToast('Informe o nome do curso'); return; }
+
+  tc.subject = subject;
+  state.role = 'professor';
+  state.studentName = name;
+
+  // Set grade for escola teachers (needed for some internal functions)
+  if (tc.type === 'escola' && tc.grade) {
+    state.grade = tc.grade;
+  } else {
+    // Set a default grade so internal functions don't break
+    state.grade = { id: 'prof', label: 'Professor(a)', level: 'em' };
+  }
+
+  store.set('studentName', name);
+  store.set('grade', state.grade);
+  store.set('role', state.role);
+  store.set('teacherConfig', tc);
+
+  // Initialize subjects for teacher (they have their own subject)
+  state.userSubjects = [tc.subject];
+  state.customSubjectDefs = {};
+  state.customSubjectDefs[tc.subject] = { icon: 'fa-chalkboard-teacher', color: '#0EA5E9' };
+  saveUserSubjects();
+
+  hide('setupScreen');
+  show('mainScreen');
+  initDashboard();
+  initCalcGrades();
+}
+
 function completeSetup() {
   var name = $('nameInput').value.trim();
   if (!name) { showToast('Digite seu nome'); return; }
   if (!state.grade) { showToast('Selecione sua série'); return; }
 
   state.studentName = name;
+  state.role = 'aluno';
   store.set('studentName', name);
   store.set('grade', state.grade);
+  store.set('role', 'aluno');
 
   // Initialize user subjects from defaults
   state.userSubjects = [].concat(LEVEL_SUBJECTS[state.grade.level] || []);
@@ -2205,17 +2535,41 @@ function completeSetup() {
 // ===== DASHBOARD =====
 function initDashboard() {
   $('headerName').textContent = state.studentName;
-  $('headerGrade').textContent = state.grade.label;
-  $('welcomeMsg').textContent = 'Olá, ' + state.studentName + '! 👋';
 
-  // Hide college/concurso for Ensino Fundamental students
-  var level = state.grade ? state.grade.level : '';
-  if (level === 'f1' || level === 'f2') {
+  if (state.role === 'professor') {
+    var tc = state.teacherConfig;
+    var typeLabel = tc.type === 'escola' ? (tc.grade ? tc.grade.label : 'Escola') :
+                    tc.type === 'idioma' ? (tc.language || 'Idioma') :
+                    tc.type === 'faculdade' ? (tc.courseName || 'Faculdade') : '';
+    $('headerGrade').textContent = 'Prof. — ' + typeLabel;
+    $('welcomeMsg').innerHTML = 'Olá, Prof. ' + state.studentName + '! 👋 <span class="teacher-badge"><i class="fas fa-chalkboard-teacher"></i> Professor(a)</span>';
+
+    // Hide student-only features
     hide('collegeCardWrap');
     hide('concursoCardWrap');
+    hide('langCardWrap');
+    hide('randomQuizCardWrap');
+    hide('calcCardWrap');
+    hide('manageSubjectsBtn');
   } else {
-    show('collegeCardWrap');
-    show('concursoCardWrap');
+    $('headerGrade').textContent = state.grade.label;
+    $('welcomeMsg').textContent = 'Olá, ' + state.studentName + '! 👋';
+
+    // Show student-only features (in case they were hidden)
+    show('langCardWrap');
+    show('randomQuizCardWrap');
+    show('calcCardWrap');
+    show('manageSubjectsBtn');
+
+    // Hide college/concurso for Ensino Fundamental students
+    var level = state.grade ? state.grade.level : '';
+    if (level === 'f1' || level === 'f2') {
+      hide('collegeCardWrap');
+      hide('concursoCardWrap');
+    } else {
+      show('collegeCardWrap');
+      show('concursoCardWrap');
+    }
   }
 
   var grid = $('subjectGrid');
@@ -2432,6 +2786,39 @@ function getLangSystemPrompt(mode) {
 function getSystemPrompt(mode) {
   if (state.langMode) return getLangSystemPrompt(mode);
 
+  // Teacher mode prompts
+  if (state.role === 'professor') {
+    var tc = state.teacherConfig;
+    var tSubject = tc.subject || state.currentSubject;
+    var tContext = '';
+    if (tc.type === 'escola' && tc.grade) {
+      tContext = 'turma do ' + tc.grade.label + ' no Brasil';
+    } else if (tc.type === 'idioma') {
+      var lvl = (LANG_LEVELS.find(function(l) { return l.id === tc.langLevel; }) || {label:'Iniciante'}).label;
+      tContext = 'alunos de ' + (tc.language || 'idioma') + ' no nível ' + lvl;
+    } else if (tc.type === 'faculdade') {
+      tContext = 'alunos do curso de ' + (tc.courseName || 'Ensino Superior');
+    }
+    if (mode === 'chat') {
+      return 'Você é um assistente pedagógico para um professor de ' + tSubject +
+        ' que leciona para ' + tContext + '. ' +
+        'Ajude o professor com planejamento de aulas, explicações de conteúdo, estratégias pedagógicas, ' +
+        'elaboração de materiais e resolução de dúvidas sobre o tema. ' +
+        'Seja profissional, detalhado e prático. Responda em português do Brasil.';
+    } else if (mode === 'activity') {
+      return 'Você é um assistente pedagógico para um professor de ' + tSubject +
+        ' que leciona para ' + tContext + '. ' +
+        'O professor precisa de ajuda para criar ou corrigir uma atividade educacional. ' +
+        'Sugira atividades criativas, com objetivos de aprendizagem claros, adaptadas ao nível dos alunos. ' +
+        'Inclua gabarito/resolução quando aplicável. Responda em português do Brasil.';
+    } else {
+      return 'Gere 5 perguntas de múltipla escolha sobre ' + tSubject +
+        ' adequadas para ' + tContext + '. ' +
+        'As perguntas devem ser úteis para o professor aplicar em sala de aula ou avaliação. ' +
+        'Retorne APENAS um JSON válido: {"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
+    }
+  }
+
   if (state.currentContext === 'college') {
     var courseName = state.college.courseName || 'Ensino Superior';
     var subjectCollege = state.currentSubject;
@@ -2505,6 +2892,12 @@ function getGlobalUnits() {
 
 function initTopicsView() {
   $('topicsUnitLabel').textContent = getGlobalUnits() + ' Unidades';
+  var hint = $('topicsHint');
+  if (hint) {
+    hint.textContent = state.role === 'professor'
+      ? 'Clique na unidade para ver como dar aula sobre cada tópico'
+      : 'Clique na unidade para carregar os tópicos via IA';
+  }
   renderUnitsAccordion();
 }
 
@@ -2607,7 +3000,15 @@ async function loadUnitTopics(unitIdx) {
   var totalUnits = getGlobalUnits();
   var sysPrompt, userMsg;
 
-  if (state.langMode) {
+  if (state.role === 'professor') {
+    var tc = state.teacherConfig;
+    var tContext = '';
+    if (tc.type === 'escola' && tc.grade) tContext = 'turma do ' + tc.grade.label;
+    else if (tc.type === 'idioma') tContext = 'alunos de ' + (tc.language || 'idioma') + ' nível ' + (LANG_LEVELS.find(function(l) { return l.id === tc.langLevel; }) || {label:'Iniciante'}).label;
+    else if (tc.type === 'faculdade') tContext = 'alunos do curso de ' + (tc.courseName || 'Ensino Superior');
+    sysPrompt = 'Você é um consultor pedagógico ajudando um professor de ' + subject + ' que leciona para ' + tContext + '. Gere uma lista de tópicos que o professor deve abordar na Unidade ' + unitNum + ' de ' + totalUnits + ' unidades do período letivo. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos seguindo o currículo e a sequência didática adequada.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' para professor. Retorne apenas JSON.';
+  } else if (state.langMode) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
     sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de um curso de ' + subject + '. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade.' + (state.abrasileirado ? ' Se o tópico tiver termos em ' + subject + ', inclua a pronúncia abrasileirada 🇧🇷 entre parênteses.' : '');
     userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' do curso de ' + subject + ' nível ' + langLevel + '. Retorne apenas JSON.';
@@ -2687,13 +3088,30 @@ async function showTopicExplanation(unitIdx, topicIdx, topicName) {
   var explBox = document.createElement('div');
   explBox.className = 'topic-explanation-box';
   explBox.id = 'topicExpl_' + unitIdx + '_' + topicIdx;
-  explBox.innerHTML = '<div class="flex items-center gap-2" style="color:var(--text-3);font-size:0.85rem;"><div class="spinner" style="border-color:var(--border);border-top-color:var(--accent-1);width:18px;height:18px;"></div> Explicando...</div>';
+  var loadingText = state.role === 'professor' ? 'Gerando plano de aula...' : 'Explicando...';
+  explBox.innerHTML = '<div class="flex items-center gap-2" style="color:var(--text-3);font-size:0.85rem;"><div class="spinner" style="border-color:var(--border);border-top-color:var(--accent-1);width:18px;height:18px;"></div> ' + loadingText + '</div>';
   topicItem.insertAdjacentElement('afterend', explBox);
 
   var subject = state.currentSubject;
   var sysPrompt;
 
-  if (state.langMode) {
+  if (state.role === 'professor') {
+    var tc = state.teacherConfig;
+    var tContext = '';
+    if (tc.type === 'escola' && tc.grade) tContext = 'uma turma do ' + tc.grade.label;
+    else if (tc.type === 'idioma') tContext = 'alunos de ' + (tc.language || 'idioma') + ' nível ' + (LANG_LEVELS.find(function(l) { return l.id === tc.langLevel; }) || {label:'Iniciante'}).label;
+    else if (tc.type === 'faculdade') tContext = 'alunos do curso de ' + (tc.courseName || 'Ensino Superior');
+    sysPrompt = 'Você é um consultor pedagógico ajudando um professor de ' + subject + ' que leciona para ' + tContext + '. ' +
+      'O professor precisa de orientação sobre COMO DAR AULA sobre o seguinte tópico: "' + topicName + '". ' +
+      'Forneça um plano de aula detalhado em Markdown incluindo:\n' +
+      '1. **Objetivo da aula** — o que os alunos devem aprender\n' +
+      '2. **Introdução** — como abrir o assunto e engajar os alunos (5-10 min)\n' +
+      '3. **Desenvolvimento** — como explicar o conteúdo passo a passo, o que falar, exemplos para usar no quadro, analogias\n' +
+      '4. **Atividade prática** — sugestão de exercício ou dinâmica em sala\n' +
+      '5. **Fechamento** — como encerrar, resumo e verificação de aprendizagem\n' +
+      '6. **Dicas do professor** — erros comuns dos alunos, como responder dúvidas frequentes\n' +
+      'Responda em português do Brasil.';
+  } else if (state.langMode) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
     sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Explique de forma clara, didática e com exemplos o seguinte tópico: "' + topicName + '". Use markdown para formatar a resposta. Responda em português do Brasil.' + (state.abrasileirado ? ' MODO ABRASILEIRADO: Sempre que escrever palavras ou frases em ' + subject + ', adicione a pronúncia abrasileirada 🇧🇷 entre parênteses (como um brasileiro leigo falaria usando sons do português). Exemplo: "Thank you" → 🇧🇷 *(thenk iú)*' : '');
   } else if (state.currentContext === 'college') {
@@ -3646,17 +4064,24 @@ function tryRestoreSession() {
     var savedAbr = store.get('abrasileirado', null);
     if (savedAbr === 'true') state.abrasileirado = true;
 
+    // Restore role and teacher config
+    var savedRole = store.get('role', 'aluno');
+    state.role = savedRole;
+    var savedTC = store.get('teacherConfig', null);
+    if (savedTC) state.teacherConfig = savedTC;
+
     // Update model select
     $('modelSelect').value = savedModel;
 
     hide('apiKeyScreen');
     hide('setupScreen');
     show('mainScreen');
-  
+
 
     initCalcGrades();
     initDashboard();
-    showToast('Bem-vindo de volta, ' + savedName + '! 👋', 'success');
+    var welcomePrefix = (state.role === 'professor') ? 'Bem-vindo de volta, Prof. ' : 'Bem-vindo de volta, ';
+    showToast(welcomePrefix + savedName + '! 👋', 'success');
     return true;
   }
 
@@ -3674,7 +4099,10 @@ $('apiKeyInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') validateApiKey();
 });
 $('nameInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') completeSetup();
+  if (e.key === 'Enter') {
+    if (state.role === 'professor') return; // teacher flow uses its own button
+    completeSetup();
+  }
 });
 
 // ===== INIT =====
