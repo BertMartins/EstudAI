@@ -200,15 +200,17 @@ input, textarea { font-size: 16px; }
 
 /* ===== Tabs ===== */
 .tab-btn {
-  padding: 10px 20px;
+  padding: 10px 16px;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
   border: 2px solid transparent;
   background: transparent;
   color: var(--text-3);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .tab-btn.active {
   background: var(--accent-1);
@@ -887,9 +889,9 @@ input, textarea { font-size: 16px; }
 }
 
 @media (max-width: 640px) {
-  .tab-btn { padding: 8px 14px; font-size: 12px; }
+  .tab-btn { padding: 7px 10px; font-size: 11px; }
+  .tab-btn i { display: none; }
   .subject-card { padding: 1rem; }
-
 }
 </style>
 </head>
@@ -3805,6 +3807,12 @@ function openLangSubject(langName, levelId) {
   // Show Bate-papo tab for language mode & reset mic for new language
   show('converseTabBtn');
   resetConverseMic();
+  // Scroll tab bar to reveal Bate-papo tab after a short delay
+  setTimeout(function() {
+    var tabBar = $('tabBar');
+    var btn = $('converseTabBtn');
+    if (tabBar && btn) { tabBar.scrollLeft = tabBar.scrollWidth; }
+  }, 100);
 
   $('headerTitle').textContent = langName;
   show('backBtn');
