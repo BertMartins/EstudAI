@@ -22,7 +22,7 @@
         <!-- Apple Touch Icon -->
         <link rel="apple-touch-icon" sizes="180x180"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
-  
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -589,8 +589,6 @@ input, textarea { font-size: 16px; }
   border-radius: 50%;
   background: rgba(255,255,255,0.1);
 }
-.college-card { background: linear-gradient(135deg, #3B82F6, #6366F1); }
-.college-card:hover { box-shadow: 0 8px 28px rgba(59,130,246,0.3); }
 .concurso-card { background: linear-gradient(135deg, #F59E0B, #F97316); }
 .concurso-card:hover { box-shadow: 0 8px 28px rgba(245,158,11,0.3); }
 .random-quiz-card { background: linear-gradient(135deg, var(--accent-2), #A855F7, var(--accent-1)); }
@@ -885,7 +883,33 @@ input, textarea { font-size: 16px; }
       <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--success)">
         <i class="fas fa-chalkboard-user mr-1"></i> Sou Professor(a)
       </p>
-      <div class="grid grid-cols-1 gap-2 mb-5" id="gradeGridProf"></div>
+      <div class="grid grid-cols-1 gap-2 mb-4" id="gradeGridProf"></div>
+      <p class="text-xs font-bold uppercase tracking-wider mb-2" style="color:#3B82F6">
+        <i class="fas fa-university mr-1"></i> Cursando Faculdade
+      </p>
+      <div class="grid grid-cols-1 gap-2 mb-4" id="gradeGridFac"></div>
+      <div id="facSetupExtra" class="view-hidden mb-5" style="background:var(--bg-input);border:1px solid var(--border);border-radius:14px;padding:1rem;">
+        <label class="block font-heading font-semibold text-xs mb-1" style="color:var(--text-2);">
+          <i class="fas fa-university mr-1"></i> Nome do curso
+        </label>
+        <input id="facCourseInput" type="text" placeholder="Ex: Engenharia Civil"
+          class="w-full px-3 py-2 rounded-xl border-2 outline-none font-body transition-all mb-3"
+          style="background:var(--bg-card);border-color:var(--border);color:var(--text-1);font-size:16px;"
+          onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'">
+        <label class="block font-heading font-semibold text-xs mb-1" style="color:var(--text-2);">
+          <i class="fas fa-calendar-alt mr-1"></i> Quantos semestres tem o curso?
+        </label>
+        <select id="facSemesterCount" class="w-full px-3 py-2 rounded-xl border-2 outline-none font-body font-bold"
+          style="background:var(--bg-card);border-color:var(--border);color:var(--text-1);font-size:16px;">
+          <option value="2">2 semestres</option>
+          <option value="4">4 semestres</option>
+          <option value="5">5 semestres</option>
+          <option value="6">6 semestres</option>
+          <option value="8" selected>8 semestres</option>
+          <option value="10">10 semestres</option>
+          <option value="12">12 semestres</option>
+        </select>
+      </div>
       <button class="btn-primary w-full justify-center" onclick="completeSetup()">
         <i class="fas fa-rocket"></i> Começar a Estudar!
       </button>
@@ -943,6 +967,23 @@ input, textarea { font-size: 16px; }
         </button>
       </div>
     </div>
+    <div id="facSemesterBar" class="view-hidden mb-4 anim-fade-up" style="animation-delay:0.08s;">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:0.85rem 1.1rem;box-shadow:var(--shadow);">
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-university" style="color:#3B82F6;"></i>
+            <span class="font-heading font-bold text-sm" id="facCourseDisplay"></span>
+          </div>
+          <div class="flex items-center gap-2 flex-1 justify-end">
+            <span class="text-xs font-bold" style="color:var(--text-3);">Semestre:</span>
+            <select id="facSemesterSelect" onchange="changeFacSemester(parseInt(this.value))"
+              class="px-3 py-1.5 rounded-lg border-2 font-bold text-sm"
+              style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;cursor:pointer;outline:none;">
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Calculator Card -->
     <div class="calc-card mb-5 anim-fade-up" style="animation-delay:0.05s" onclick="openCalcView()">
       <div class="flex items-center gap-3 relative z-10">
@@ -965,19 +1006,6 @@ input, textarea { font-size: 16px; }
         <div class="flex-1">
           <p class="font-heading font-bold text-base">Cursos de Idiomas</p>
           <p class="text-xs opacity-80">Aprenda novos idiomas com ajuda da IA 🌍</p>
-        </div>
-        <i class="fas fa-chevron-right opacity-60"></i>
-      </div>
-    </div>
-    <!-- College Card -->
-    <div class="feature-card college-card mb-5 anim-fade-up view-hidden" id="collegeCardWrap" style="animation-delay:0.15s" onclick="openCollegeView()">
-      <div class="flex items-center gap-3 relative z-10">
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
-          <i class="fas fa-university text-xl"></i>
-        </div>
-        <div class="flex-1">
-          <p class="font-heading font-bold text-base">Faculdade</p>
-          <p class="text-xs opacity-80" id="collegeCardSummary">Estude as matérias do seu curso universitário</p>
         </div>
         <i class="fas fa-chevron-right opacity-60"></i>
       </div>
@@ -1202,55 +1230,6 @@ input, textarea { font-size: 16px; }
     </div>
   </div>
 
-  <!-- College View -->
-  <div id="collegeView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
-    <div class="p-4 max-w-3xl mx-auto w-full">
-      <!-- Setup phase -->
-      <div id="collegeSetup" class="anim-fade-up">
-        <div class="text-center mb-6">
-          <div class="w-20 h-20 rounded-2xl mx-auto mb-3 flex items-center justify-center" style="background:linear-gradient(135deg, #3B82F6, #6366F1);">
-            <i class="fas fa-university text-white text-3xl"></i>
-          </div>
-          <h2 class="font-heading text-2xl font-bold">🎓 Faculdade</h2>
-          <p class="text-sm mt-1" style="color:var(--text-2);">Informe seu curso para começar</p>
-        </div>
-        <input id="courseNameInput" type="text" placeholder="Ex: Engenharia, Direito, Medicina..."
-          class="w-full px-4 py-3 rounded-xl border-2 outline-none font-body transition-all mb-4"
-          style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);font-size:16px;"
-          onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"
-          onkeydown="if(event.key==='Enter')saveCourseName()">
-        <button class="btn-primary w-full justify-center" onclick="saveCourseName()">
-          <i class="fas fa-arrow-right"></i> Continuar
-        </button>
-      </div>
-      <!-- Subject grid phase -->
-      <div id="collegeSubjects" class="view-hidden">
-        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <div>
-            <h2 class="font-heading text-xl font-bold">🎓 <span id="courseNameDisplay"></span></h2>
-            <p class="text-sm" style="color:var(--text-2);">Suas matérias da faculdade</p>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="editCourseName()" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--bg-input);color:var(--text-2);border:1px solid var(--border);cursor:pointer;">
-              <i class="fas fa-pen text-xs"></i> Curso
-            </button>
-            <button onclick="openSubjectManagerModal('college')" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1" style="background:var(--accent-1);color:white;border:1px solid var(--accent-1);cursor:pointer;">
-              <i class="fas fa-plus text-xs"></i> Matéria
-            </button>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 ctx-subject-grid" id="collegeSubjectGrid"></div>
-        <div id="collegeEmptyMsg" class="view-hidden text-center py-8 anim-fade-in">
-          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background:var(--bg-input);">
-            <i class="fas fa-plus-circle text-2xl" style="color:var(--accent-1)"></i>
-          </div>
-          <p class="font-heading font-bold" style="color:var(--text-2);">Nenhuma matéria ainda</p>
-          <p class="text-xs" style="color:var(--text-3);">Clique em "+ Matéria" para adicionar</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Concurso View -->
   <div id="concursoView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
     <div class="p-4 max-w-3xl mx-auto w-full">
@@ -1353,7 +1332,7 @@ const state = {
   currentContext: 'school',
   userSubjects: [],
   customSubjectDefs: {},
-  college: { courseName: '', subjects: [], customDefs: {} },
+  fac: { courseName: '', totalSemesters: 8, currentSemester: 1, semesters: {} },
   concurso: { subjects: [], customDefs: {} },
   calc: {
     units: 4,
@@ -1379,6 +1358,7 @@ const GRADES = [
   { id: '3m', label: '3ª Série EM', level: 'em' },
   { id: 'emc', label: 'EM Completo', level: 'emc' },
   { id: 'prof', label: 'Professor(a)', level: 'prof' },
+  { id: 'fac', label: 'Cursando Faculdade', level: 'fac' },
 ];
 
 const SUBJECTS = {
@@ -1402,6 +1382,7 @@ const LEVEL_SUBJECTS = {
   em: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
   emc: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês'],
   prof: ['Português', 'Matemática', 'Física', 'Química', 'Biologia', 'História', 'Geografia', 'Filosofia', 'Sociologia', 'Inglês', 'Artes', 'Ciências'],
+  fac: [],
 };
 
 const LANGUAGES = {
@@ -1467,6 +1448,12 @@ function hide(el) { if (typeof el === 'string') el = $(el); if (el) el.classList
 
 // ===== SUBJECT HELPERS =====
 function getUserSubjects() {
+  if (state.grade && state.grade.level === 'fac') {
+    var sem = state.fac.currentSemester || 1;
+    var semData = state.fac.semesters[sem];
+    if (semData && semData.subjects && semData.subjects.length > 0) return semData.subjects;
+    return [];
+  }
   if (state.userSubjects && state.userSubjects.length > 0) return state.userSubjects;
   if (state.grade && LEVEL_SUBJECTS[state.grade.level]) return LEVEL_SUBJECTS[state.grade.level];
   return [];
@@ -1474,7 +1461,10 @@ function getUserSubjects() {
 
 function getSubjectInfo(name) {
   if (state.customSubjectDefs && state.customSubjectDefs[name]) return state.customSubjectDefs[name];
-  if (state.college.customDefs && state.college.customDefs[name]) return state.college.customDefs[name];
+  if (state.grade && state.grade.level === 'fac') {
+    var facSem = state.fac.semesters[state.fac.currentSemester];
+    if (facSem && facSem.customDefs && facSem.customDefs[name]) return facSem.customDefs[name];
+  }
   if (state.concurso.customDefs && state.concurso.customDefs[name]) return state.concurso.customDefs[name];
   if (SUBJECTS[name]) return SUBJECTS[name];
   if (CONCURSO_DEFAULT_SUBJECTS[name]) return CONCURSO_DEFAULT_SUBJECTS[name];
@@ -1482,7 +1472,6 @@ function getSubjectInfo(name) {
 }
 
 function getCtxSubjectInfo(name, ctx) {
-  if (ctx === 'college' && state.college.customDefs[name]) return state.college.customDefs[name];
   if (ctx === 'concurso' && state.concurso.customDefs[name]) return state.concurso.customDefs[name];
   if (SUBJECTS[name]) return SUBJECTS[name];
   if (CONCURSO_DEFAULT_SUBJECTS[name]) return CONCURSO_DEFAULT_SUBJECTS[name];
@@ -1490,6 +1479,10 @@ function getCtxSubjectInfo(name, ctx) {
 }
 
 function saveUserSubjects() {
+  if (state.grade && state.grade.level === 'fac') {
+    store.set('fac', state.fac);
+    return;
+  }
   store.set('userSubjects', state.userSubjects);
   store.set('customSubjectDefs', state.customSubjectDefs);
 }
@@ -1539,8 +1532,8 @@ function openHelpModal() {
           'Aprenda idiomas como Inglês, Espanhol, Francês, Japonês e mais! Escolha seu nível (Iniciante, Mediano ou Avançado) e use o Chat, Atividades e Quiz para praticar. A IA adapta o conteúdo ao seu nível! 🌍') +
         helpItem('fa-pen', 'var(--accent-1)', 'Gerenciar Matérias',
           'Adicione, edite ou remova matérias da sua lista! Escolha ícones e cores personalizados. Se selecionou "EM Completo", pode adicionar qualquer matéria que quiser.') +
-        helpItem('fa-university', '#3B82F6', 'Faculdade',
-          'Para quem está na faculdade! Informe seu curso, adicione suas matérias universitárias e use o Chat, Atividades e Quiz com prompts adaptados para o nível superior. 🎓') +
+        helpItem('fa-university', '#3B82F6', 'Cursando Faculdade',
+          'Para universitários! Escolha "Cursando Faculdade" na série, informe seu curso e quantos semestres tem. Cada semestre tem suas próprias matérias! Use o seletor de semestre no dashboard e adicione as matérias de cada período. 🎓') +
         helpItem('fa-file-contract', '#F97316', 'Concursos Públicos',
           'Prepare-se para concursos! Vem com matérias padrão (Português, Matemática, Direito, Raciocínio Lógico...) e você pode personalizar. Questões no estilo de bancas reais! 📋') +
         helpItem('fa-list-ol', '#0984E3', 'Conteúdo por Unidades',
@@ -1601,7 +1594,7 @@ function openSubjectManagerModal(context) {
 
   // Subject list
   html += '<div class="flex flex-col gap-2 mb-4" id="smSubjectList">';
-  var smSubjects = _smContext === 'college' ? state.college.subjects : _smContext === 'concurso' ? state.concurso.subjects : getUserSubjects();
+  var smSubjects = _smContext === 'concurso' ? state.concurso.subjects : getUserSubjects();
   smSubjects.forEach(function(name) {
     var info = getCtxSubjectInfo(name, _smContext);
     var escapedName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
@@ -1701,8 +1694,13 @@ function smSaveSubject() {
   var selectedColor = colorPicker ? colorPicker.getAttribute('data-selected') : '#6366F1';
 
   var subjectList, customDefs;
-  if (_smContext === 'college') { subjectList = state.college.subjects; customDefs = state.college.customDefs; }
-  else if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  else if (state.grade && state.grade.level === 'fac') {
+    var sem = state.fac.currentSemester;
+    if (!state.fac.semesters[sem]) state.fac.semesters[sem] = { subjects: [], customDefs: {} };
+    subjectList = state.fac.semesters[sem].subjects;
+    customDefs = state.fac.semesters[sem].customDefs;
+  }
   else { subjectList = state.userSubjects; customDefs = state.customSubjectDefs; }
 
   if (_editingSubjectOriginalName) {
@@ -1747,8 +1745,11 @@ function smSaveSubject() {
   }
 
   // Save based on context
-  if (_smContext === 'college') { store.set('college', state.college); renderCollegeGrid(); }
-  else if (_smContext === 'concurso') { store.set('concurso', state.concurso); renderConcursoGrid(); }
+  if (_smContext === 'concurso') { store.set('concurso', state.concurso); renderConcursoGrid(); }
+  else if (state.grade && state.grade.level === 'fac') {
+    store.set('fac', state.fac);
+    initDashboard();
+  }
   else { saveUserSubjects(); saveCalcData(); initDashboard(); }
 
   openSubjectManagerModal(_smContext);
@@ -1784,8 +1785,13 @@ function smDeleteSubject(name) {
 
 function smConfirmDelete(name) {
   var subjectList, customDefs;
-  if (_smContext === 'college') { subjectList = state.college.subjects; customDefs = state.college.customDefs; }
-  else if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  if (_smContext === 'concurso') { subjectList = state.concurso.subjects; customDefs = state.concurso.customDefs; }
+  else if (state.grade && state.grade.level === 'fac') {
+    var sem = state.fac.currentSemester;
+    if (!state.fac.semesters[sem]) state.fac.semesters[sem] = { subjects: [], customDefs: {} };
+    subjectList = state.fac.semesters[sem].subjects;
+    customDefs = state.fac.semesters[sem].customDefs;
+  }
   else { subjectList = state.userSubjects; customDefs = state.customSubjectDefs; }
 
   var idx = subjectList.indexOf(name);
@@ -1793,15 +1799,17 @@ function smConfirmDelete(name) {
   if (customDefs[name]) delete customDefs[name];
 
   if (_smContext === 'school') {
-    if (state.calc.grades[name]) delete state.calc.grades[name];
-    var chatKey = name + '_' + state.grade.id;
-    if (state.chatHistories[chatKey]) delete state.chatHistories[chatKey];
-    saveUserSubjects();
-    saveCalcData();
-    initDashboard();
-  } else if (_smContext === 'college') {
-    store.set('college', state.college);
-    renderCollegeGrid();
+    if (state.grade && state.grade.level === 'fac') {
+      store.set('fac', state.fac);
+      initDashboard();
+    } else {
+      if (state.calc.grades[name]) delete state.calc.grades[name];
+      var chatKey = name + '_' + state.grade.id;
+      if (state.chatHistories[chatKey]) delete state.chatHistories[chatKey];
+      saveUserSubjects();
+      saveCalcData();
+      initDashboard();
+    }
   } else if (_smContext === 'concurso') {
     store.set('concurso', state.concurso);
     renderConcursoGrid();
@@ -2032,7 +2040,7 @@ function confirmResetAll() {
   store.remove('calcConfig');
   store.remove('userSubjects');
   store.remove('customSubjectDefs');
-  store.remove('college');
+  store.remove('fac');
   store.remove('concurso');
   store.remove('abrasileirado');
 
@@ -2048,7 +2056,7 @@ function confirmResetAll() {
   state.abrasileirado = false;
   state.userSubjects = [];
   state.customSubjectDefs = {};
-  state.college = { courseName: '', subjects: [], customDefs: {} };
+  state.fac = { courseName: '', totalSemesters: 8, currentSemester: 1, semesters: {} };
   state.concurso = { subjects: [], customDefs: {} };
   state.currentContext = 'school';
   state.calc = { units: 4, minAvg: 7, grades: {} };
@@ -2191,6 +2199,7 @@ function initSetup() {
   var em = $('gradeGridEM');
   var emc = $('gradeGridEMC');
   var prof = $('gradeGridProf');
+  var fac = $('gradeGridFac');
 
   GRADES.forEach(function(g) {
     var btn = document.createElement('button');
@@ -2201,6 +2210,7 @@ function initSetup() {
     else if (g.level === 'f2') f2.appendChild(btn);
     else if (g.level === 'emc') emc.appendChild(btn);
     else if (g.level === 'prof') prof.appendChild(btn);
+    else if (g.level === 'fac') fac.appendChild(btn);
     else em.appendChild(btn);
   });
 }
@@ -2209,6 +2219,8 @@ function selectGrade(grade, btn) {
   document.querySelectorAll('.grade-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   state.grade = grade;
+  if (grade.level === 'fac') { show('facSetupExtra'); }
+  else { hide('facSetupExtra'); }
 }
 
 function completeSetup() {
@@ -2224,6 +2236,15 @@ function completeSetup() {
   state.userSubjects = [].concat(LEVEL_SUBJECTS[state.grade.level] || []);
   state.customSubjectDefs = {};
   saveUserSubjects();
+
+  // Initialize fac data if college student
+  if (state.grade.level === 'fac') {
+    var facCourse = $('facCourseInput').value.trim() || 'Meu Curso';
+    var facSemesters = parseInt($('facSemesterCount').value) || 8;
+    state.fac = { courseName: facCourse, totalSemesters: facSemesters, currentSemester: 1, semesters: {} };
+    state.fac.semesters[1] = { subjects: [], customDefs: {} };
+    store.set('fac', state.fac);
+  }
 
   hide('setupScreen');
   show('mainScreen');
@@ -2241,19 +2262,36 @@ function initDashboard() {
     ? 'Olá, Prof. ' + state.studentName + '! 🍎'
     : 'Olá, ' + state.studentName + '! 👋';
 
-  // Hide college/concurso for Ensino Fundamental students
+  // Hide concurso for Ensino Fundamental students
   var level = state.grade ? state.grade.level : '';
   if (level === 'f1' || level === 'f2') {
-    hide('collegeCardWrap');
     hide('concursoCardWrap');
   } else {
-    show('collegeCardWrap');
     show('concursoCardWrap');
   }
 
-  // Update header badge for professor
+  // Show semester bar for fac students
+  if (level === 'fac') {
+    show('facSemesterBar');
+    $('facCourseDisplay').textContent = state.fac.courseName || 'Meu Curso';
+    var semSelect = $('facSemesterSelect');
+    semSelect.innerHTML = '';
+    for (var s = 1; s <= state.fac.totalSemesters; s++) {
+      var opt = document.createElement('option');
+      opt.value = s;
+      opt.textContent = s + 'º semestre';
+      if (s === state.fac.currentSemester) opt.selected = true;
+      semSelect.appendChild(opt);
+    }
+  } else {
+    hide('facSemesterBar');
+  }
+
+  // Update header badge for professor/fac
   if (level === 'prof') {
     $('headerGrade').innerHTML = '<i class="fas fa-chalkboard-user mr-1"></i>' + state.grade.label;
+  } else if (level === 'fac') {
+    $('headerGrade').innerHTML = '<i class="fas fa-university mr-1"></i>' + state.grade.label;
   }
 
   var grid = $('subjectGrid');
@@ -2290,6 +2328,15 @@ function initDashboard() {
   updateCalcCardSummary();
 }
 
+function changeFacSemester(sem) {
+  state.fac.currentSemester = sem;
+  if (!state.fac.semesters[sem]) {
+    state.fac.semesters[sem] = { subjects: [], customDefs: {} };
+  }
+  store.set('fac', state.fac);
+  initDashboard();
+}
+
 // ===== SUBJECT VIEW =====
 function openSubject(name, mode, context) {
   state.currentSubject = name;
@@ -2299,7 +2346,7 @@ function openSubject(name, mode, context) {
   state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: false };
   // Reset quiz UI to start screen
   show('quizStart'); hide('quizActive'); hide('quizResults'); hide('quizLoading');
-  var info = (context === 'college' || context === 'concurso') ? getCtxSubjectInfo(name, context) : getSubjectInfo(name);
+  var info = (context === 'concurso') ? getCtxSubjectInfo(name, context) : getSubjectInfo(name);
 
   $('subjectIcon').style.background = info.color;
   $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
@@ -2310,7 +2357,6 @@ function openSubject(name, mode, context) {
   hide('dashboardView');
   hide('calcView');
   hide('langSelectView');
-  hide('collegeView');
   hide('concursoView');
   show('subjectView');
   state.currentView = 'subject';
@@ -2324,16 +2370,7 @@ function goBack() {
 
   state.quiz.isRandom = false;
 
-  // From subject in college/concurso → back to their view
-  if (!state.langMode && state.currentContext === 'college' && state.currentView === 'subject') {
-    hide('subjectView');
-    show('collegeView');
-    state.currentView = 'college';
-    state.currentContext = 'school';
-    state.currentSubject = null;
-    $('headerTitle').textContent = 'Faculdade';
-    return;
-  }
+  // From subject in concurso → back to their view
   if (!state.langMode && state.currentContext === 'concurso' && state.currentView === 'subject') {
     hide('subjectView');
     show('concursoView');
@@ -2341,17 +2378,6 @@ function goBack() {
     state.currentContext = 'school';
     state.currentSubject = null;
     $('headerTitle').textContent = 'Concursos';
-    return;
-  }
-
-  // From college view → dashboard
-  if (state.currentView === 'college') {
-    hide('collegeView');
-    show('dashboardView');
-    hide('backBtn');
-    $('headerTitle').textContent = 'EstudAI';
-    state.currentView = 'dashboard';
-    updateCalcCardSummary();
     return;
   }
 
@@ -2390,7 +2416,7 @@ function goBack() {
     return;
   }
 
-  // Default: from subject/calc → back to dashboard
+  // Default: from subject/calc back to dashboard
   hide('subjectView');
   hide('calcView');
   show('dashboardView');
@@ -2470,15 +2496,16 @@ function getLangSystemPrompt(mode) {
 function getSystemPrompt(mode) {
   if (state.langMode) return getLangSystemPrompt(mode);
 
-  if (state.currentContext === 'college') {
-    var courseName = state.college.courseName || 'Ensino Superior';
-    var subjectCollege = state.currentSubject;
+  if (state.grade && state.grade.level === 'fac') {
+    var courseName = state.fac.courseName || 'Ensino Superior';
+    var semester = state.fac.currentSemester || 1;
+    var subjectFac = state.currentSubject;
     if (mode === 'chat') {
-      return 'Você é um professor universitário de ' + subjectCollege + ' para um aluno do curso de ' + courseName + ' no Brasil. Responda dúvidas de forma aprofundada, técnica porém didática. Use exemplos acadêmicos e referências quando relevante. Responda em português do Brasil.';
+      return 'Você é um professor universitário de ' + subjectFac + ' para um aluno do ' + semester + 'º semestre do curso de ' + courseName + ' no Brasil. Responda dúvidas de forma aprofundada, técnica porém didática. Use exemplos acadêmicos e referências quando relevante. Responda em português do Brasil.';
     } else if (mode === 'activity') {
-      return 'Você é um professor universitário de ' + subjectCollege + ' para um aluno do curso de ' + courseName + '. O aluno precisa de ajuda com uma atividade acadêmica. Guie-o passo a passo com rigor conceitual. Responda em português do Brasil.';
+      return 'Você é um professor universitário de ' + subjectFac + ' para um aluno do ' + semester + 'º semestre do curso de ' + courseName + '. O aluno precisa de ajuda com uma atividade acadêmica. Guie-o passo a passo com rigor conceitual. Responda em português do Brasil.';
     } else {
-      return 'Gere 5 perguntas de múltipla escolha de nível universitário sobre ' + subjectCollege + ' (curso de ' + courseName + '). Retorne APENAS um JSON válido: {"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
+      return 'Gere 5 perguntas de múltipla escolha de nível universitário sobre ' + subjectFac + ' (' + semester + 'º semestre de ' + courseName + '). Retorne APENAS um JSON válido: {"questions":[{"question":"texto","options":["A) ...","B) ...","C) ...","D) ..."],"correct":0,"explanation":"explicação"}]}';
     }
   }
   if (state.currentContext === 'concurso') {
@@ -2539,7 +2566,7 @@ function getChatKey() {
   if (state.langMode) {
     return 'lang_' + state.currentLanguage + '_' + state.currentLangLevel;
   }
-  if (state.currentContext === 'college') return 'col_' + state.currentSubject;
+  if (state.grade && state.grade.level === 'fac') return 'fac_s' + state.fac.currentSemester + '_' + state.currentSubject;
   if (state.currentContext === 'concurso') return 'conc_' + state.currentSubject;
   return state.currentSubject + '_' + state.grade.id;
 }
@@ -2669,10 +2696,11 @@ async function loadUnitTopics(unitIdx) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
     sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de um curso de ' + subject + '. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos para essa unidade.' + (state.abrasileirado ? ' Se o tópico tiver termos em ' + subject + ', inclua a pronúncia abrasileirada 🇧🇷 entre parênteses.' : '');
     userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' do curso de ' + subject + ' nível ' + langLevel + '. Retorne apenas JSON.';
-  } else if (state.currentContext === 'college') {
-    var courseName = state.college.courseName || 'Ensino Superior';
-    sysPrompt = 'Você é um professor universitário de ' + subject + ' do curso de ' + courseName + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades da disciplina. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos.';
-    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' (curso de ' + courseName + '). Retorne apenas JSON.';
+  } else if (state.grade && state.grade.level === 'fac') {
+    var courseName = state.fac.courseName || 'Ensino Superior';
+    var semester = state.fac.currentSemester || 1;
+    sysPrompt = 'Você é um professor universitário de ' + subject + ' do ' + semester + 'º semestre do curso de ' + courseName + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades da disciplina. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos relevantes e progressivos.';
+    userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' (' + semester + 'º semestre de ' + courseName + '). Retorne apenas JSON.';
   } else if (state.currentContext === 'concurso') {
     sysPrompt = 'Você é um professor preparatório para concursos públicos, especialista em ' + subject + '. Gere uma lista de tópicos de estudo para a Unidade ' + unitNum + ' de ' + totalUnits + ' unidades de preparação. Retorne APENAS um JSON: {"topics":["tópico 1","tópico 2",...]}. Gere entre 5 e 8 tópicos que mais caem em provas, progressivos.';
     userMsg = 'Liste os tópicos da Unidade ' + unitNum + '/' + totalUnits + ' de ' + subject + ' para concursos. Retorne apenas JSON.';
@@ -2760,9 +2788,10 @@ async function showTopicExplanation(unitIdx, topicIdx, topicName) {
   if (state.langMode) {
     var langLevel = (LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; }) || { label: 'Iniciante' }).label;
     sysPrompt = 'Você é um professor de ' + subject + ' para alunos de nível ' + langLevel + '. Explique de forma clara, didática e com exemplos o seguinte tópico: "' + topicName + '". Use markdown para formatar a resposta. Responda em português do Brasil.' + (state.abrasileirado ? ' MODO ABRASILEIRADO: Sempre que escrever palavras ou frases em ' + subject + ', adicione a pronúncia abrasileirada 🇧🇷 entre parênteses (como um brasileiro leigo falaria usando sons do português). Exemplo: "Thank you" → 🇧🇷 *(thenk iú)*' : '');
-  } else if (state.currentContext === 'college') {
-    var courseName = state.college.courseName || 'Ensino Superior';
-    sysPrompt = 'Você é um professor universitário de ' + subject + ' do curso de ' + courseName + '. Explique de forma aprofundada e didática o seguinte tópico: "' + topicName + '". Use markdown, exemplos e referências. Responda em português do Brasil.';
+  } else if (state.grade && state.grade.level === 'fac') {
+    var courseName = state.fac.courseName || 'Ensino Superior';
+    var semester = state.fac.currentSemester || 1;
+    sysPrompt = 'Você é um professor universitário de ' + subject + ' do ' + semester + 'º semestre do curso de ' + courseName + '. Explique de forma aprofundada e didática o seguinte tópico: "' + topicName + '". Use markdown, exemplos e referências. Responda em português do Brasil.';
   } else if (state.currentContext === 'concurso') {
     sysPrompt = 'Você é um professor preparatório para concursos públicos, especialista em ' + subject + '. Explique o seguinte tópico focando no que é cobrado em provas: "' + topicName + '". Use markdown, exemplos de questões e macetes. Responda em português do Brasil.';
   } else {
@@ -3115,7 +3144,6 @@ function openLangSelectView() {
   hide('dashboardView');
   hide('subjectView');
   hide('calcView');
-  hide('collegeView');
   hide('concursoView');
   show('langSelectView');
   renderLangGrid();
@@ -3248,106 +3276,12 @@ function openLangSubject(langName, levelId) {
   hide('dashboardView');
   hide('calcView');
   hide('langSelectView');
-  hide('collegeView');
   hide('concursoView');
   show('subjectView');
   state.currentView = 'subject';
 
   switchTab('chat');
   loadChatHistory();
-}
-
-// ===== COLLEGE FUNCTIONS =====
-function openCollegeView() {
-  state.currentView = 'college';
-  $('headerTitle').textContent = 'Faculdade';
-  show('backBtn');
-  hide('dashboardView');
-  hide('subjectView');
-  hide('calcView');
-  hide('langSelectView');
-  hide('concursoView');
-  show('collegeView');
-
-  if (state.college.courseName) {
-    hide('collegeSetup');
-    show('collegeSubjects');
-    $('courseNameDisplay').textContent = state.college.courseName;
-    renderCollegeGrid();
-  } else {
-    show('collegeSetup');
-    hide('collegeSubjects');
-    $('courseNameInput').value = '';
-  }
-}
-
-function saveCourseName() {
-  var input = $('courseNameInput');
-  var name = input ? input.value.trim() : '';
-  if (!name) { showToast('Digite o nome do curso'); return; }
-
-  state.college.courseName = name;
-  store.set('college', state.college);
-
-  hide('collegeSetup');
-  show('collegeSubjects');
-  $('courseNameDisplay').textContent = name;
-  renderCollegeGrid();
-  showToast('Curso salvo! Agora adicione suas matérias.', 'success');
-}
-
-function editCourseName() {
-  show('collegeSetup');
-  hide('collegeSubjects');
-  $('courseNameInput').value = state.college.courseName || '';
-  $('courseNameInput').focus();
-}
-
-function renderCollegeGrid() {
-  var grid = $('collegeSubjectGrid');
-  grid.innerHTML = '';
-  var subjects = state.college.subjects;
-
-  if (!subjects || subjects.length === 0) {
-    show('collegeEmptyMsg');
-    return;
-  }
-  hide('collegeEmptyMsg');
-
-  subjects.forEach(function(name, i) {
-    var info = getCtxSubjectInfo(name, 'college');
-    var safeName = name.replace(/'/g, "\\'");
-    var card = document.createElement('div');
-    card.className = 'subject-card anim-fade-up';
-    card.style.setProperty('--card-accent', info.color);
-    card.style.animationDelay = (i * 0.06) + 's';
-    card.style.opacity = '0';
-    card.innerHTML =
-      '<div class="flex items-center gap-3 mb-3">' +
-        '<div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg" style="background:' + info.color + '">' +
-          '<i class="fas ' + info.icon + '"></i>' +
-        '</div>' +
-        '<span class="font-heading font-bold text-sm">' + name + '</span>' +
-      '</div>' +
-      '<div class="flex gap-2 flex-wrap">' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'chat\',\'college\')">' +
-          '<i class="fas fa-comments"></i> Chat</button>' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'activity\',\'college\')">' +
-          '<i class="fas fa-clipboard-list"></i> Atividade</button>' +
-        '<button class="mode-btn" onclick="event.stopPropagation();openSubject(\'' + safeName + '\',\'quiz\',\'college\')">' +
-          '<i class="fas fa-gamepad"></i> Quiz</button>' +
-      '</div>';
-    card.onclick = function() { openSubject(name, 'chat', 'college'); };
-    grid.appendChild(card);
-  });
-
-  // Update dashboard summary
-  var summary = $('collegeCardSummary');
-  if (summary) {
-    if (state.college.courseName) {
-      summary.textContent = state.college.courseName + ' — ' + subjects.length + ' matéria(s)';
-    }
-  }
 }
 
 // ===== CONCURSO FUNCTIONS =====
@@ -3359,7 +3293,6 @@ function openConcursoView() {
   hide('subjectView');
   hide('calcView');
   hide('langSelectView');
-  hide('collegeView');
   show('concursoView');
 
   // Initialize with defaults if empty
@@ -3427,7 +3360,6 @@ function startRandomQuiz() {
   hide('dashboardView');
   hide('calcView');
   hide('langSelectView');
-  hide('collegeView');
   hide('concursoView');
   show('subjectView');
   state.currentView = 'subject';
@@ -3444,7 +3376,6 @@ function openCalcView() {
   hide('dashboardView');
   hide('subjectView');
   hide('langSelectView');
-  hide('collegeView');
   hide('concursoView');
   show('calcView');
   renderCalcSubjects();
@@ -3707,8 +3638,8 @@ function tryRestoreSession() {
     }
     if (savedCD) state.customSubjectDefs = savedCD;
 
-    var savedCollege = store.get('college', null);
-    if (savedCollege) state.college = savedCollege;
+    var savedFac = store.get('fac', null);
+    if (savedFac) state.fac = savedFac;
     var savedConcurso = store.get('concurso', null);
     if (savedConcurso) state.concurso = savedConcurso;
 
