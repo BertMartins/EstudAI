@@ -1098,7 +1098,7 @@ input, textarea { font-size: 16px; }
           style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
           onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"
           onkeydown="if(event.key==='Enter')sendChatMessage()">
-        <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="Falar com a IA">
+        <button class="mic-btn" id="micBtn" title="Segure para falar">
           <i class="fas fa-microphone" id="micIcon"></i>
         </button>
         <button class="btn-primary px-4" onclick="sendChatMessage()" id="chatSendBtn">
@@ -2958,9 +2958,10 @@ async function sendChatMessage() {
   $('chatInput').focus();
 }
 
-// ===== SPEECH RECOGNITION (MIC) =====
+// ===== SPEECH RECOGNITION (MIC) — PUSH TO TALK =====
 var _speechRecognition = null;
 var _micListening = false;
+var _micSupported = false;
 
 function initSpeechRecognition() {
   var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2969,10 +2970,11 @@ function initSpeechRecognition() {
     $('micBtn').title = 'Reconhecimento de voz não suportado neste navegador';
     return;
   }
+  _micSupported = true;
 
   _speechRecognition = new SpeechRecognition();
   _speechRecognition.lang = 'pt-BR';
-  _speechRecognition.continuous = false;
+  _speechRecognition.continuous = true;
   _speechRecognition.interimResults = true;
   _speechRecognition.maxAlternatives = 1;
 
@@ -2985,66 +2987,79 @@ function initSpeechRecognition() {
   };
 
   _speechRecognition.onend = function() {
-    _micListening = false;
-    $('micBtn').classList.remove('listening');
-    $('micIcon').className = 'fas fa-microphone';
-    $('chatInput').placeholder = 'Digite sua dúvida...';
-    // Auto-send if there's text
-    var text = $('chatInput').value.trim();
-    if (text) {
-      sendChatMessage();
+    // If still holding, recognition ended unexpectedly — restart
+    if (_micListening) {
+      try { _speechRecognition.start(); } catch (_e) { micStop(); }
+      return;
     }
+    micStop();
   };
 
   _speechRecognition.onerror = function(event) {
-    _micListening = false;
-    $('micBtn').classList.remove('listening');
-    $('micIcon').className = 'fas fa-microphone';
-    $('chatInput').placeholder = 'Digite sua dúvida...';
+    if (event.error === 'aborted' || event.error === 'no-speech') return;
+    micStop();
     if (event.error === 'not-allowed') {
       showToast('Permissão de microfone negada. Verifique as configurações do navegador.');
-    } else if (event.error === 'no-speech') {
-      showToast('Nenhuma fala detectada. Tente novamente.');
     } else if (event.error === 'network') {
       showToast('Erro de rede no reconhecimento de voz.');
     } else {
       showToast('Erro no microfone: ' + event.error);
     }
   };
+
+  // Push-to-talk events
+  var btn = $('micBtn');
+
+  btn.addEventListener('mousedown', function(e) { e.preventDefault(); micStart(); });
+  btn.addEventListener('mouseup', function(e) { e.preventDefault(); micRelease(); });
+  btn.addEventListener('mouseleave', function() { if (_micListening) micRelease(); });
+
+  btn.addEventListener('touchstart', function(e) { e.preventDefault(); micStart(); }, { passive: false });
+  btn.addEventListener('touchend', function(e) { e.preventDefault(); micRelease(); }, { passive: false });
+  btn.addEventListener('touchcancel', function() { if (_micListening) micRelease(); });
 }
 
-function toggleMic() {
-  if ($('micBtn').classList.contains('unsupported')) {
-    showToast('Reconhecimento de voz não suportado neste navegador. Use Chrome, Edge ou Safari.');
-    return;
-  }
-  if (state.isStreaming) return;
+function micStart() {
+  if (!_micSupported || state.isStreaming || _micListening) return;
 
-  if (!_speechRecognition) {
-    initSpeechRecognition();
-    if (!_speechRecognition) return;
-  }
+  _micListening = true;
+  $('micBtn').classList.add('listening');
+  $('micIcon').className = 'fas fa-microphone-lines';
+  $('chatInput').value = '';
+  $('chatInput').placeholder = '🎙️ Ouvindo... solte para enviar';
 
-  if (_micListening) {
-    _speechRecognition.stop();
-    _micListening = false;
-    $('micBtn').classList.remove('listening');
-    $('micIcon').className = 'fas fa-microphone';
-  } else {
-    _micListening = true;
-    $('micBtn').classList.add('listening');
-    $('micIcon').className = 'fas fa-microphone-lines';
-    $('chatInput').value = '';
-    $('chatInput').placeholder = 'Ouvindo... Fale agora 🎙️';
-    try {
-      _speechRecognition.start();
-    } catch (e) {
-      _micListening = false;
-      $('micBtn').classList.remove('listening');
-      $('micIcon').className = 'fas fa-microphone';
-      showToast('Erro ao iniciar microfone: ' + e.message);
+  try {
+    _speechRecognition.start();
+  } catch (e) {
+    micStop();
+    showToast('Erro ao iniciar microfone: ' + e.message);
+  }
+}
+
+function micRelease() {
+  if (!_micListening) return;
+  _micListening = false;
+
+  try { _speechRecognition.stop(); } catch (_e) { /* ignore */ }
+
+  micStop();
+
+  // Auto-send after a tiny delay for final results
+  setTimeout(function() {
+    var text = $('chatInput').value.trim();
+    if (text) {
+      sendChatMessage();
+    } else {
+      showToast('Nenhuma fala detectada. Segure e fale.');
     }
-  }
+  }, 300);
+}
+
+function micStop() {
+  _micListening = false;
+  $('micBtn').classList.remove('listening');
+  $('micIcon').className = 'fas fa-microphone';
+  $('chatInput').placeholder = 'Digite sua dúvida...';
 }
 
 // Init speech recognition on load
