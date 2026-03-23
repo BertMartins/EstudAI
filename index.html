@@ -411,6 +411,79 @@ input, textarea { font-size: 16px; }
 }
 .mic-btn.unsupported { opacity: 0.3; cursor: not-allowed; }
 
+/* ===== Conversação (Conversation Practice) ===== */
+.converse-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.converse-bubble {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  animation: fadeUp 0.3s ease;
+  word-wrap: break-word;
+}
+.converse-bubble.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-4));
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.converse-bubble.bot {
+  align-self: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  border-bottom-left-radius: 4px;
+  box-shadow: var(--shadow);
+}
+.converse-bubble.bot .md-content { font-size: 0.92rem; line-height: 1.6; }
+.converse-correction {
+  display: inline-block;
+  background: rgba(255,159,67,0.12);
+  border-left: 3px solid var(--accent-3);
+  padding: 4px 8px;
+  border-radius: 0 8px 8px 0;
+  margin: 4px 0;
+  font-size: 0.82rem;
+  color: var(--text-2);
+}
+.converse-start-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  flex: 1;
+  padding: 2rem;
+}
+.converse-start-btn .start-icon {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-1), #00B894);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; color: white;
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.converse-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: linear-gradient(135deg, #00B894, #00CEC9);
+  color: white; font-size: 0.7rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  vertical-align: middle; margin-left: 6px;
+}
+
 /* ===== Gradient text ===== */
 .gradient-text {
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
@@ -1079,6 +1152,7 @@ input, textarea { font-size: 16px; }
         <button class="tab-btn" onclick="switchTab('activity')"><i class="fas fa-clipboard-list mr-1"></i> Atividades</button>
         <button class="tab-btn" onclick="switchTab('quiz')"><i class="fas fa-gamepad mr-1"></i> Quiz</button>
         <button class="tab-btn" onclick="switchTab('topics')"><i class="fas fa-list-ol mr-1"></i> Conteúdo</button>
+        <button class="tab-btn view-hidden" id="converseTabBtn" onclick="switchTab('converse')"><i class="fas fa-language mr-1"></i> Conversação</button>
       </div>
     </div>
     <!-- Chat Content -->
