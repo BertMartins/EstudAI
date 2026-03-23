@@ -22,7 +22,7 @@
         <!-- Apple Touch Icon -->
         <link rel="apple-touch-icon" sizes="180x180"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
-
+        
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -694,6 +694,70 @@ input, textarea { font-size: 16px; }
 .concurso-card:hover { box-shadow: 0 8px 28px rgba(245,158,11,0.3); }
 .random-quiz-card { background: linear-gradient(135deg, var(--accent-2), #A855F7, var(--accent-1)); }
 .random-quiz-card:hover { box-shadow: 0 8px 28px rgba(168,85,247,0.3); }
+.jogos-card { background: linear-gradient(135deg, #00B894, #0984E3); }
+.jogos-card:hover { box-shadow: 0 8px 28px rgba(0,184,148,0.3); }
+
+/* ===== Games grid ===== */
+.game-tile {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  overflow: hidden;
+}
+.game-tile:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: var(--accent-1); }
+.game-tile .game-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: white;
+}
+.game-tile .game-name {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-1);
+}
+.game-tile .game-tag {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.game-tag.em-breve {
+  background: rgba(255,159,67,0.15);
+  color: #F59E0B;
+}
+.game-tag.disponivel {
+  background: rgba(0,184,148,0.15);
+  color: #00B894;
+}
+.coming-soon-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+.coming-soon-icon {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bg-input), var(--border));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem;
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
 .ctx-subject-grid .subject-card { margin-bottom: 0; }
 
 /* ===== Topics / Units system ===== */
@@ -1124,6 +1188,19 @@ input, textarea { font-size: 16px; }
         <i class="fas fa-chevron-right opacity-60"></i>
       </div>
     </div>
+    <!-- Jogos Card -->
+    <div class="feature-card jogos-card mb-5 anim-fade-up" style="animation-delay:0.22s" onclick="openJogosView()">
+      <div class="flex items-center gap-3 relative z-10">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(255,255,255,0.2);">
+          <i class="fas fa-gamepad text-xl"></i>
+        </div>
+        <div class="flex-1">
+          <p class="font-heading font-bold text-base">Jogos</p>
+          <p class="text-xs opacity-80">Divirta-se com jogos clássicos 🎮</p>
+        </div>
+        <i class="fas fa-chevron-right opacity-60"></i>
+      </div>
+    </div>
     <!-- Random Quiz Card -->
     <div class="feature-card random-quiz-card mb-5 anim-fade-up" style="animation-delay:0.25s" onclick="startRandomQuiz()">
       <div class="flex items-center gap-3 relative z-10">
@@ -1377,6 +1454,29 @@ input, textarea { font-size: 16px; }
         </button>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 ctx-subject-grid" id="concursoSubjectGrid"></div>
+    </div>
+  </div>
+
+  <!-- Jogos View -->
+  <div id="jogosView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <div class="mb-5 anim-fade-up">
+        <h2 class="font-heading text-2xl font-bold"><span style="font-size:1.2em;">🎮</span> Jogos</h2>
+        <p class="text-sm mt-1" style="color:var(--text-2);">Escolha um jogo para se divertir</p>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="jogosGrid"></div>
+    </div>
+  </div>
+
+  <!-- Coming Soon Screen (inside jogos) -->
+  <div id="comingSoonView" class="view-hidden flex-1 flex flex-col">
+    <div class="coming-soon-screen anim-fade-up">
+      <div class="coming-soon-icon">🚧</div>
+      <h3 class="font-heading text-xl font-bold" style="color:var(--text-1);" id="comingSoonTitle">Em Breve!</h3>
+      <p class="text-sm" style="color:var(--text-2);max-width:320px;" id="comingSoonMsg">Estamos trabalhando neste jogo. Em breve estará disponível para você jogar!</p>
+      <button class="btn-primary px-6 py-3" onclick="goBack()" style="background:linear-gradient(135deg, #00B894, #0984E3);">
+        <i class="fas fa-arrow-left mr-2"></i> Voltar aos Jogos
+      </button>
     </div>
   </div>
 </section>
@@ -1670,6 +1770,8 @@ function openHelpModal() {
           'Para universitários! Escolha "Cursando Faculdade" na série, informe seu curso e quantos semestres tem. Cada semestre tem suas próprias matérias! Use o seletor de semestre no dashboard e adicione as matérias de cada período. 🎓') +
         helpItem('fa-file-contract', '#F97316', 'Concursos Públicos',
           'Prepare-se para concursos! Vem com matérias padrão (Português, Matemática, Direito, Raciocínio Lógico...) e você pode personalizar. Questões no estilo de bancas reais! 📋') +
+        helpItem('fa-gamepad', '#00B894', 'Jogos',
+          'Divirta-se com jogos clássicos! Jogo da Velha, Sudoku, Campo Minado, 2048, Cobrinha e muito mais. Novos jogos sendo adicionados! 🎮') +
         helpItem('fa-list-ol', '#0984E3', 'Conteúdo por Unidades',
           'Organize o estudo por unidades! Escolha quantas unidades quer, clique em uma unidade e a IA gera os tópicos automaticamente. Clique em um tópico para receber uma explicação detalhada! 📚') +
         helpItem('fa-chalkboard-user', 'var(--success)', 'Modo Professor',
@@ -2495,6 +2597,8 @@ function openSubject(name, mode, context) {
   hide('calcView');
   hide('langSelectView');
   hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('subjectView');
   state.currentView = 'subject';
 
@@ -2521,6 +2625,26 @@ function goBack() {
   // From concurso view → dashboard
   if (state.currentView === 'concurso') {
     hide('concursoView');
+    show('dashboardView');
+    hide('backBtn');
+    $('headerTitle').textContent = 'EstudAI';
+    state.currentView = 'dashboard';
+    updateCalcCardSummary();
+    return;
+  }
+
+  // From coming soon → back to jogos
+  if (state.currentView === 'comingSoon') {
+    hide('comingSoonView');
+    show('jogosView');
+    state.currentView = 'jogos';
+    $('headerTitle').textContent = 'Jogos';
+    return;
+  }
+
+  // From jogos view → dashboard
+  if (state.currentView === 'jogos') {
+    hide('jogosView');
     show('dashboardView');
     hide('backBtn');
     $('headerTitle').textContent = 'EstudAI';
@@ -2556,6 +2680,8 @@ function goBack() {
   // Default: from subject/calc back to dashboard
   hide('subjectView');
   hide('calcView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('dashboardView');
   hide('backBtn');
   $('headerTitle').textContent = 'EstudAI';
@@ -3678,6 +3804,8 @@ function openLangSelectView() {
   hide('subjectView');
   hide('calcView');
   hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('langSelectView');
   renderLangGrid();
   hide('langLevelSection');
@@ -3820,11 +3948,86 @@ function openLangSubject(langName, levelId) {
   hide('calcView');
   hide('langSelectView');
   hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('subjectView');
   state.currentView = 'subject';
 
   switchTab('chat');
   loadChatHistory();
+}
+
+// ===== JOGOS (GAMES) =====
+var GAMES = [
+  { name: 'Jogo da Velha',    icon: 'fas fa-hashtag',       color: '#6C5CE7', href: '' },
+  { name: 'Sudoku',           icon: 'fas fa-th',            color: '#0984E3', href: '' },
+  { name: 'Jogo da Memória',  icon: 'fas fa-clone',         color: '#00B894', href: '' },
+  { name: 'Jogo da Forca',    icon: 'fas fa-user-slash',    color: '#F97316', href: '' },
+  { name: 'Caça-Palavras',    icon: 'fas fa-magnifying-glass', color: '#E84393', href: '' },
+  { name: '2048',             icon: 'fas fa-cubes',         color: '#FDCB6E', href: '' },
+  { name: 'Campo Minado',     icon: 'fas fa-bomb',          color: '#636E72', href: '' },
+  { name: 'Cobrinha',         icon: 'fas fa-dragon',        color: '#00CEC9', href: '' },
+  { name: 'Tetris',           icon: 'fas fa-shapes',        color: '#A855F7', href: '' },
+  { name: 'Ping Pong',        icon: 'fas fa-table-tennis-paddle-ball', color: '#FF6B6B', href: '' },
+  { name: 'Palavras Cruzadas', icon: 'fas fa-spell-check',  color: '#2D3436', href: '' },
+  { name: 'Quiz de Bandeiras', icon: 'fas fa-flag',         color: '#0984E3', href: '' },
+  { name: 'Damas',            icon: 'fas fa-chess-board',   color: '#6D4C41', href: '' },
+  { name: 'Flappy Bird',      icon: 'fas fa-dove',          color: '#55E6C1', href: '' },
+  { name: 'Labirinto',        icon: 'fas fa-route',         color: '#7C3AED', href: '' },
+  { name: 'Pedra Papel Tesoura', icon: 'fas fa-hand-scissors', color: '#F39C12', href: '' },
+];
+
+function openJogosView() {
+  state.currentView = 'jogos';
+  $('headerTitle').textContent = 'Jogos';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  hide('calcView');
+  hide('langSelectView');
+  hide('concursoView');
+  hide('comingSoonView');
+  show('jogosView');
+  renderJogosGrid();
+}
+
+function renderJogosGrid() {
+  var grid = $('jogosGrid');
+  grid.innerHTML = '';
+  GAMES.forEach(function(game, idx) {
+    var hasHref = game.href && game.href.trim() !== '';
+    var tag = hasHref
+      ? '<span class="game-tag disponivel"><i class="fas fa-play mr-1"></i>Jogar</span>'
+      : '<span class="game-tag em-breve"><i class="fas fa-clock mr-1"></i>Em breve</span>';
+    var tile = document.createElement('div');
+    tile.className = 'game-tile anim-fade-up';
+    tile.style.animationDelay = (idx * 0.04) + 's';
+    tile.innerHTML =
+      '<div class="game-icon" style="background:' + game.color + ';">' +
+        '<i class="' + game.icon + '"></i>' +
+      '</div>' +
+      '<span class="game-name">' + game.name + '</span>' +
+      tag;
+    tile.onclick = function() { openGame(idx); };
+    grid.appendChild(tile);
+  });
+}
+
+function openGame(idx) {
+  var game = GAMES[idx];
+  if (!game) return;
+  var href = game.href ? game.href.trim() : '';
+  if (href) {
+    // Open game in new tab with the provided link
+    window.open(href, '_blank');
+  } else {
+    // Show coming soon screen
+    state.currentView = 'comingSoon';
+    $('comingSoonTitle').textContent = game.name + ' — Em Breve!';
+    $('comingSoonMsg').textContent = 'Criaremos o jogo "' + game.name + '" em breve. Fique ligado nas atualizações!';
+    hide('jogosView');
+    show('comingSoonView');
+  }
 }
 
 // ===== CONCURSO FUNCTIONS =====
@@ -3836,6 +4039,8 @@ function openConcursoView() {
   hide('subjectView');
   hide('calcView');
   hide('langSelectView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('concursoView');
 
   // Initialize with defaults if empty
@@ -3904,6 +4109,8 @@ function startRandomQuiz() {
   hide('calcView');
   hide('langSelectView');
   hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('subjectView');
   state.currentView = 'subject';
 
@@ -3920,6 +4127,8 @@ function openCalcView() {
   hide('subjectView');
   hide('langSelectView');
   hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
   show('calcView');
   renderCalcSubjects();
   updateCalcSummary();
