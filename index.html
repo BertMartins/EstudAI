@@ -23,7 +23,6 @@
         <link rel="apple-touch-icon" sizes="180x180"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
 
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <script>
 tailwind.config = {
@@ -1152,7 +1151,7 @@ input, textarea { font-size: 16px; }
         <button class="tab-btn" onclick="switchTab('activity')"><i class="fas fa-clipboard-list mr-1"></i> Atividades</button>
         <button class="tab-btn" onclick="switchTab('quiz')"><i class="fas fa-gamepad mr-1"></i> Quiz</button>
         <button class="tab-btn" onclick="switchTab('topics')"><i class="fas fa-list-ol mr-1"></i> Conteúdo</button>
-        <button class="tab-btn view-hidden" id="converseTabBtn" onclick="switchTab('converse')"><i class="fas fa-language mr-1"></i> Conversação</button>
+        <button class="tab-btn view-hidden" id="converseTabBtn" onclick="switchTab('converse')"><i class="fas fa-comments mr-1"></i> Bate-papo</button>
       </div>
     </div>
     <!-- Chat Content -->
@@ -1256,6 +1255,35 @@ input, textarea { font-size: 16px; }
         <span class="text-xs" style="color:var(--text-3);flex:1;">Clique na unidade para carregar os tópicos via IA</span>
       </div>
       <div id="topicsUnitList"></div>
+    </div>
+    <!-- Bate-papo (Conversation Practice) Content -->
+    <div id="converseContent" class="view-hidden flex-1 flex flex-col" style="min-height:0;">
+      <!-- Start screen -->
+      <div id="converseStartScreen" class="converse-start-btn">
+        <div class="start-icon"><i class="fas fa-comments"></i></div>
+        <h3 class="font-heading text-xl font-bold" style="color:var(--text-1);">Bate-papo em <span id="converseLangName"></span></h3>
+        <p class="text-sm" style="color:var(--text-2);max-width:320px;">A IA vai iniciar uma conversa com você no idioma escolhido. Ela vai corrigir seus erros e continuar o bate-papo naturalmente!</p>
+        <button class="btn-primary px-6 py-3 text-base" onclick="startConversation()" id="converseStartBtn" style="background:linear-gradient(135deg, #00B894, #00CEC9);">
+          <i class="fas fa-play mr-2"></i> Iniciar Bate-papo
+        </button>
+      </div>
+      <!-- Chat area -->
+      <div id="converseActiveArea" class="view-hidden flex-1 flex flex-col" style="min-height:0;">
+        <div class="converse-chat-area" id="converseMessages"></div>
+        <div class="p-3 flex gap-2" style="background:var(--bg-card);border-top:1px solid var(--border);">
+          <input id="converseInput" type="text" placeholder="Responda na conversa..."
+            class="flex-1 px-4 py-3 rounded-xl border-2 outline-none transition-all"
+            style="background:var(--bg-input);border-color:var(--border);color:var(--text-1);"
+            onfocus="this.style.borderColor='var(--accent-1)'" onblur="this.style.borderColor='var(--border)'"
+            onkeydown="if(event.key==='Enter')sendConverseMessage()">
+          <button class="mic-btn" id="converseMicBtn" title="Segure para falar">
+            <i class="fas fa-microphone" id="converseMicIcon"></i>
+          </button>
+          <button class="btn-primary px-4" onclick="sendConverseMessage()" id="converseSendBtn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2456,6 +2484,9 @@ function openSubject(name, mode, context) {
   $('subjectIcon').innerHTML = '<i class="fas ' + info.icon + '"></i>';
   $('subjectTitle').textContent = name;
 
+  // Hide Bate-papo tab for non-language subjects
+  hide('converseTabBtn');
+
   $('headerTitle').textContent = name;
   show('backBtn');
   hide('dashboardView');
@@ -2539,15 +2570,17 @@ function switchTab(tab) {
     if ((tab === 'chat' && t.textContent.indexOf('Chat') !== -1) ||
         (tab === 'activity' && t.textContent.indexOf('Atividade') !== -1) ||
         (tab === 'quiz' && t.textContent.indexOf('Quiz') !== -1) ||
-        (tab === 'topics' && t.textContent.indexOf('Conteúdo') !== -1)) {
+        (tab === 'topics' && t.textContent.indexOf('Conteúdo') !== -1) ||
+        (tab === 'converse' && t.textContent.indexOf('Bate-papo') !== -1)) {
       t.classList.add('active');
     }
   });
-  hide('chatContent'); hide('activityContent'); hide('quizContent'); hide('topicsContent');
+  hide('chatContent'); hide('activityContent'); hide('quizContent'); hide('topicsContent'); hide('converseContent');
   if (tab === 'chat') show('chatContent');
   else if (tab === 'activity') show('activityContent');
   else if (tab === 'quiz') { show('quizContent'); renderQuizUnitGrid(); }
   else if (tab === 'topics') { show('topicsContent'); initTopicsView(); }
+  else if (tab === 'converse') { show('converseContent'); initConverseView(); }
 }
 
 // ===== CHAT FUNCTIONS =====
@@ -3139,6 +3172,293 @@ function micStop() {
 // Init speech recognition on load
 initSpeechRecognition();
 
+// ===== BATE-PAPO (CONVERSATION PRACTICE) =====
+var _converseRecognition = null;
+var _converseMicListening = false;
+var _converseMicSupported = false;
+
+function getConverseChatKey() {
+  return 'conv_' + state.currentLanguage + '_' + state.currentLangLevel;
+}
+
+function getConverseSystemPrompt() {
+  var lang = state.currentLanguage;
+  var levelObj = LANG_LEVELS.find(function(l) { return l.id === state.currentLangLevel; });
+  var levelLabel = levelObj ? levelObj.label : 'Iniciante';
+  var abr = state.abrasileirado;
+
+  var abrInstr = abr
+    ? '\n\nMODO ABRASILEIRADO: Sempre que você escrever algo em ' + lang + ', coloque logo abaixo a pronúncia abrasileirada entre parênteses — como um brasileiro leria usando os sons do português do Brasil. Use 🇧🇷 antes da pronúncia. Exemplo para inglês: "Good morning!" → 🇧🇷 *(gud mórnim!)*'
+    : '';
+
+  return 'Você é um parceiro de conversação em ' + lang + ' para um aluno brasileiro de nível ' + levelLabel + '. ' +
+    'Seu papel é manter um bate-papo natural e fluido em ' + lang + '. ' +
+    '\n\nREGRAS IMPORTANTES:' +
+    '\n1. INICIE a conversa dando bom dia/boa tarde e puxando um assunto interessante em ' + lang + '.' +
+    '\n2. Quando o aluno responder, PRIMEIRO corrija gentilmente eventuais erros (gramática, ortografia, vocabulário) entre colchetes, por exemplo: [📝 Correção: "I am go" → "I am going" — use o gerúndio após "am"]' +
+    '\n3. Depois da correção (se houver), CONTINUE a conversa normalmente — faça perguntas, comente, mude de assunto.' +
+    '\n4. Se o aluno não cometer erros, apenas continue o bate-papo sem mencionar correções.' +
+    '\n5. Sempre forneça uma tradução em português entre parênteses das suas mensagens em ' + lang + '.' +
+    '\n6. Adapte a complexidade ao nível ' + levelLabel + ': use frases simples para iniciantes, mais complexas para avançados.' +
+    '\n7. Seja encorajador e natural, como um amigo que fala ' + lang + '.' +
+    '\n8. NÃO fique repetitivo. Varie os assuntos: hobbies, viagens, comida, filmes, dia a dia, cultura, etc.' +
+    '\n9. Responda de forma concisa (2-4 frases), como uma conversa de chat real.' + abrInstr;
+}
+
+function initConverseView() {
+  var key = getConverseChatKey();
+  if (!state.chatHistories[key]) state.chatHistories[key] = [];
+
+  if (state.chatHistories[key].length > 0) {
+    // Already has conversation history, show active area
+    show('converseActiveArea');
+    hide('converseStartScreen');
+    loadConverseHistory();
+  } else {
+    // Show start screen
+    show('converseStartScreen');
+    hide('converseActiveArea');
+    $('converseLangName').textContent = state.currentLanguage || '';
+  }
+}
+
+function loadConverseHistory() {
+  var key = getConverseChatKey();
+  if (!state.chatHistories[key]) state.chatHistories[key] = [];
+  var container = $('converseMessages');
+  container.innerHTML = '';
+  state.chatHistories[key].forEach(function(msg) {
+    addConverseBubble(msg.role, msg.content, false);
+  });
+  scrollConverseToBottom();
+}
+
+function addConverseBubble(role, content, animate) {
+  var container = $('converseMessages');
+  var bubble = document.createElement('div');
+  bubble.className = 'converse-bubble ' + (role === 'user' ? 'user' : 'bot');
+  if (!animate) bubble.style.animation = 'none';
+  if (role === 'user') {
+    bubble.textContent = content;
+  } else {
+    bubble.classList.add('md-content');
+    bubble.innerHTML = marked.parse(content);
+  }
+  container.appendChild(bubble);
+  return bubble;
+}
+
+function addConverseTyping() {
+  var container = $('converseMessages');
+  var typing = document.createElement('div');
+  typing.className = 'converse-bubble bot typing-indicator';
+  typing.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  container.appendChild(typing);
+  scrollConverseToBottom();
+  return typing;
+}
+
+function scrollConverseToBottom() {
+  var container = $('converseMessages');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function startConversation() {
+  var btn = $('converseStartBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;"></div> Iniciando...';
+
+  var key = getConverseChatKey();
+  state.chatHistories[key] = [];
+
+  hide('converseStartScreen');
+  show('converseActiveArea');
+
+  var container = $('converseMessages');
+  container.innerHTML = '';
+
+  var typing = addConverseTyping();
+
+  var apiMessages = [
+    { role: 'system', content: getConverseSystemPrompt() },
+    { role: 'user', content: 'Inicie a conversa! Dê bom dia e puxe um assunto interessante em ' + state.currentLanguage + '.' }
+  ];
+
+  var responseBubble = null;
+  await callAPI(apiMessages,
+    function(fullContent) {
+      if (typing.parentNode) typing.remove();
+      if (!responseBubble) { responseBubble = addConverseBubble('assistant', fullContent, true); }
+      else { responseBubble.innerHTML = marked.parse(fullContent); }
+      scrollConverseToBottom();
+    },
+    function(fullContent) {
+      if (typing.parentNode) typing.remove();
+      var c = fullContent || 'Olá! Vamos conversar?';
+      if (!responseBubble) { responseBubble = addConverseBubble('assistant', c, true); }
+      else { responseBubble.innerHTML = marked.parse(c); }
+      if (fullContent) state.chatHistories[key].push({ role: 'assistant', content: fullContent });
+      scrollConverseToBottom();
+    },
+    function(error) {
+      if (typing.parentNode) typing.remove();
+      addConverseBubble('assistant', '❌ Erro ao iniciar conversa: ' + error, true);
+      scrollConverseToBottom();
+    }
+  );
+
+  state.isStreaming = false;
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-play mr-2"></i> Iniciar Bate-papo';
+  initConverseMic();
+}
+
+async function sendConverseMessage() {
+  var input = $('converseInput');
+  var text = input.value.trim();
+  if (!text || state.isStreaming) return;
+  input.value = '';
+  state.isStreaming = true;
+  $('converseSendBtn').disabled = true;
+
+  var key = getConverseChatKey();
+  if (!state.chatHistories[key]) state.chatHistories[key] = [];
+  state.chatHistories[key].push({ role: 'user', content: text });
+  addConverseBubble('user', text, true);
+  scrollConverseToBottom();
+
+  var typing = addConverseTyping();
+
+  var apiMessages = [{ role: 'system', content: getConverseSystemPrompt() }];
+  var history = state.chatHistories[key].slice(-12);
+  history.forEach(function(m) {
+    apiMessages.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.content });
+  });
+
+  var responseBubble = null;
+  await callAPI(apiMessages,
+    function(fullContent) {
+      if (typing.parentNode) typing.remove();
+      if (!responseBubble) { responseBubble = addConverseBubble('assistant', fullContent, true); }
+      else { responseBubble.innerHTML = marked.parse(fullContent); }
+      scrollConverseToBottom();
+    },
+    function(fullContent) {
+      if (typing.parentNode) typing.remove();
+      var c = fullContent || 'Desculpe, não consegui responder.';
+      if (!responseBubble) { responseBubble = addConverseBubble('assistant', c, true); }
+      else { responseBubble.innerHTML = marked.parse(c); }
+      if (fullContent) state.chatHistories[key].push({ role: 'assistant', content: fullContent });
+      scrollConverseToBottom();
+    },
+    function(error) {
+      if (typing.parentNode) typing.remove();
+      addConverseBubble('assistant', '❌ Erro: ' + error, true);
+      scrollConverseToBottom();
+    }
+  );
+
+  state.isStreaming = false;
+  $('converseSendBtn').disabled = false;
+  $('converseInput').focus();
+}
+
+function initConverseMic() {
+  if (_converseRecognition) return; // Already initialized
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    $('converseMicBtn').classList.add('unsupported');
+    $('converseMicBtn').title = 'Reconhecimento de voz não suportado';
+    return;
+  }
+  _converseMicSupported = true;
+
+  _converseRecognition = new SpeechRecognition();
+  // Set language to the target language for conversation practice
+  var langMap = {
+    'Inglês': 'en-US', 'Espanhol': 'es-ES', 'Francês': 'fr-FR', 'Alemão': 'de-DE',
+    'Italiano': 'it-IT', 'Japonês': 'ja-JP', 'Coreano': 'ko-KR', 'Mandarim': 'zh-CN',
+    'Russo': 'ru-RU', 'Árabe': 'ar-SA', 'Hindi': 'hi-IN', 'Turco': 'tr-TR',
+    'Holandês': 'nl-NL', 'Sueco': 'sv-SE', 'Grego': 'el-GR', 'Hebraico': 'he-IL',
+    'Polonês': 'pl-PL', 'Tailandês': 'th-TH', 'Português': 'pt-BR'
+  };
+  _converseRecognition.lang = langMap[state.currentLanguage] || 'en-US';
+  _converseRecognition.continuous = true;
+  _converseRecognition.interimResults = true;
+  _converseRecognition.maxAlternatives = 1;
+
+  _converseRecognition.onresult = function(event) {
+    var transcript = '';
+    for (var i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    $('converseInput').value = transcript;
+  };
+
+  _converseRecognition.onend = function() {
+    if (_converseMicListening) {
+      try { _converseRecognition.start(); } catch (_e) { converseMicStop(); }
+      return;
+    }
+    converseMicStop();
+  };
+
+  _converseRecognition.onerror = function(event) {
+    if (event.error === 'aborted' || event.error === 'no-speech') return;
+    converseMicStop();
+    if (event.error === 'not-allowed') {
+      showToast('Permissão de microfone negada.');
+    } else if (event.error === 'network') {
+      showToast('Erro de rede no reconhecimento de voz.');
+    }
+  };
+
+  // Push-to-talk events
+  var btn = $('converseMicBtn');
+  btn.addEventListener('mousedown', function(e) { e.preventDefault(); converseMicStart(); });
+  btn.addEventListener('mouseup', function(e) { e.preventDefault(); converseMicRelease(); });
+  btn.addEventListener('mouseleave', function() { if (_converseMicListening) converseMicRelease(); });
+  btn.addEventListener('touchstart', function(e) { e.preventDefault(); converseMicStart(); }, { passive: false });
+  btn.addEventListener('touchend', function(e) { e.preventDefault(); converseMicRelease(); }, { passive: false });
+  btn.addEventListener('touchcancel', function() { if (_converseMicListening) converseMicRelease(); });
+}
+
+function converseMicStart() {
+  if (!_converseMicSupported || state.isStreaming || _converseMicListening) return;
+  _converseMicListening = true;
+  $('converseMicBtn').classList.add('listening');
+  $('converseMicIcon').className = 'fas fa-microphone-lines';
+  $('converseInput').value = '';
+  $('converseInput').placeholder = '🎙️ Ouvindo... solte para enviar';
+  try { _converseRecognition.start(); } catch (e) { converseMicStop(); }
+}
+
+function converseMicRelease() {
+  if (!_converseMicListening) return;
+  _converseMicListening = false;
+  try { _converseRecognition.stop(); } catch (_e) { /* ignore */ }
+  converseMicStop();
+  setTimeout(function() {
+    var text = $('converseInput').value.trim();
+    if (text) { sendConverseMessage(); }
+    else { showToast('Nenhuma fala detectada. Segure e fale.'); }
+  }, 300);
+}
+
+function converseMicStop() {
+  _converseMicListening = false;
+  $('converseMicBtn').classList.remove('listening');
+  $('converseMicIcon').className = 'fas fa-microphone';
+  $('converseInput').placeholder = 'Responda na conversa...';
+}
+
+// Reset converse mic when switching languages
+function resetConverseMic() {
+  _converseRecognition = null;
+  _converseMicListening = false;
+  _converseMicSupported = false;
+}
+
 // ===== ACTIVITY FUNCTIONS =====
 async function sendActivity() {
   var input = $('activityInput');
@@ -3481,6 +3801,10 @@ function openLangSubject(langName, levelId) {
   } else {
     $('subjectTitle').textContent = titleText;
   }
+
+  // Show Bate-papo tab for language mode & reset mic for new language
+  show('converseTabBtn');
+  resetConverseMic();
 
   $('headerTitle').textContent = langName;
   show('backBtn');
