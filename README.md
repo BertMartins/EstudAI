@@ -10,19 +10,6 @@ A plataforma oferece fluxos distintos para **alunos** e **professores**, contemp
 
 ## Principais recursos
 
-### Fluxo de acesso com configuração de IA
-A aplicação inicia com uma tela de configuração onde o usuário informa:
-
-- chave da API Poe
-- modelo de IA desejado
-
-Modelos disponíveis no sistema:
-
-- GPT-5.2
-- Gemini 3 Flash
-- Claude Sonnet 4.5
-- Grok 4.1 Fast Non-Reasoning :contentReference[oaicite:2]{index=2}
-
 ### Setup inicial com perfis de uso
 O onboarding foi expandido para suportar dois perfis principais:
 
