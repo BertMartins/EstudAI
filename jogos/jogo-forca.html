@@ -45,6 +45,40 @@
         }
         .screen.active{display:flex;opacity:1;transform:translateY(0);}
 
+        /* CONNECTION STATUS */
+        .connection-badge{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;
+            font-family:'Nunito',sans-serif;letter-spacing:0.3px;
+            margin-bottom:16px;animation:fadeIn .5s ease-out .15s both;
+            transition:all .3s ease;
+        }
+        .connection-badge.connected{
+            background:var(--green-glow);border:1.5px solid var(--green);color:var(--green);
+        }
+        .connection-badge.disconnected{
+            background:var(--red-glow);border:1.5px solid var(--red);color:var(--red);
+        }
+        .connection-dot{
+            width:8px;height:8px;border-radius:50%;flex-shrink:0;
+        }
+        .connection-badge.connected .connection-dot{
+            background:var(--green);
+            box-shadow:0 0 6px var(--green);
+            animation:pulse-dot 2s ease-in-out infinite;
+        }
+        .connection-badge.disconnected .connection-dot{
+            background:var(--red);
+        }
+        @keyframes pulse-dot{
+            0%,100%{opacity:1;box-shadow:0 0 6px var(--green);}
+            50%{opacity:.5;box-shadow:0 0 2px var(--green);}
+        }
+        .connection-key-preview{
+            font-size:11px;color:var(--text-2);opacity:.7;
+            max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+        }
+
         /* MENU */
         .menu-header{text-align:center;margin-bottom:24px;animation:slideDown .5s ease-out;}
         .menu-icon{font-size:48px;display:block;margin-bottom:6px;}
@@ -215,6 +249,7 @@
                 <h1 class="menu-title">Forca Multilingue</h1>
                 <p class="menu-subtitle">Aprenda idiomas jogando!</p>
             </div>
+            <div id="connection-status"></div>
             <div class="section-label">Escolha o idioma</div>
             <div class="lang-grid" id="lang-grid"></div>
             <div class="section-label">Nivel de dificuldade</div>
@@ -308,6 +343,69 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
     else { document.documentElement.classList.remove('dark'); }
 });
 
+/* ==================== API KEY FROM COOKIE ==================== */
+var apiKey = null;
+
+function getCookie(name) {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.indexOf(name + '=') === 0) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return null;
+}
+
+function extractApiKey() {
+    var raw = getCookie('estudai_apiKey');
+    if (!raw) { return null; }
+    // decodeURIComponent to remove %22 (encoded quotes) and other encoded chars
+    var decoded = '';
+    try {
+        decoded = decodeURIComponent(raw);
+    } catch (e) {
+        decoded = raw;
+    }
+    // Strip leading/trailing double quotes if present
+    decoded = decoded.replace(/^["']+|["']+$/g, '');
+    // Validate it looks like a key
+    if (decoded && decoded.length > 10) {
+        return decoded;
+    }
+    return null;
+}
+
+function maskKey(key) {
+    if (!key) { return ''; }
+    if (key.length <= 12) { return key.substring(0, 4) + '***'; }
+    return key.substring(0, 7) + '...' + key.substring(key.length - 4);
+}
+
+function renderConnectionStatus() {
+    var container = document.getElementById('connection-status');
+    apiKey = extractApiKey();
+    if (apiKey) {
+        container.innerHTML =
+            '<div class="connection-badge connected">' +
+                '<span class="connection-dot"></span>' +
+                '<span>Conectado</span>' +
+            '</div>' +
+            '<div class="connection-key-preview" style="text-align:center;font-size:11px;color:var(--text-2);opacity:.6;margin-top:-10px;margin-bottom:12px;">' +
+                maskKey(apiKey) +
+            '</div>';
+    } else {
+        container.innerHTML =
+            '<div class="connection-badge disconnected">' +
+                '<span class="connection-dot"></span>' +
+                '<span>Desconectado</span>' +
+            '</div>' +
+            '<div style="text-align:center;font-size:11px;color:var(--text-2);opacity:.6;margin-top:-10px;margin-bottom:12px;">' +
+                'Cookie estudai_apiKey nao encontrado' +
+            '</div>';
+    }
+}
+
 /* ==================== CONSTANTS ==================== */
 var LANGUAGES = [
     { id:'ingles', name:'Ingles', flag:'\u{1F1EC}\u{1F1E7}', aiName:'ingles' },
@@ -372,6 +470,8 @@ function getUsedWordsForLang() {
 
 /* ==================== MENU ==================== */
 function renderMenu() {
+    renderConnectionStatus();
+
     var langGrid = document.getElementById('lang-grid');
     langGrid.innerHTML = LANGUAGES.map(function(l) {
         return '<button class="lang-card ' + (state.language === l.id ? 'selected' : '') +
