@@ -48,9 +48,9 @@
         /* CONNECTION STATUS */
         .connection-badge{
             display:inline-flex;align-items:center;gap:6px;
-            padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;
+            padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;
             font-family:'Nunito',sans-serif;letter-spacing:0.3px;
-            margin-bottom:16px;animation:fadeIn .5s ease-out .15s both;
+            margin-bottom:6px;animation:fadeIn .5s ease-out .15s both;
             transition:all .3s ease;
         }
         .connection-badge.connected{
@@ -70,13 +70,38 @@
         .connection-badge.disconnected .connection-dot{
             background:var(--red);
         }
+        .connection-key-hint{
+            text-align:center;font-size:11px;color:var(--text-2);opacity:.6;
+            margin-bottom:16px;
+        }
+        .key-input-area{
+            width:100%;margin-bottom:16px;animation:fadeIn .4s ease-out;
+        }
+        .key-input-row{
+            display:flex;gap:8px;align-items:center;
+        }
+        .key-input{
+            flex:1;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+            background:var(--bg-2);color:var(--text-1);border:2px solid var(--border);border-radius:10px;
+            outline:none;transition:border-color .2s;
+        }
+        .key-input:focus{border-color:var(--gold);}
+        .key-input::placeholder{color:var(--text-2);opacity:.5;}
+        .key-connect-btn{
+            padding:10px 18px;font-family:'Fredoka',sans-serif;font-size:14px;font-weight:600;
+            color:#fff;background:linear-gradient(135deg,var(--teal),#158a64);border:none;border-radius:10px;
+            cursor:pointer;transition:all .2s ease;white-space:nowrap;
+        }
+        .key-connect-btn:hover{transform:translateY(-1px);box-shadow:0 4px 15px var(--teal-glow);}
+        .key-disconnect-btn{
+            padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;
+            color:var(--text-2);background:var(--bg-3);border:1.5px solid var(--border);border-radius:8px;
+            cursor:pointer;transition:all .2s ease;margin-top:4px;
+        }
+        .key-disconnect-btn:hover{border-color:var(--red);color:var(--red);}
         @keyframes pulse-dot{
             0%,100%{opacity:1;box-shadow:0 0 6px var(--green);}
             50%{opacity:.5;box-shadow:0 0 2px var(--green);}
-        }
-        .connection-key-preview{
-            font-size:11px;color:var(--text-2);opacity:.7;
-            max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
         }
 
         /* MENU */
@@ -343,8 +368,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fun
     else { document.documentElement.classList.remove('dark'); }
 });
 
-/* ==================== API KEY FROM COOKIE ==================== */
+/* ==================== API KEY MANAGEMENT ==================== */
 var apiKey = null;
+var POE_API_URL = 'https://api.poe.com/v1/chat/completions';
+var POE_MODEL = 'Grok-4.1-Fast-Non-Reasoning';
 
 function getCookie(name) {
     var cookies = document.cookie.split(';');
@@ -357,22 +384,33 @@ function getCookie(name) {
     return null;
 }
 
-function extractApiKey() {
-    var raw = getCookie('estudai_apiKey');
+function cleanKeyValue(raw) {
     if (!raw) { return null; }
-    // decodeURIComponent to remove %22 (encoded quotes) and other encoded chars
     var decoded = '';
     try {
         decoded = decodeURIComponent(raw);
     } catch (e) {
         decoded = raw;
     }
-    // Strip leading/trailing double quotes if present
-    decoded = decoded.replace(/^["']+|["']+$/g, '');
-    // Validate it looks like a key
+    decoded = decoded.replace(/^["']+|["']+$/g, '').trim();
     if (decoded && decoded.length > 10) {
         return decoded;
     }
+    return null;
+}
+
+function extractApiKey() {
+    // 1) If already set manually, keep it
+    if (apiKey) { return apiKey; }
+    // 2) Try cookie
+    var fromCookie = cleanKeyValue(getCookie('estudai_apiKey'));
+    if (fromCookie) { return fromCookie; }
+    // 3) Try URL params (?estudai_apiKey=...)
+    try {
+        var params = new URLSearchParams(window.location.search);
+        var fromUrl = cleanKeyValue(params.get('estudai_apiKey'));
+        if (fromUrl) { return fromUrl; }
+    } catch (e) { /* ignore */ }
     return null;
 }
 
@@ -382,28 +420,92 @@ function maskKey(key) {
     return key.substring(0, 7) + '...' + key.substring(key.length - 4);
 }
 
+function connectWithKey() {
+    var input = document.getElementById('key-input');
+    if (!input) { return; }
+    var val = input.value.trim();
+    // Clean %22 and quotes in case user pastes raw cookie value
+    var cleaned = cleanKeyValue(val);
+    if (cleaned) {
+        apiKey = cleaned;
+        renderMenu();
+        showToast('Conectado com sucesso!', 'info');
+    } else {
+        showToast('Chave invalida. Cole a chave sk-poe-...', 'error');
+    }
+}
+
+function disconnectKey() {
+    apiKey = null;
+    renderMenu();
+}
+
 function renderConnectionStatus() {
     var container = document.getElementById('connection-status');
-    apiKey = extractApiKey();
+    var currentKey = extractApiKey();
+    apiKey = currentKey;
+
     if (apiKey) {
         container.innerHTML =
             '<div class="connection-badge connected">' +
                 '<span class="connection-dot"></span>' +
                 '<span>Conectado</span>' +
             '</div>' +
-            '<div class="connection-key-preview" style="text-align:center;font-size:11px;color:var(--text-2);opacity:.6;margin-top:-10px;margin-bottom:12px;">' +
-                maskKey(apiKey) +
-            '</div>';
+            '<div class="connection-key-hint">' + maskKey(apiKey) + '</div>' +
+            '<button class="key-disconnect-btn" onclick="disconnectKey()">Desconectar</button>';
     } else {
         container.innerHTML =
             '<div class="connection-badge disconnected">' +
                 '<span class="connection-dot"></span>' +
                 '<span>Desconectado</span>' +
             '</div>' +
-            '<div style="text-align:center;font-size:11px;color:var(--text-2);opacity:.6;margin-top:-10px;margin-bottom:12px;">' +
-                'Cookie estudai_apiKey nao encontrado' +
+            '<div class="key-input-area">' +
+                '<div class="key-input-row">' +
+                    '<input type="text" id="key-input" class="key-input" placeholder="Cole sua chave sk-poe-..." />' +
+                    '<button class="key-connect-btn" onclick="connectWithKey()">Conectar</button>' +
+                '</div>' +
             '</div>';
+        // Allow Enter key to connect
+        setTimeout(function() {
+            var inp = document.getElementById('key-input');
+            if (inp) {
+                inp.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { connectWithKey(); }
+                });
+            }
+        }, 50);
     }
+}
+
+/* ==================== POE API (fetch) ==================== */
+function callPoeAPI(promptText) {
+    return fetch(POE_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+            model: POE_MODEL,
+            messages: [
+                { role: 'user', content: promptText }
+            ]
+        })
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            return response.text().then(function(body) {
+                throw new Error('API erro ' + response.status + ': ' + body);
+            });
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
+        throw new Error('Resposta inesperada da API');
+    });
 }
 
 /* ==================== CONSTANTS ==================== */
@@ -490,7 +592,10 @@ function renderMenu() {
             '<span class="diff-desc">' + d.desc + '</span></button>';
     }).join('');
 
-    document.getElementById('play-btn').disabled = !state.language || !state.difficulty;
+    // Button disabled if no lang, no diff, OR no API key
+    var canPlay = state.language && state.difficulty && apiKey;
+    document.getElementById('play-btn').disabled = !canPlay;
+
     var total = state.score.wins + state.score.losses;
     document.getElementById('stats-total').textContent = total;
     document.getElementById('stats-winrate').textContent = total > 0 ? Math.round((state.score.wins / total) * 100) + '%' : '0%';
@@ -507,7 +612,7 @@ function backToMenu() {
     showScreen('menu');
 }
 
-/* ==================== AI INTEGRATION ==================== */
+/* ==================== AI INTEGRATION (fetch) ==================== */
 function parseJSON(text) {
     var s = text;
     var codeBlock = s.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -517,60 +622,7 @@ function parseJSON(text) {
     return JSON.parse(s.trim());
 }
 
-var handlerRegistered = false;
-
-function setupHandler() {
-    if (handlerRegistered || !window.Poe) { return; }
-    handlerRegistered = true;
-
-    window.Poe.registerHandler('forca-word', function(result) {
-        var msg = result.responses[0];
-
-        if (msg.status === 'error') {
-            showToast('Erro ao gerar palavra: ' + (msg.statusText || 'Tente novamente'), 'error');
-            showScreen('menu');
-            return;
-        }
-
-        if (msg.status !== 'complete') { return; }
-
-        try {
-            var data = parseJSON(msg.content);
-            if (!data.word || !data.hint) { throw new Error('Missing fields'); }
-
-            var clean = data.word.toUpperCase().replace(/[^A-Z]/g, '');
-            if (clean.length < 2) { throw new Error('Word too short'); }
-
-            var used = getUsedWordsForLang();
-            if (used.indexOf(clean) !== -1) {
-                state.retryCount++;
-                if (state.retryCount > 3) {
-                    state.usedWords[state.language] = used.slice(-5);
-                    state.retryCount = 0;
-                }
-                requestNewWord();
-                return;
-            }
-
-            state.retryCount = 0;
-            used.push(clean);
-            initGame(clean, data.hint, data.translation || data.word);
-        } catch (e) {
-            state.retryCount++;
-            if (state.retryCount > 3) {
-                showToast('Nao foi possivel gerar uma palavra. Tente novamente.', 'error');
-                state.retryCount = 0;
-                showScreen('menu');
-                return;
-            }
-            requestNewWord();
-        }
-    });
-}
-
-function requestNewWord() {
-    showScreen('loading');
-
+function buildPrompt() {
     var lang = LANGUAGES.find(function(l) { return l.id === state.language; });
     var diff = DIFFICULTIES.find(function(d) { return d.id === state.difficulty; });
 
@@ -582,7 +634,7 @@ function requestNewWord() {
     else if (diff.id === 'medio') { diffDesc = 'Medio: palavras comuns mas menos basicas, entre 5 e 7 letras'; }
     else { diffDesc = 'Dificil: palavras complexas, tecnicas ou pouco comuns, com 7 ou mais letras'; }
 
-    var prompt = 'Gere UMA palavra em ' + lang.aiName + ' para um jogo da forca.\n\n' +
+    return 'Gere UMA palavra em ' + lang.aiName + ' para um jogo da forca.\n\n' +
         'Nivel de dificuldade: ' + diffDesc + '\n\n' +
         'REGRAS:\n' +
         '1. A palavra deve conter APENAS letras de A a Z (sem acentos, cedilha, espacos ou hifens)\n' +
@@ -591,33 +643,63 @@ function requestNewWord() {
         '4. Responda SOMENTE com um JSON valido, sem nenhum texto antes ou depois\n' +
         (usedList ? '5. NAO use estas palavras ja usadas: ' + usedList + '\n' : '') +
         '\nFormato exato:\n{"word":"PALAVRA","hint":"dica em portugues","translation":"traducao em portugues"}';
+}
 
-    if (!window.Poe) {
-        showToast('Este app requer a plataforma Poe para funcionar.', 'error');
+function requestNewWord() {
+    showScreen('loading');
+
+    if (!apiKey) {
+        showToast('Chave API nao encontrada. Verifique o cookie estudai_apiKey.', 'error');
         showScreen('menu');
         return;
     }
 
-    window.Poe.sendUserMessage('@Grok-4.1-Fast-Non-Reasoning ' + prompt, {
-        handler: 'forca-word',
-        stream: false,
-        openChat: false,
-        parameters: {}
-    }).catch(function(err) {
-        if (err.errorType === 'USER_REJECTED_CONFIRMATION') {
+    var prompt = buildPrompt();
+
+    callPoeAPI(prompt)
+        .then(function(content) {
+            try {
+                var data = parseJSON(content);
+                if (!data.word || !data.hint) { throw new Error('Missing fields'); }
+
+                var clean = data.word.toUpperCase().replace(/[^A-Z]/g, '');
+                if (clean.length < 2) { throw new Error('Word too short'); }
+
+                var used = getUsedWordsForLang();
+                if (used.indexOf(clean) !== -1) {
+                    state.retryCount++;
+                    if (state.retryCount > 3) {
+                        state.usedWords[state.language] = used.slice(-5);
+                        state.retryCount = 0;
+                    }
+                    requestNewWord();
+                    return;
+                }
+
+                state.retryCount = 0;
+                used.push(clean);
+                initGame(clean, data.hint, data.translation || data.word);
+            } catch (e) {
+                state.retryCount++;
+                if (state.retryCount > 3) {
+                    showToast('Nao foi possivel gerar uma palavra. Tente novamente.', 'error');
+                    state.retryCount = 0;
+                    showScreen('menu');
+                    return;
+                }
+                requestNewWord();
+            }
+        })
+        .catch(function(err) {
+            showToast('Erro na API: ' + (err.message || 'Tente novamente'), 'error');
             showScreen('menu');
-            return;
-        }
-        showToast('Erro: ' + (err.message || 'Tente novamente'), 'error');
-        showScreen('menu');
-    });
+        });
 }
 
 /* ==================== GAME LOGIC ==================== */
 function startGame() {
-    if (!state.language || !state.difficulty) { return; }
+    if (!state.language || !state.difficulty || !apiKey) { return; }
     state.retryCount = 0;
-    setupHandler();
     requestNewWord();
 }
 
