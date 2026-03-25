@@ -417,13 +417,37 @@ var ConnectionManager = (function() {
     if (!badgeEl) return;
     badgeEl.className = 'conn-badge conn-' + newMode;
     var labelEl = badgeEl.querySelector('.conn-label');
-    if (labelEl) labelEl.textContent = label;
+    if (labelEl) labelEl.innerHTML = label;
   }
 
   function updateMiniBadge(el, newMode, label) {
     if (!el) return;
     el.className = 'conn-mini conn-' + newMode;
     el.innerHTML = '<span class="conn-dot"></span> ' + label;
+  }
+
+  function setConnected(key) {
+    apiKey = key;
+    mode = 'poe-api';
+    var badge = document.getElementById('conn-badge-start');
+    updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
+  }
+
+  function setOffline() {
+    mode = 'offline';
+    apiKey = null;
+    var badge = document.getElementById('conn-badge-start');
+    updateBadge(badge, 'offline', '<i class="fas fa-wifi"></i> Modo Offline — perguntas locais');
+  }
+
+  function validateAndSetKey(raw) {
+    if (!raw) return false;
+    var k = String(raw).replace(/%22/g, '').replace(/%27/g, '').replace(/^["']+|["']+$/g, '').trim();
+    if (k.indexOf('sk-poe-') === 0 && k.length > 20) {
+      setConnected(k);
+      return true;
+    }
+    return false;
   }
 
   function detect() {
@@ -436,37 +460,53 @@ var ConnectionManager = (function() {
       return;
     }
 
-    // 2. Try cookie
-    apiKey = getCookie('estudai_apiKey');
+    // 2. Try cookie (works if same-origin)
+    var cookieKey = getCookie('estudai_apiKey');
+    if (validateAndSetKey(cookieKey)) return;
 
-    // 3. Fallback: URL param
-    if (!apiKey) {
-      apiKey = getKeyFromURL();
-    }
+    // 3. Try URL param
+    var urlKey = getKeyFromURL();
+    if (validateAndSetKey(urlKey)) return;
 
-    if (apiKey && apiKey.indexOf('sk-poe-') === 0) {
-      mode = 'poe-api';
-      updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
-    } else {
-      mode = 'offline';
-      apiKey = null;
-      updateBadge(badge, 'offline', '<i class="fas fa-wifi"></i> Modo Offline — perguntas locais');
-    }
+    // 4. Request key from parent window (cross-origin iframe scenario)
+    // Show "waiting" state while we ask the parent
+    updateBadge(badge, 'checking', '<i class="fas fa-spinner fa-spin"></i> Aguardando conexão...');
+    requestKeyFromParent();
+
+    // After 3 seconds, if still no key, go offline
+    setTimeout(function() {
+      if (mode === 'checking') {
+        setOffline();
+      }
+    }, 3000);
+  }
+
+  // Ask parent window to send us the API key
+  function requestKeyFromParent() {
+    try {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'estudai_requestKey' }, '*');
+      }
+    } catch(e) { /* cross-origin block - that's ok, we wait for parent to send proactively */ }
   }
 
   // Listen for API key from parent window (when embedded as iframe)
   window.addEventListener('message', function(event) {
     try {
       var data = event.data;
-      if (data && data.type === 'estudai_apiKey' && data.key) {
-        var k = String(data.key).replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
-        if (k.indexOf('sk-poe-') === 0) {
-          apiKey = k;
-          mode = 'poe-api';
-          var badge = document.getElementById('conn-badge-start');
-          updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
-          showNotification('🔑 API Key recebida! Conectado.', 'success');
-        }
+      if (!data) return;
+
+      // Accept key via: { type: "estudai_apiKey", key: "sk-poe-..." }
+      // Or simpler:     { estudai_apiKey: "sk-poe-..." }
+      var receivedKey = null;
+      if (data.type === 'estudai_apiKey' && data.key) {
+        receivedKey = data.key;
+      } else if (data.estudai_apiKey) {
+        receivedKey = data.estudai_apiKey;
+      }
+
+      if (receivedKey && validateAndSetKey(receivedKey)) {
+        showNotification('🔑 API Key recebida! Conectado.', 'success');
       }
     } catch(e) { /* ignore */ }
   });
