@@ -42,42 +42,44 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font-body);ba
 h2{font-family:var(--font-heading);font-size:clamp(1.3rem,5vw,1.8rem);color:var(--gold-light);margin-bottom:12px}
 h3{font-family:var(--font-heading);font-size:clamp(1.1rem,4vw,1.4rem);color:var(--text);margin-bottom:8px}
 
-/* Connection Badge */
-.conn-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 14px;border-radius:20px;
-  font-family:var(--font-heading);font-size:.8rem;font-weight:700;
-  margin-bottom:20px;transition:all .4s ease;
-  letter-spacing:.5px;
+/* API Status Bar */
+.api-bar{
+  background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  font-size:.8rem;font-weight:600;font-family:var(--font-heading);
+  margin-bottom:12px;
 }
-.conn-badge .conn-dot{
-  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+.api-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.api-dot.connected{background:var(--success);box-shadow:0 0 6px rgba(50,168,80,0.5);animation:apiPulse 2s ease-in-out infinite}
+.api-dot.disconnected{background:var(--danger);box-shadow:0 0 6px rgba(192,48,48,0.5)}
+.api-dot.checking{background:var(--gold);animation:apiPulse 1s ease-in-out infinite}
+.api-dot.poe{background:var(--monster-light);box-shadow:0 0 6px rgba(120,50,168,0.5);animation:apiPulse 2s ease-in-out infinite}
+@keyframes apiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.api-label{flex:1;color:var(--text-sec)}
+.api-label.ok{color:var(--success-light)}
+.api-label.poe-mode{color:var(--monster-light)}
+.api-config-btn{
+  background:var(--bg-card-hover);border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;font-family:var(--font-heading);font-size:.7rem;font-weight:700;
+  color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap;
 }
-.conn-badge.conn-checking{
-  background:rgba(200,160,50,0.12);border:1px solid rgba(200,160,50,0.35);color:var(--gold-light);
+.api-config-btn:hover{border-color:var(--gold);color:var(--gold-light)}
+.api-input-area{margin-top:8px;display:none}
+.api-key-input{
+  width:100%;padding:10px 14px;background:var(--bg-deep);
+  border:2px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-family:var(--font-body);font-size:16px;
+  outline:none;transition:border-color .2s;
 }
-.conn-badge.conn-checking .conn-dot{
-  background:var(--gold);animation:connPulse 1.2s ease-in-out infinite;
+.api-key-input:focus{border-color:var(--gold)}
+.api-key-input::placeholder{color:var(--text-muted)}
+.api-save-btn{
+  background:linear-gradient(135deg,#8b4513,#a0522d);border:1px solid var(--gold);
+  border-radius:var(--radius);padding:8px 16px;font-family:var(--font-heading);
+  font-size:.85rem;font-weight:700;color:#f0e0c0;cursor:pointer;transition:all .2s;
+  white-space:nowrap;
 }
-.conn-badge.conn-poe{
-  background:rgba(120,50,168,0.15);border:1px solid rgba(120,50,168,0.4);color:var(--monster-light);
-}
-.conn-badge.conn-poe .conn-dot{
-  background:var(--monster-light);box-shadow:0 0 6px rgba(120,50,168,0.5);animation:connPulse 2s ease-in-out infinite;
-}
-.conn-badge.conn-api{
-  background:rgba(50,168,80,0.12);border:1px solid rgba(50,168,80,0.35);color:var(--success-light);
-}
-.conn-badge.conn-api .conn-dot{
-  background:var(--success);box-shadow:0 0 6px rgba(50,168,80,0.5);animation:connPulse 2s ease-in-out infinite;
-}
-.conn-badge.conn-offline{
-  background:rgba(200,120,50,0.12);border:1px solid rgba(200,120,50,0.3);color:var(--gold);
-}
-.conn-badge.conn-offline .conn-dot{
-  background:var(--gold);
-}
-@keyframes connPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.api-save-btn:hover{background:linear-gradient(135deg,#a0522d,#b8652f)}
 
 /* Game header connection mini-badge */
 .conn-mini{
@@ -240,10 +242,22 @@ h3{font-family:var(--font-heading);font-size:clamp(1.1rem,4vw,1.4rem);color:var(
     <div class="screen-content">
       <h1 class="game-title">Labirinto dos Idiomas</h1>
       <p class="subtitle">Uma aventura de RPG para aprender idiomas</p>
-      <!-- Connection Status Badge -->
-      <div id="conn-badge-start" class="conn-badge conn-checking">
-        <span class="conn-dot"></span>
-        <span class="conn-label">Verificando conexão...</span>
+      <!-- API Status Bar (same pattern as MemoLingua) -->
+      <div class="api-bar" id="api-bar">
+        <span id="api-dot" class="api-dot checking"></span>
+        <span id="api-label" class="api-label">Verificando API...</span>
+        <button id="api-toggle-btn" class="api-config-btn" onclick="toggleApiInput()">
+          <i class="fas fa-key"></i> Configurar
+        </button>
+      </div>
+      <div class="api-input-area" id="api-input-area">
+        <div style="display:flex;gap:8px;">
+          <input id="api-key-input" class="api-key-input" type="password" placeholder="Cole sua API Key aqui...">
+          <button class="api-save-btn" onclick="saveManualKey()">Salvar</button>
+        </div>
+        <p style="font-size:.72rem;color:var(--text-muted);margin-top:6px;font-style:italic;">
+          <i class="fas fa-info-circle"></i> A chave fica salva apenas nesta sessão.
+        </p>
       </div>
       <div class="form-section">
         <label class="form-label"><i class="fas fa-hat-wizard"></i> Seu Nome de Aventureiro</label>
@@ -369,251 +383,172 @@ h3{font-family:var(--font-heading);font-size:clamp(1.1rem,4vw,1.4rem);color:var(
 if(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.classList.add('dark')}
 window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){e.matches?document.documentElement.classList.add('dark'):document.documentElement.classList.remove('dark')});
 
-/* ========== CONNECTION / API LAYER ========== */
-var ConnectionManager = (function() {
-  var mode = 'checking'; // 'poe-embed' | 'poe-api' | 'offline'
-  var apiKey = null;
-  var API_URL = 'https://api.poe.com/v1/chat/completions';
-  var API_MODEL = 'GPT-5.2';
+/* ========== API KEY MANAGEMENT (same pattern as MemoLingua) ========== */
+var API_ENDPOINT = 'https://api.poe.com/v1/chat/completions';
+var API_MODEL = 'GPT-5.2';
+var apiKey = null;
+var connectionMode = 'offline'; // 'poe-embed' | 'poe-api' | 'offline'
 
-  // Read cookie by name, strip %22 and quotes
-  function getCookie(name) {
-    try {
-      var pairs = document.cookie.split(';');
-      for (var i = 0; i < pairs.length; i++) {
-        var pair = pairs[i].trim();
-        if (pair.indexOf(name + '=') === 0) {
-          var val = pair.substring(name.length + 1);
-          try { val = decodeURIComponent(val); } catch(e) {
-            val = val.replace(/%22/g, '').replace(/%27/g, '');
-          }
-          val = val.replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
-          return val;
-        }
+function readApiKeyFromCookie() {
+  try {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var c = cookies[i].trim();
+      var eqIdx = c.indexOf('=');
+      if (eqIdx === -1) continue;
+      var name = c.substring(0, eqIdx).trim();
+      if (name === 'estudai_apiKey') {
+        var raw = decodeURIComponent(c.substring(eqIdx + 1));
+        return raw.replace(/^["']|["']$/g, '');
       }
-    } catch(e) { /* cookie access blocked */ }
-    return null;
-  }
+    }
+  } catch (e) { /* cookie not accessible */ }
+  return null;
+}
 
-  // Fallback: read from URL params
-  function getKeyFromURL() {
-    try {
-      var params = new URLSearchParams(window.location.search);
-      var k = params.get('estudai_apiKey') || params.get('apiKey') || params.get('key');
+function updateApiStatus() {
+  var dot = document.getElementById('api-dot');
+  var label = document.getElementById('api-label');
+  var toggleBtn = document.getElementById('api-toggle-btn');
+  if (connectionMode === 'poe-embed') {
+    dot.className = 'api-dot poe';
+    label.textContent = 'Conectado via Poe';
+    label.className = 'api-label poe-mode';
+    toggleBtn.style.display = 'none';
+  } else if (apiKey) {
+    connectionMode = 'poe-api';
+    dot.className = 'api-dot connected';
+    label.textContent = 'API conectada';
+    label.className = 'api-label ok';
+    toggleBtn.innerHTML = '<i class="fas fa-check"></i> OK';
+  } else {
+    connectionMode = 'offline';
+    dot.className = 'api-dot disconnected';
+    label.textContent = 'Sem API — perguntas locais';
+    label.className = 'api-label';
+    toggleBtn.innerHTML = '<i class="fas fa-key"></i> Configurar';
+  }
+}
+
+function toggleApiInput() {
+  var area = document.getElementById('api-input-area');
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveManualKey() {
+  var input = document.getElementById('api-key-input');
+  var val = input.value.trim().replace(/^["']|["']$/g, '');
+  if (val) {
+    apiKey = val;
+    input.value = '';
+    document.getElementById('api-input-area').style.display = 'none';
+    updateApiStatus();
+    showNotification('🔑 API Key salva! Conectado.', 'success');
+  }
+}
+
+// Listen for API key from parent window (when embedded as iframe)
+window.addEventListener('message', function(event) {
+  try {
+    var data = event.data;
+    if (!data) return;
+    var receivedKey = null;
+    if (data.type === 'estudai_apiKey' && data.key) {
+      receivedKey = data.key;
+    } else if (data.estudai_apiKey) {
+      receivedKey = data.estudai_apiKey;
+    }
+    if (receivedKey) {
+      var k = String(receivedKey).replace(/%22/g, '').replace(/^["']|["']$/g, '').trim();
       if (k) {
-        k = k.replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
-        return k;
-      }
-    } catch(e) {}
-    return null;
-  }
-
-  function maskKey(k) {
-    if (!k || k.length < 16) return '***';
-    return k.substring(0, 10) + '...' + k.substring(k.length - 4);
-  }
-
-  function updateBadge(badgeEl, newMode, label) {
-    if (!badgeEl) return;
-    badgeEl.className = 'conn-badge conn-' + newMode;
-    var labelEl = badgeEl.querySelector('.conn-label');
-    if (labelEl) labelEl.innerHTML = label;
-  }
-
-  function updateMiniBadge(el, newMode, label) {
-    if (!el) return;
-    el.className = 'conn-mini conn-' + newMode;
-    el.innerHTML = '<span class="conn-dot"></span> ' + label;
-  }
-
-  function setConnected(key) {
-    apiKey = key;
-    mode = 'poe-api';
-    var badge = document.getElementById('conn-badge-start');
-    updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
-  }
-
-  function setOffline() {
-    mode = 'offline';
-    apiKey = null;
-    var badge = document.getElementById('conn-badge-start');
-    updateBadge(badge, 'offline', '<i class="fas fa-wifi"></i> Modo Offline — perguntas locais');
-  }
-
-  function validateAndSetKey(raw) {
-    if (!raw) return false;
-    var k = String(raw).replace(/%22/g, '').replace(/%27/g, '').replace(/^["']+|["']+$/g, '').trim();
-    if (k.indexOf('sk-poe-') === 0 && k.length > 20) {
-      setConnected(k);
-      return true;
-    }
-    return false;
-  }
-
-  function detect() {
-    var badge = document.getElementById('conn-badge-start');
-
-    // 1. Check Poe Embed API
-    if (window.Poe && typeof window.Poe.sendUserMessage === 'function' && typeof window.Poe.registerHandler === 'function') {
-      mode = 'poe-embed';
-      updateBadge(badge, 'poe', '<i class="fas fa-plug"></i> Conectado via Poe');
-      return;
-    }
-
-    // 2. Try cookie (works if same-origin)
-    var cookieKey = getCookie('estudai_apiKey');
-    if (validateAndSetKey(cookieKey)) return;
-
-    // 3. Try URL param
-    var urlKey = getKeyFromURL();
-    if (validateAndSetKey(urlKey)) return;
-
-    // 4. Request key from parent window (cross-origin iframe scenario)
-    // Show "waiting" state while we ask the parent
-    updateBadge(badge, 'checking', '<i class="fas fa-spinner fa-spin"></i> Aguardando conexão...');
-    requestKeyFromParent();
-
-    // After 3 seconds, if still no key, go offline
-    setTimeout(function() {
-      if (mode === 'checking') {
-        setOffline();
-      }
-    }, 3000);
-  }
-
-  // Ask parent window to send us the API key
-  function requestKeyFromParent() {
-    try {
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: 'estudai_requestKey' }, '*');
-      }
-    } catch(e) { /* cross-origin block - that's ok, we wait for parent to send proactively */ }
-  }
-
-  // Listen for API key from parent window (when embedded as iframe)
-  window.addEventListener('message', function(event) {
-    try {
-      var data = event.data;
-      if (!data) return;
-
-      // Accept key via: { type: "estudai_apiKey", key: "sk-poe-..." }
-      // Or simpler:     { estudai_apiKey: "sk-poe-..." }
-      var receivedKey = null;
-      if (data.type === 'estudai_apiKey' && data.key) {
-        receivedKey = data.key;
-      } else if (data.estudai_apiKey) {
-        receivedKey = data.estudai_apiKey;
-      }
-
-      if (receivedKey && validateAndSetKey(receivedKey)) {
+        apiKey = k;
+        updateApiStatus();
         showNotification('🔑 API Key recebida! Conectado.', 'success');
       }
-    } catch(e) { /* ignore */ }
-  });
-
-  // Fetch quiz via Poe REST API
-  function fetchViaRestAPI(prompt) {
-    return new Promise(function(resolve, reject) {
-      if (!apiKey) { reject(new Error('No API key')); return; }
-
-      fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey
-        },
-        body: JSON.stringify({
-          model: API_MODEL,
-          messages: [{ role: 'user', content: prompt }],
-          stream: false
-        })
-      })
-      .then(function(res) {
-        if (!res.ok) {
-          return res.text().then(function(body) {
-            throw new Error('HTTP ' + res.status + ': ' + body);
-          });
-        }
-        return res.json();
-      })
-      .then(function(data) {
-        var content = '';
-        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
-          content = data.choices[0].message.content;
-        }
-        if (content) {
-          resolve(content);
-        } else {
-          reject(new Error('Empty response'));
-        }
-      })
-      .catch(function(err) {
-        reject(err);
-      });
-    });
-  }
-
-  // Fetch quiz via Poe Embed API
-  function fetchViaEmbed(prompt) {
-    return new Promise(function(resolve, reject) {
-      if (!window.Poe || !window.Poe.sendUserMessage || !window.Poe.registerHandler) {
-        reject(new Error('No Poe Embed'));
-        return;
-      }
-      var hid = 'quiz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
-      var resolved = false;
-      var timeout = setTimeout(function() {
-        if (!resolved) { resolved = true; reject(new Error('Timeout')); }
-      }, 30000);
-
-      window.Poe.registerHandler(hid, function(result) {
-        if (resolved) return;
-        var msg = result.responses[0];
-        if (msg.status === 'complete') {
-          resolved = true; clearTimeout(timeout);
-          resolve(msg.content);
-        } else if (msg.status === 'error') {
-          resolved = true; clearTimeout(timeout);
-          reject(new Error(msg.statusText || 'Error'));
-        }
-      });
-
-      window.Poe.sendUserMessage('@GPT-5.2 ' + prompt, {
-        handler: hid, stream: false, openChat: false, parameters: {}
-      }).catch(function(err) {
-        if (!resolved) { resolved = true; clearTimeout(timeout); reject(err); }
-      });
-    });
-  }
-
-  // Public: fetch quiz content (auto-selects method)
-  function fetchQuiz(prompt) {
-    if (mode === 'poe-embed') {
-      return fetchViaEmbed(prompt);
-    } else if (mode === 'poe-api') {
-      return fetchViaRestAPI(prompt);
-    } else {
-      return Promise.reject(new Error('No connection'));
     }
-  }
+  } catch(e) { /* ignore */ }
+});
 
-  return {
-    detect: detect,
-    fetchQuiz: fetchQuiz,
-    getMode: function() { return mode; },
-    getModeLabel: function() {
-      if (mode === 'poe-embed') return 'Poe';
-      if (mode === 'poe-api') return 'API';
-      return 'Offline';
+// Poe REST API call (same as MemoLingua)
+function callPoeAPI(prompt) {
+  if (!apiKey) return Promise.resolve(null);
+  return fetch(API_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
     },
-    getModeClass: function() {
-      if (mode === 'poe-embed') return 'poe';
-      if (mode === 'poe-api') return 'api';
-      return 'offline';
-    },
-    updateMiniBadge: updateMiniBadge
-  };
-})();
+    body: JSON.stringify({
+      model: API_MODEL,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  })
+  .then(function(res) {
+    if (!res.ok) return null;
+    return res.json();
+  })
+  .then(function(data) {
+    if (data && data.choices && data.choices[0] && data.choices[0].message) {
+      return data.choices[0].message.content;
+    }
+    return null;
+  })
+  .catch(function() { return null; });
+}
+
+// Poe Embed API call (when inside Poe platform)
+function callPoeEmbed(prompt) {
+  return new Promise(function(resolve) {
+    if (!window.Poe || !window.Poe.sendUserMessage || !window.Poe.registerHandler) {
+      resolve(null); return;
+    }
+    var hid = 'quiz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+    var done = false;
+    var timeout = setTimeout(function() {
+      if (!done) { done = true; resolve(null); }
+    }, 30000);
+
+    window.Poe.registerHandler(hid, function(result) {
+      if (done) return;
+      var msg = result.responses[0];
+      if (msg.status === 'complete') {
+        done = true; clearTimeout(timeout);
+        resolve(msg.content);
+      } else if (msg.status === 'error') {
+        done = true; clearTimeout(timeout);
+        resolve(null);
+      }
+    });
+
+    window.Poe.sendUserMessage('@GPT-5.2 ' + prompt, {
+      handler: hid, stream: false, openChat: false, parameters: {}
+    }).catch(function() {
+      if (!done) { done = true; clearTimeout(timeout); resolve(null); }
+    });
+  });
+}
+
+// Unified call: tries Poe Embed first, then REST API
+function callAI(prompt) {
+  if (connectionMode === 'poe-embed') {
+    return callPoeEmbed(prompt);
+  } else if (connectionMode === 'poe-api' && apiKey) {
+    return callPoeAPI(prompt);
+  }
+  return Promise.resolve(null);
+}
+
+function getConnectionModeLabel() {
+  if (connectionMode === 'poe-embed') return 'Poe';
+  if (connectionMode === 'poe-api') return 'API';
+  return 'Offline';
+}
+
+function getConnectionModeClass() {
+  if (connectionMode === 'poe-embed') return 'poe';
+  if (connectionMode === 'poe-api') return 'api';
+  return 'offline';
+}
 
 /* ========== CONSTANTS ========== */
 var LANGUAGES=[
@@ -948,8 +883,8 @@ function updateStatsUI(){
   // Add mini connection badge
   var miniSpan=document.createElement('span');
   miniSpan.id='conn-mini-game';
-  miniSpan.className='conn-mini conn-'+ConnectionManager.getModeClass();
-  miniSpan.innerHTML='<span class="conn-dot"></span> '+ConnectionManager.getModeLabel();
+  miniSpan.className='conn-mini conn-'+getConnectionModeClass();
+  miniSpan.innerHTML='<span class="conn-dot"></span> '+getConnectionModeLabel();
   levelInd.appendChild(miniSpan);
 }
 
@@ -1024,14 +959,14 @@ function getRandomFallbackQuiz(){
 
 function fetchQuizFromAPI(action,monster){
   var prompt=buildQuizPrompt(action,monster);
-  var connMode=ConnectionManager.getMode();
 
   // If offline, go straight to fallback
-  if(connMode==='offline'){
+  if(connectionMode==='offline'){
     return Promise.reject(new Error('Offline'));
   }
 
-  return ConnectionManager.fetchQuiz(prompt).then(function(content){
+  return callAI(prompt).then(function(content){
+    if(!content) throw new Error('No response');
     var quiz=parseQuizJSON(content);
     if(quiz)return quiz;
     throw new Error('Parse failed');
@@ -1065,10 +1000,9 @@ function chooseAction(action){
   state.quizAnswered=false;
 
   var loadingText=document.getElementById('quiz-loading-text');
-  var connMode=ConnectionManager.getMode();
-  if(connMode==='poe-embed'){
+  if(connectionMode==='poe-embed'){
     loadingText.textContent='Gerando pergunta via Poe...';
-  }else if(connMode==='poe-api'){
+  }else if(connectionMode==='poe-api'){
     loadingText.textContent='Gerando pergunta via API...';
   }else{
     loadingText.textContent='Carregando pergunta...';
@@ -1304,8 +1238,21 @@ function init(){
   createParticles();
   initStartScreen();
   showScreen('start-screen');
-  // Detect connection after a short delay (Poe Embed may need time to init)
-  setTimeout(function(){ConnectionManager.detect()},400);
+  // Detect connection (same pattern as MemoLingua)
+  // 1. Check Poe Embed API
+  if (window.Poe && typeof window.Poe.sendUserMessage === 'function' && typeof window.Poe.registerHandler === 'function') {
+    connectionMode = 'poe-embed';
+  } else {
+    // 2. Try cookie
+    apiKey = readApiKeyFromCookie();
+  }
+  updateApiStatus();
+  // Also request from parent in case we're in a cross-origin iframe
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'estudai_requestKey' }, '*');
+    }
+  } catch(e) { /* ok */ }
 }
 init();
 </script>
