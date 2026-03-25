@@ -1323,6 +1323,20 @@
                 ::-webkit-scrollbar-thumb:hover {
                     background: var(--wood-dark);
                 }
+        .btn-home {
+                max-width: 250px;
+                margin: 15px auto 5px;
+                
+                background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%);
+                color: var(--text-dark);
+
+                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+            }
+
+            .btn-home:hover {
+                transform: translateY(-2px) scale(1.03);
+                box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+            }
         </style>
     </head>
     <body>
@@ -1361,6 +1375,10 @@
                 <span class="stat-value" id="completedCount">0/10</span>
             </div>
         </div>
+
+        <button class="btn btn-home" onclick="window.location.href='/index.html'">
+            <span>🏠</span> Tela Inicial
+        </button>
 
         <main class="container">
             <!-- Sidebar -->
