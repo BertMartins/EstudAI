@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Labirinto dos Idiomas</title>
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Almendra:wght@400;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg-deep:#0a0806;--bg-primary:#14100c;--bg-card:#1e1814;--bg-card-hover:#2a2218;
+  --border:#3a302a;--border-light:#4a403a;
+  --gold:#c87832;--gold-light:#e8a050;--gold-glow:rgba(200,120,50,0.35);
+  --text:#d4c4a8;--text-sec:#a89070;--text-muted:#6a5a4a;
+  --hp:#a83232;--hp-light:#d04040;--xp:#c8a832;--xp-light:#e8c850;
+  --success:#32a850;--success-light:#50d070;--danger:#c03030;--danger-light:#e04848;
+  --monster:#7832a8;--monster-light:#9b59b6;
+  --font-display:'MedievalSharp',cursive;--font-heading:'Almendra',serif;--font-body:'Lora',serif;
+  --radius:10px;
+}
+html:not(.dark){
+  --bg-deep:#f0e6d2;--bg-primary:#e8dcc4;--bg-card:#fff6e8;--bg-card-hover:#fff0d8;
+  --border:#c8b898;--border-light:#d8c8a8;
+  --text:#1e1810;--text-sec:#4a3e30;--text-muted:#8a7a6a;
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font-body);background:var(--bg-deep);color:var(--text)}
+#app{width:100%;height:100%;position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s ease;overflow-y:auto;padding:16px;z-index:1}
+.screen.active{opacity:1;pointer-events:auto}
+.screen.overlay{background:rgba(6,4,2,0.92);z-index:10}
+.screen-content{max-width:520px;width:100%;text-align:center}
+
+/* Particles */
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:3px;height:3px;background:var(--gold);border-radius:50%;opacity:0;animation:floatUp var(--dur,6s) var(--delay,0s) ease-in infinite}
+@keyframes floatUp{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:.7}80%{opacity:.15}100%{transform:translateY(-5vh) translateX(var(--drift,0px));opacity:0}}
+
+/* Typography */
+.game-title{font-family:var(--font-display);font-size:clamp(2rem,7vw,3.2rem);color:var(--gold-light);text-shadow:0 0 30px var(--gold-glow),0 2px 4px rgba(0,0,0,.6);margin-bottom:6px;line-height:1.2}
+.subtitle{font-family:var(--font-heading);color:var(--text-sec);font-size:clamp(.95rem,3vw,1.15rem);margin-bottom:28px;font-style:italic}
+h2{font-family:var(--font-heading);font-size:clamp(1.3rem,5vw,1.8rem);color:var(--gold-light);margin-bottom:12px}
+h3{font-family:var(--font-heading);font-size:clamp(1.1rem,4vw,1.4rem);color:var(--text);margin-bottom:8px}
+
+/* Connection Badge */
+.conn-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 14px;border-radius:20px;
+  font-family:var(--font-heading);font-size:.8rem;font-weight:700;
+  margin-bottom:20px;transition:all .4s ease;
+  letter-spacing:.5px;
+}
+.conn-badge .conn-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.conn-badge.conn-checking{
+  background:rgba(200,160,50,0.12);border:1px solid rgba(200,160,50,0.35);color:var(--gold-light);
+}
+.conn-badge.conn-checking .conn-dot{
+  background:var(--gold);animation:connPulse 1.2s ease-in-out infinite;
+}
+.conn-badge.conn-poe{
+  background:rgba(120,50,168,0.15);border:1px solid rgba(120,50,168,0.4);color:var(--monster-light);
+}
+.conn-badge.conn-poe .conn-dot{
+  background:var(--monster-light);box-shadow:0 0 6px rgba(120,50,168,0.5);animation:connPulse 2s ease-in-out infinite;
+}
+.conn-badge.conn-api{
+  background:rgba(50,168,80,0.12);border:1px solid rgba(50,168,80,0.35);color:var(--success-light);
+}
+.conn-badge.conn-api .conn-dot{
+  background:var(--success);box-shadow:0 0 6px rgba(50,168,80,0.5);animation:connPulse 2s ease-in-out infinite;
+}
+.conn-badge.conn-offline{
+  background:rgba(200,120,50,0.12);border:1px solid rgba(200,120,50,0.3);color:var(--gold);
+}
+.conn-badge.conn-offline .conn-dot{
+  background:var(--gold);
+}
+@keyframes connPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* Game header connection mini-badge */
+.conn-mini{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.7rem;color:var(--text-muted);font-family:var(--font-heading);
+  margin-left:8px;
+}
+.conn-mini .conn-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.conn-mini.conn-poe .conn-dot{background:var(--monster-light);box-shadow:0 0 4px rgba(120,50,168,0.5)}
+.conn-mini.conn-api .conn-dot{background:var(--success);box-shadow:0 0 4px rgba(50,168,80,0.5)}
+.conn-mini.conn-offline .conn-dot{background:var(--gold)}
+.conn-mini.conn-poe{color:var(--monster-light)}
+.conn-mini.conn-api{color:var(--success-light)}
+.conn-mini.conn-offline{color:var(--gold)}
+
+/* Form */
+.form-section{margin-bottom:20px;text-align:left}
+.form-label{display:block;font-family:var(--font-heading);font-weight:700;color:var(--gold);font-size:1rem;margin-bottom:8px}
+.input-field{width:100%;padding:12px 16px;background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:16px;outline:none;transition:border-color .2s}
+.input-field:focus{border-color:var(--gold)}
+.input-field::placeholder{color:var(--text-muted)}
+
+/* Option grids */
+.option-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.option-grid.difficulty{grid-template-columns:repeat(3,1fr)}
+.opt-card{padding:12px 8px;background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .2s;text-align:center;user-select:none}
+.opt-card:hover{border-color:var(--gold);background:var(--bg-card-hover)}
+.opt-card.selected{border-color:var(--gold-light);background:var(--bg-card-hover);box-shadow:0 0 12px var(--gold-glow)}
+.opt-card .flag{font-size:1.8rem;display:block;margin-bottom:4px}
+.opt-card .opt-name{font-family:var(--font-heading);font-size:.85rem;color:var(--text)}
+.opt-card .opt-desc{font-size:.75rem;color:var(--text-muted);margin-top:2px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border:2px solid var(--border);border-radius:var(--radius);font-family:var(--font-heading);font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;color:var(--text);background:var(--bg-card);user-select:none}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.btn:active{transform:translateY(0)}
+.btn-primary{background:linear-gradient(135deg,#8b4513,#a0522d);border-color:var(--gold);color:#f0e0c0}
+.btn-primary:hover{background:linear-gradient(135deg,#a0522d,#b8652f);box-shadow:0 0 16px var(--gold-glow)}
+.btn-large{padding:14px 32px;font-size:1.1rem;width:100%;margin-top:8px}
+.btn-attack{background:linear-gradient(135deg,#6b1010,#8b2020);border-color:var(--danger);color:#ffa0a0;flex:1}
+.btn-attack:hover{background:linear-gradient(135deg,#8b2020,#a03030);box-shadow:0 0 12px rgba(180,50,50,.4)}
+.btn-flee{background:linear-gradient(135deg,#0a3a1a,#105020);border-color:var(--success);color:#a0f0b0;flex:1}
+.btn-flee:hover{background:linear-gradient(135deg,#105020,#188030);box-shadow:0 0 12px rgba(50,180,80,.3)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;transform:none!important}
+
+/* Bars */
+.bar{height:14px;background:var(--bg-deep);border-radius:7px;overflow:hidden;flex:1;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:7px;transition:width .5s ease}
+.hp-bar .bar-fill{background:linear-gradient(90deg,var(--hp),var(--hp-light))}
+.xp-bar .bar-fill{background:linear-gradient(90deg,var(--xp),var(--xp-light))}
+.monster-bar .bar-fill{background:linear-gradient(90deg,var(--monster),var(--monster-light))}
+.stat{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.stat-label{font-family:var(--font-heading);font-size:.8rem;color:var(--text-sec);min-width:50px;white-space:nowrap}
+.stat-value{font-size:.75rem;color:var(--text-muted);min-width:60px;text-align:right}
+
+/* Game header */
+.game-header{padding:8px 12px;background:var(--bg-primary);border-bottom:1px solid var(--border);flex-shrink:0}
+.level-indicator{font-family:var(--font-heading);font-size:.9rem;color:var(--gold);text-align:center;margin-bottom:4px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px}
+.stats-bar{display:flex;flex-direction:column;gap:2px}
+
+/* Canvas */
+.canvas-container{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:var(--bg-deep);min-height:0}
+#maze-canvas{display:block;image-rendering:pixelated}
+
+/* D-pad */
+.game-footer{padding:8px 12px 12px;background:var(--bg-primary);border-top:1px solid var(--border);flex-shrink:0;text-align:center}
+.dpad{display:grid;grid-template-areas:"_ up _" "left _ right" "_ down _";grid-template-columns:60px 60px 60px;grid-template-rows:50px 50px 50px;gap:4px;justify-content:center;margin:0 auto}
+.dpad-btn{background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);color:var(--gold);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.dpad-btn:active{background:var(--gold);color:var(--bg-deep);border-color:var(--gold-light)}
+.dpad-btn.up{grid-area:up}.dpad-btn.down{grid-area:down}.dpad-btn.left{grid-area:left}.dpad-btn.right{grid-area:right}
+.hint-text{font-size:.75rem;color:var(--text-muted);margin-top:6px}
+
+/* Encounter */
+.encounter-card,.quiz-card,.result-card,.complete-card,.gameover-card,.victory-card,.intro-card{
+  background:var(--bg-card);border:2px solid var(--border);border-radius:16px;padding:24px 20px;max-width:420px;width:100%;text-align:center;
+  animation:cardAppear .4s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+@keyframes cardAppear{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.encounter-title{color:var(--danger-light);margin-bottom:16px}
+.monster-display{margin:16px 0}
+.monster-emoji{font-size:4rem;margin-bottom:8px;animation:monsterBounce 1.5s ease infinite}
+@keyframes monsterBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.monster-name{font-family:var(--font-heading);font-size:1.4rem;color:var(--monster-light)}
+.monster-desc{color:var(--text-sec);font-size:.9rem;font-style:italic;margin:6px 0 12px}
+.monster-hp-bar{display:flex;align-items:center;gap:8px;max-width:250px;margin:0 auto}
+.monster-hp-bar span{font-size:.75rem;color:var(--text-muted);min-width:50px}
+.action-buttons{display:flex;gap:12px;margin-top:20px}
+
+/* Quiz */
+.quiz-card{padding:20px 16px}
+.quiz-timer{height:5px;background:var(--bg-deep);border-radius:3px;margin-bottom:16px;overflow:hidden}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--danger),var(--gold),var(--success));border-radius:3px;width:100%;transition:width 1s linear}
+.quiz-loading{padding:40px 0;display:flex;flex-direction:column;align-items:center;gap:16px;color:var(--text-sec)}
+.loading-spinner{width:44px;height:44px;border:4px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.quiz-context{font-size:.85rem;color:var(--text-sec);margin-bottom:12px;font-style:italic}
+.quiz-question{font-size:1.1rem;color:var(--text);margin-bottom:20px;line-height:1.5}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quiz-opt{padding:14px 12px;background:var(--bg-deep);border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;font-family:var(--font-body);font-size:1rem;color:var(--text);transition:all .2s;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center}
+.quiz-opt:hover{border-color:var(--gold);background:var(--bg-card-hover)}
+.quiz-opt.correct{border-color:var(--success);background:rgba(50,168,80,.2);color:var(--success-light)}
+.quiz-opt.wrong{border-color:var(--danger);background:rgba(192,48,48,.2);color:var(--danger-light)}
+.quiz-opt[disabled]{cursor:default;opacity:.7}
+
+/* Result */
+.result-icon{font-size:3.5rem;margin-bottom:8px}
+.result-title{margin-bottom:8px}
+.result-detail{color:var(--text-sec);font-size:.9rem;margin-bottom:12px}
+.result-explanation{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:16px;font-size:.9rem;color:var(--text-sec);text-align:left;line-height:1.5}
+.result-card.success .result-title{color:var(--success-light)}
+.result-card.failure .result-title{color:var(--danger-light)}
+
+/* Level intro */
+.level-badge{font-size:3rem;margin-bottom:12px;text-shadow:0 0 20px var(--gold-glow)}
+.level-info{color:var(--text-sec);font-size:.9rem;margin:16px 0 20px;line-height:1.6}
+
+/* Complete / Gameover / Victory */
+.complete-title{color:var(--gold-light)}
+.gameover-title{color:var(--danger-light);font-family:var(--font-display);font-size:clamp(1.8rem,6vw,2.5rem)}
+.gameover-text{color:var(--text-sec);margin-bottom:16px}
+.victory-title{color:var(--gold-light);font-family:var(--font-display);font-size:clamp(1.8rem,6vw,2.5rem)}
+.victory-text{font-family:var(--font-heading);font-size:1.2rem;color:var(--text);margin-bottom:4px}
+.victory-subtext{color:var(--text-sec);margin-bottom:16px;font-style:italic}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.stat-row .sr-label{color:var(--text-sec)}.stat-row .sr-value{color:var(--gold-light);font-weight:700}
+.stats-summary{background:var(--bg-deep);border-radius:var(--radius);padding:12px 16px;margin:16px 0;text-align:left}
+
+/* Notification */
+#notification-container{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none}
+.notification{padding:10px 20px;background:var(--bg-card);border:1px solid var(--gold);border-radius:var(--radius);color:var(--gold-light);font-family:var(--font-heading);font-size:.9rem;margin-bottom:8px;animation:notifySlide 2.5s ease forwards;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.notification.success{border-color:var(--success);color:var(--success-light)}
+.notification.danger{border-color:var(--danger);color:var(--danger-light)}
+@keyframes notifySlide{0%{opacity:0;transform:translateY(-16px)}12%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+
+/* Shake */
+.shake{animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* Responsive */
+@media(max-width:420px){
+  .quiz-options{grid-template-columns:1fr}
+  .option-grid{grid-template-columns:repeat(2,1fr)}
+  .option-grid.difficulty{grid-template-columns:1fr 1fr 1fr}
+  .dpad{grid-template-columns:52px 52px 52px;grid-template-rows:44px 44px 44px}
+}
+@media(min-width:769px){
+  .dpad{display:none}
+  .hint-text::after{content:' (← ↑ → ↓ ou WASD)'}
+}
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div id="notification-container"></div>
+
+<div id="app">
+  <!-- Start Screen -->
+  <div id="start-screen" class="screen active">
+    <div class="screen-content">
+      <h1 class="game-title">Labirinto dos Idiomas</h1>
+      <p class="subtitle">Uma aventura de RPG para aprender idiomas</p>
+      <!-- Connection Status Badge -->
+      <div id="conn-badge-start" class="conn-badge conn-checking">
+        <span class="conn-dot"></span>
+        <span class="conn-label">Verificando conexão...</span>
+      </div>
+      <div class="form-section">
+        <label class="form-label"><i class="fas fa-hat-wizard"></i> Seu Nome de Aventureiro</label>
+        <input type="text" id="player-name" placeholder="Digite seu nome..." class="input-field" maxlength="20">
+      </div>
+      <div class="form-section">
+        <label class="form-label"><i class="fas fa-globe"></i> Escolha o Idioma</label>
+        <div id="language-grid" class="option-grid"></div>
+      </div>
+      <div class="form-section">
+        <label class="form-label"><i class="fas fa-shield-halved"></i> Nível de Dificuldade</label>
+        <div id="difficulty-grid" class="option-grid difficulty"></div>
+      </div>
+      <button id="start-btn" class="btn btn-primary btn-large"><i class="fas fa-dungeon"></i> Iniciar Aventura</button>
+    </div>
+  </div>
+
+  <!-- Level Intro -->
+  <div id="level-intro" class="screen overlay">
+    <div class="intro-card">
+      <div class="level-badge" id="level-badge"></div>
+      <h2 id="level-name-intro"></h2>
+      <p class="level-info" id="level-desc-intro"></p>
+      <button class="btn btn-primary btn-large" id="enter-level-btn"><i class="fas fa-door-open"></i> Entrar</button>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen">
+    <div class="game-header">
+      <div class="level-indicator" id="level-indicator"></div>
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-label"><i class="fas fa-heart"></i> HP</span><div class="bar hp-bar"><div class="bar-fill" id="hp-fill"></div></div><span class="stat-value" id="hp-text"></span></div>
+        <div class="stat"><span class="stat-label"><i class="fas fa-star"></i> XP</span><div class="bar xp-bar"><div class="bar-fill" id="xp-fill"></div></div><span class="stat-value" id="xp-text"></span></div>
+      </div>
+    </div>
+    <div class="canvas-container"><canvas id="maze-canvas"></canvas></div>
+    <div class="game-footer">
+      <div class="dpad" id="dpad">
+        <button class="dpad-btn up" data-dx="0" data-dy="-1"><i class="fas fa-chevron-up"></i></button>
+        <button class="dpad-btn left" data-dx="-1" data-dy="0"><i class="fas fa-chevron-left"></i></button>
+        <button class="dpad-btn right" data-dx="1" data-dy="0"><i class="fas fa-chevron-right"></i></button>
+        <button class="dpad-btn down" data-dx="0" data-dy="1"><i class="fas fa-chevron-down"></i></button>
+      </div>
+      <p class="hint-text"><i class="fas fa-lightbulb"></i> Deslize no mapa para mover</p>
+    </div>
+  </div>
+
+  <!-- Encounter -->
+  <div id="encounter-screen" class="screen overlay">
+    <div class="encounter-card">
+      <h2 class="encounter-title"><i class="fas fa-exclamation-triangle"></i> Encontro!</h2>
+      <div class="monster-display">
+        <div class="monster-emoji" id="monster-emoji"></div>
+        <h3 class="monster-name" id="monster-name"></h3>
+        <p class="monster-desc" id="monster-desc"></p>
+        <div class="monster-hp-bar"><div class="bar monster-bar"><div class="bar-fill" id="monster-hp-fill"></div></div><span id="monster-hp-text"></span></div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-attack" id="attack-btn">⚔️ Atacar</button>
+        <button class="btn btn-flee" id="flee-btn">🏃 Fugir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz-screen" class="screen overlay">
+    <div class="quiz-card">
+      <div class="quiz-timer"><div class="timer-bar-fill" id="timer-fill"></div></div>
+      <div id="quiz-loading" class="quiz-loading"><div class="loading-spinner"></div><p id="quiz-loading-text">Gerando pergunta...</p></div>
+      <div id="quiz-content" style="display:none">
+        <p class="quiz-context" id="quiz-context"></p>
+        <h3 class="quiz-question" id="quiz-question"></h3>
+        <div class="quiz-options" id="quiz-options"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Result -->
+  <div id="quiz-result" class="screen overlay">
+    <div class="result-card" id="result-card">
+      <div class="result-icon" id="result-icon"></div>
+      <h3 class="result-title" id="result-title"></h3>
+      <p class="result-detail" id="result-detail"></p>
+      <div class="result-explanation" id="result-explanation"></div>
+      <button class="btn btn-primary" id="result-continue-btn">Continuar</button>
+    </div>
+  </div>
+
+  <!-- Level Complete -->
+  <div id="level-complete" class="screen overlay">
+    <div class="complete-card">
+      <h2 class="complete-title">🏆 Nível Completo!</h2>
+      <div class="stats-summary" id="level-stats"></div>
+      <button class="btn btn-primary btn-large" id="next-level-btn"><i class="fas fa-arrow-right"></i> Próximo Nível</button>
+    </div>
+  </div>
+
+  <!-- Game Over -->
+  <div id="gameover-screen" class="screen overlay">
+    <div class="gameover-card">
+      <h2 class="gameover-title">☠️ Fim de Jogo</h2>
+      <p class="gameover-text" id="gameover-text"></p>
+      <div class="stats-summary" id="gameover-stats"></div>
+      <button class="btn btn-primary btn-large" id="restart-btn"><i class="fas fa-redo"></i> Tentar Novamente</button>
+    </div>
+  </div>
+
+  <!-- Victory -->
+  <div id="victory-screen" class="screen overlay">
+    <div class="victory-card">
+      <h2 class="victory-title">🏆 Vitória!</h2>
+      <p class="victory-text">Parabéns, Aventureiro!</p>
+      <p class="victory-subtext">Você conquistou todos os labirintos e dominou os idiomas!</p>
+      <div class="stats-summary" id="victory-stats"></div>
+      <button class="btn btn-primary btn-large" id="victory-restart-btn"><i class="fas fa-redo"></i> Nova Aventura</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== DARK MODE ========== */
+if(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.classList.add('dark')}
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',function(e){e.matches?document.documentElement.classList.add('dark'):document.documentElement.classList.remove('dark')});
+
+/* ========== CONNECTION / API LAYER ========== */
+var ConnectionManager = (function() {
+  var mode = 'checking'; // 'poe-embed' | 'poe-api' | 'offline'
+  var apiKey = null;
+  var API_URL = 'https://api.poe.com/v1/chat/completions';
+  var API_MODEL = 'GPT-5.2';
+
+  // Read cookie by name, strip %22 and quotes
+  function getCookie(name) {
+    try {
+      var pairs = document.cookie.split(';');
+      for (var i = 0; i < pairs.length; i++) {
+        var pair = pairs[i].trim();
+        if (pair.indexOf(name + '=') === 0) {
+          var val = pair.substring(name.length + 1);
+          try { val = decodeURIComponent(val); } catch(e) {
+            val = val.replace(/%22/g, '').replace(/%27/g, '');
+          }
+          val = val.replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
+          return val;
+        }
+      }
+    } catch(e) { /* cookie access blocked */ }
+    return null;
+  }
+
+  // Fallback: read from URL params
+  function getKeyFromURL() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var k = params.get('estudai_apiKey') || params.get('apiKey') || params.get('key');
+      if (k) {
+        k = k.replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
+        return k;
+      }
+    } catch(e) {}
+    return null;
+  }
+
+  function maskKey(k) {
+    if (!k || k.length < 16) return '***';
+    return k.substring(0, 10) + '...' + k.substring(k.length - 4);
+  }
+
+  function updateBadge(badgeEl, newMode, label) {
+    if (!badgeEl) return;
+    badgeEl.className = 'conn-badge conn-' + newMode;
+    var labelEl = badgeEl.querySelector('.conn-label');
+    if (labelEl) labelEl.textContent = label;
+  }
+
+  function updateMiniBadge(el, newMode, label) {
+    if (!el) return;
+    el.className = 'conn-mini conn-' + newMode;
+    el.innerHTML = '<span class="conn-dot"></span> ' + label;
+  }
+
+  function detect() {
+    var badge = document.getElementById('conn-badge-start');
+
+    // 1. Check Poe Embed API
+    if (window.Poe && typeof window.Poe.sendUserMessage === 'function' && typeof window.Poe.registerHandler === 'function') {
+      mode = 'poe-embed';
+      updateBadge(badge, 'poe', '<i class="fas fa-plug"></i> Conectado via Poe');
+      return;
+    }
+
+    // 2. Try cookie
+    apiKey = getCookie('estudai_apiKey');
+
+    // 3. Fallback: URL param
+    if (!apiKey) {
+      apiKey = getKeyFromURL();
+    }
+
+    if (apiKey && apiKey.indexOf('sk-poe-') === 0) {
+      mode = 'poe-api';
+      updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
+    } else {
+      mode = 'offline';
+      apiKey = null;
+      updateBadge(badge, 'offline', '<i class="fas fa-wifi"></i> Modo Offline — perguntas locais');
+    }
+  }
+
+  // Listen for API key from parent window (when embedded as iframe)
+  window.addEventListener('message', function(event) {
+    try {
+      var data = event.data;
+      if (data && data.type === 'estudai_apiKey' && data.key) {
+        var k = String(data.key).replace(/%22/g, '').replace(/^["']+|["']+$/g, '').trim();
+        if (k.indexOf('sk-poe-') === 0) {
+          apiKey = k;
+          mode = 'poe-api';
+          var badge = document.getElementById('conn-badge-start');
+          updateBadge(badge, 'api', '<i class="fas fa-satellite-dish"></i> API Conectada — ' + maskKey(apiKey));
+          showNotification('🔑 API Key recebida! Conectado.', 'success');
+        }
+      }
+    } catch(e) { /* ignore */ }
+  });
+
+  // Fetch quiz via Poe REST API
+  function fetchViaRestAPI(prompt) {
+    return new Promise(function(resolve, reject) {
+      if (!apiKey) { reject(new Error('No API key')); return; }
+
+      fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+          model: API_MODEL,
+          messages: [{ role: 'user', content: prompt }],
+          stream: false
+        })
+      })
+      .then(function(res) {
+        if (!res.ok) {
+          return res.text().then(function(body) {
+            throw new Error('HTTP ' + res.status + ': ' + body);
+          });
+        }
+        return res.json();
+      })
+      .then(function(data) {
+        var content = '';
+        if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+          content = data.choices[0].message.content;
+        }
+        if (content) {
+          resolve(content);
+        } else {
+          reject(new Error('Empty response'));
+        }
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+    });
+  }
+
+  // Fetch quiz via Poe Embed API
+  function fetchViaEmbed(prompt) {
+    return new Promise(function(resolve, reject) {
+      if (!window.Poe || !window.Poe.sendUserMessage || !window.Poe.registerHandler) {
+        reject(new Error('No Poe Embed'));
+        return;
+      }
+      var hid = 'quiz-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+      var resolved = false;
+      var timeout = setTimeout(function() {
+        if (!resolved) { resolved = true; reject(new Error('Timeout')); }
+      }, 30000);
+
+      window.Poe.registerHandler(hid, function(result) {
+        if (resolved) return;
+        var msg = result.responses[0];
+        if (msg.status === 'complete') {
+          resolved = true; clearTimeout(timeout);
+          resolve(msg.content);
+        } else if (msg.status === 'error') {
+          resolved = true; clearTimeout(timeout);
+          reject(new Error(msg.statusText || 'Error'));
+        }
+      });
+
+      window.Poe.sendUserMessage('@GPT-5.2 ' + prompt, {
+        handler: hid, stream: false, openChat: false, parameters: {}
+      }).catch(function(err) {
+        if (!resolved) { resolved = true; clearTimeout(timeout); reject(err); }
+      });
+    });
+  }
+
+  // Public: fetch quiz content (auto-selects method)
+  function fetchQuiz(prompt) {
+    if (mode === 'poe-embed') {
+      return fetchViaEmbed(prompt);
+    } else if (mode === 'poe-api') {
+      return fetchViaRestAPI(prompt);
+    } else {
+      return Promise.reject(new Error('No connection'));
+    }
+  }
+
+  return {
+    detect: detect,
+    fetchQuiz: fetchQuiz,
+    getMode: function() { return mode; },
+    getModeLabel: function() {
+      if (mode === 'poe-embed') return 'Poe';
+      if (mode === 'poe-api') return 'API';
+      return 'Offline';
+    },
+    getModeClass: function() {
+      if (mode === 'poe-embed') return 'poe';
+      if (mode === 'poe-api') return 'api';
+      return 'offline';
+    },
+    updateMiniBadge: updateMiniBadge
+  };
+})();
+
+/* ========== CONSTANTS ========== */
+var LANGUAGES=[
+  {id:'english',name:'Inglês',flag:'🇬🇧'},{id:'french',name:'Francês',flag:'🇫🇷'},
+  {id:'spanish',name:'Espanhol',flag:'🇪🇸'},{id:'german',name:'Alemão',flag:'🇩🇪'},
+  {id:'italian',name:'Italiano',flag:'🇮🇹'},{id:'japanese',name:'Japonês',flag:'🇯🇵'}
+];
+var DIFFICULTIES=[
+  {id:'beginner',name:'Iniciante',desc:'Vocabulário básico'},
+  {id:'intermediate',name:'Intermediário',desc:'Gramática e frases'},
+  {id:'advanced',name:'Avançado',desc:'Expressões idiomáticas'}
+];
+var MONSTER_TYPES=[
+  {name:'Slime',emoji:'🟢',hp:1,damage:10,xp:25,desc:'Uma gosma verde pulsante rasteja pelo chão'},
+  {name:'Morcego',emoji:'🦇',hp:1,damage:12,xp:30,desc:'Um morcego gigante com olhos vermelhos brilhantes'},
+  {name:'Goblin',emoji:'👺',hp:2,damage:15,xp:45,desc:'Um goblin astuto empunhando uma adaga enferrujada'},
+  {name:'Lobo Sombrio',emoji:'🐺',hp:2,damage:18,xp:55,desc:'Um lobo com pelos negros como a noite'},
+  {name:'Esqueleto',emoji:'💀',hp:2,damage:20,xp:65,desc:'Um guerreiro esqueleto com armadura antiga'},
+  {name:'Fantasma',emoji:'👻',hp:2,damage:22,xp:75,desc:'Um espírito inquieto preso no labirinto'},
+  {name:'Ogro',emoji:'👹',hp:3,damage:25,xp:95,desc:'Um ogro enorme com um porrete gigante'},
+  {name:'Aranha Gigante',emoji:'🕷️',hp:3,damage:22,xp:85,desc:'Uma aranha do tamanho de um cavalo'},
+  {name:'Dragão',emoji:'🐉',hp:3,damage:30,xp:160,desc:'Um dragão ancestral guardando seu tesouro'}
+];
+var LEVELS=[
+  {name:'As Catacumbas Esquecidas',size:7,monsters:2,pool:[0,1],items:1,desc:'Você desce por escadas de pedra úmida até as catacumbas antigas sob a cidade. O ar cheira a mofo e mistério...'},
+  {name:'A Floresta Sombria',size:9,monsters:3,pool:[1,2,3],items:2,desc:'Uma floresta densa e escura se abre à sua frente. Galhos retorcidos bloqueiam a luz da lua...'},
+  {name:'As Minas Abandonadas',size:9,monsters:4,pool:[2,3,4],items:2,desc:'Trilhos enferrujados levam às profundezas das minas. Ecos estranhos ressoam nas paredes rochosas...'},
+  {name:'A Torre do Feiticeiro',size:11,monsters:4,pool:[4,5,6],items:3,desc:'Uma torre misteriosa se eleva acima das nuvens. Runas brilham nas paredes de cada andar...'},
+  {name:'O Covil do Dragão',size:11,monsters:5,pool:[5,6,7,8],items:3,desc:'O calor é intenso. Ossos e tesouros espalham-se pelo chão do covil do temido dragão...'}
+];
+var XP_THRESHOLDS=[0,100,250,450,700,1000,1500];
+
+/* ========== FALLBACK QUIZZES ========== */
+var FALLBACK_QUIZZES={
+  english:[
+    {q:"Como se diz 'espada' em inglês?",o:["Sword","Shield","Arrow","Armor"],c:0,e:"'Sword' significa espada em inglês."},
+    {q:"Qual a tradução de 'castle'?",o:["Castelo","Cavalo","Campo","Coroa"],c:0,e:"'Castle' significa castelo."},
+    {q:"Complete: 'The hero ___ very brave.'",o:["is","are","am","be"],c:0,e:"Usamos 'is' com sujeito singular na terceira pessoa."},
+    {q:"Como se diz 'tesouro' em inglês?",o:["Tower","Treasure","Thunder","Throne"],c:1,e:"'Treasure' significa tesouro."},
+    {q:"Qual o significado de 'shield'?",o:["Espada","Escudo","Lança","Capacete"],c:1,e:"'Shield' significa escudo."},
+    {q:"Qual o passado de 'fight'?",o:["fighted","foughted","fought","fighting"],c:2,e:"O passado de 'fight' é 'fought' (irregular)."},
+    {q:"'The knight rescued the princess' significa:",o:["O cavaleiro resgatou a princesa","O cavaleiro atacou a princesa","O rei resgatou a rainha","O cavaleiro fugiu da princesa"],c:0,e:"'Rescued' = resgatou, 'knight' = cavaleiro, 'princess' = princesa."},
+    {q:"Como se diz 'fogo' em inglês?",o:["Water","Earth","Fire","Wind"],c:2,e:"'Fire' significa fogo em inglês."}
+  ],
+  french:[
+    {q:"Como se diz 'espada' em francês?",o:["Épée","Bouclier","Flèche","Lance"],c:0,e:"'Épée' significa espada em francês."},
+    {q:"Qual a tradução de 'château'?",o:["Chapéu","Castelo","Gato","Cavalo"],c:1,e:"'Château' significa castelo em francês."},
+    {q:"Como se diz 'dragão' em francês?",o:["Drageon","Dragon","Dragonne","Dracon"],c:1,e:"Em francês, dragão é 'dragon' (pronuncia-se diferente)."},
+    {q:"Complete: 'Le guerrier ___ fort.'",o:["est","es","suis","sont"],c:0,e:"'Est' é a conjugação de 'être' para 'il/le'."},
+    {q:"Como se diz 'fogo' em francês?",o:["Eau","Feu","Terre","Air"],c:1,e:"'Feu' significa fogo em francês."},
+    {q:"Qual o significado de 'bouclier'?",o:["Espada","Arco","Escudo","Lança"],c:2,e:"'Bouclier' significa escudo em francês."}
+  ],
+  spanish:[
+    {q:"Como se diz 'espada' em espanhol?",o:["Espada","Escudo","Flecha","Lanza"],c:0,e:"Em espanhol, espada é 'espada' (mesma palavra!)."},
+    {q:"Qual a tradução de 'dragón'?",o:["Guerreiro","Castelo","Dragão","Tesouro"],c:2,e:"'Dragón' significa dragão em espanhol."},
+    {q:"Complete: 'El caballero ___ valiente.'",o:["es","está","son","estás"],c:0,e:"Usamos 'es' para características permanentes com 'él'."},
+    {q:"Como se diz 'tesouro' em espanhol?",o:["Tesoro","Tesauro","Tesoreo","Tresor"],c:0,e:"'Tesoro' significa tesouro em espanhol."},
+    {q:"Qual o significado de 'fuego'?",o:["Fuga","Fogo","Força","Medo"],c:1,e:"'Fuego' significa fogo em espanhol."},
+    {q:"Como se diz 'escudo' em espanhol?",o:["Espada","Escudo","Estudo","Escada"],c:1,e:"Em espanhol, escudo também é 'escudo'."}
+  ],
+  german:[
+    {q:"Como se diz 'espada' em alemão?",o:["Schwert","Schild","Pfeil","Rüstung"],c:0,e:"'Schwert' significa espada em alemão."},
+    {q:"Qual a tradução de 'Drache'?",o:["Dragão","Escuro","Tesouro","Castelo"],c:0,e:"'Drache' significa dragão em alemão."},
+    {q:"Como se diz 'fogo' em alemão?",o:["Wasser","Feuer","Erde","Luft"],c:1,e:"'Feuer' significa fogo em alemão."},
+    {q:"Complete: 'Der Ritter ___ mutig.'",o:["ist","bist","sind","bin"],c:0,e:"'Ist' é a conjugação de 'sein' para 'er/der'."},
+    {q:"Qual o significado de 'Schild'?",o:["Espada","Castelo","Escudo","Capacete"],c:2,e:"'Schild' significa escudo em alemão."},
+    {q:"Como se diz 'tesouro' em alemão?",o:["Turm","Schatz","Burg","Gold"],c:1,e:"'Schatz' significa tesouro em alemão."}
+  ],
+  italian:[
+    {q:"Como se diz 'espada' em italiano?",o:["Spada","Scudo","Freccia","Lancia"],c:0,e:"'Spada' significa espada em italiano."},
+    {q:"Qual a tradução de 'drago'?",o:["Mago","Dragão","Castelo","Tesouro"],c:1,e:"'Drago' significa dragão em italiano."},
+    {q:"Complete: 'Il cavaliere ___ coraggioso.'",o:["è","sei","sono","siamo"],c:0,e:"'È' é a conjugação de 'essere' para 'lui/il'."},
+    {q:"Como se diz 'fogo' em italiano?",o:["Acqua","Fuoco","Terra","Aria"],c:1,e:"'Fuoco' significa fogo em italiano."},
+    {q:"Qual o significado de 'scudo'?",o:["Escuro","Estudo","Escudo","Escada"],c:2,e:"'Scudo' significa escudo em italiano."},
+    {q:"Como se diz 'tesouro' em italiano?",o:["Tesoro","Tesauro","Torre","Trono"],c:0,e:"'Tesoro' significa tesouro em italiano."}
+  ],
+  japanese:[
+    {q:"Como se diz 'espada' em japonês?",o:["剣 (ken)","盾 (tate)","弓 (yumi)","槍 (yari)"],c:0,e:"'剣' (ken/tsurugi) significa espada em japonês."},
+    {q:"Qual a tradução de '竜' (ryū)?",o:["Guerreiro","Castelo","Tesouro","Dragão"],c:3,e:"'竜' (ryū) significa dragão em japonês."},
+    {q:"Como se diz 'fogo' em japonês?",o:["水 (mizu)","火 (hi)","土 (tsuchi)","風 (kaze)"],c:1,e:"'火' (hi) significa fogo em japonês."},
+    {q:"Qual o significado de '宝' (takara)?",o:["Espada","Castelo","Tesouro","Dragão"],c:2,e:"'宝' (takara) significa tesouro em japonês."},
+    {q:"Como se diz 'forte' em japonês?",o:["弱い (yowai)","強い (tsuyoi)","速い (hayai)","高い (takai)"],c:1,e:"'強い' (tsuyoi) significa forte em japonês."},
+    {q:"Qual o significado de '魔法' (mahō)?",o:["Monstro","Labirinto","Magia","Escudo"],c:2,e:"'魔法' (mahō) significa magia em japonês."}
+  ]
+};
+
+/* ========== STATE ========== */
+var state={
+  language:null,difficulty:null,playerName:'Aventureiro',
+  currentLevel:0,currentScreen:'start',
+  player:{x:0,y:0,hp:100,maxHp:100,xp:0,level:1},
+  maze:null,revealed:null,monsters:[],items:[],exit:{x:0,y:0},
+  combat:{monster:null,monsterHp:0,action:null,round:0},
+  currentQuiz:null,quizAnswered:false,
+  stats:{monstersKilled:0,questionsCorrect:0,questionsTotal:0,itemsCollected:0,levelsCompleted:0},
+  canMove:true,animFrame:0
+};
+
+/* ========== DOM REFS ========== */
+var canvas,ctx;
+
+/* ========== UTILITY ========== */
+function showScreen(id){
+  state.currentScreen=id.replace('-screen','').replace('-','');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  var el=document.getElementById(id);
+  if(el)el.classList.add('active');
+}
+function showNotification(text,type){
+  var container=document.getElementById('notification-container');
+  var n=document.createElement('div');
+  n.className='notification'+(type?' '+type:'');
+  n.textContent=text;
+  container.appendChild(n);
+  setTimeout(function(){n.remove()},2600);
+}
+function parseQuizJSON(content){
+  try{var o=JSON.parse(content.trim());if(o.q&&o.o&&o.o.length===4&&typeof o.c==='number')return o}catch(e){/* ignore */}
+  var m=content.match(/\{[\s\S]*?\}/);
+  if(m){try{var o2=JSON.parse(m[0]);if(o2.q&&o2.o&&o2.o.length===4&&typeof o2.c==='number')return o2}catch(e){/* ignore */}}
+  return null;
+}
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function shuffleArray(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=rand(0,i);var tmp=a[i];a[i]=a[j];a[j]=tmp}return a}
+
+/* ========== PARTICLES ========== */
+function createParticles(){
+  var c=document.getElementById('particles');
+  for(var i=0;i<25;i++){
+    var p=document.createElement('div');p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.setProperty('--dur',(5+Math.random()*5)+'s');
+    p.style.setProperty('--delay',(Math.random()*6)+'s');
+    p.style.setProperty('--drift',(Math.random()*60-30)+'px');
+    c.appendChild(p);
+  }
+}
+
+/* ========== START SCREEN INIT ========== */
+function initStartScreen(){
+  var lg=document.getElementById('language-grid');
+  LANGUAGES.forEach(function(l){
+    var d=document.createElement('div');d.className='opt-card';d.dataset.id=l.id;
+    d.innerHTML='<span class="flag">'+l.flag+'</span><span class="opt-name">'+l.name+'</span>';
+    d.addEventListener('click',function(){
+      lg.querySelectorAll('.opt-card').forEach(function(c){c.classList.remove('selected')});
+      d.classList.add('selected');state.language=l.id;
+    });
+    lg.appendChild(d);
+  });
+  var dg=document.getElementById('difficulty-grid');
+  DIFFICULTIES.forEach(function(df){
+    var el=document.createElement('div');el.className='opt-card';el.dataset.id=df.id;
+    el.innerHTML='<span class="opt-name">'+df.name+'</span><span class="opt-desc">'+df.desc+'</span>';
+    el.addEventListener('click',function(){
+      dg.querySelectorAll('.opt-card').forEach(function(c){c.classList.remove('selected')});
+      el.classList.add('selected');state.difficulty=df.id;
+    });
+    dg.appendChild(el);
+  });
+}
+
+/* ========== MAZE GENERATION ========== */
+function generateMaze(w,h){
+  var grid=[];
+  for(var y=0;y<h;y++){grid[y]=[];for(var x=0;x<w;x++){grid[y][x]={walls:[true,true,true,true],visited:false}}}
+  var stack=[];var cx=0,cy=0;grid[0][0].visited=true;stack.push([cx,cy]);
+  var dirs=[[0,-1,0,2],[1,0,1,3],[0,1,2,0],[-1,0,3,1]];
+  while(stack.length>0){
+    var neighbors=[];
+    for(var di=0;di<dirs.length;di++){var dd=dirs[di];var nx=cx+dd[0],ny=cy+dd[1];if(nx>=0&&nx<w&&ny>=0&&ny<h&&!grid[ny][nx].visited)neighbors.push([nx,ny,dd[2],dd[3]])}
+    if(neighbors.length>0){
+      var chosen=neighbors[rand(0,neighbors.length-1)];
+      grid[cy][cx].walls[chosen[2]]=false;grid[chosen[1]][chosen[0]].walls[chosen[3]]=false;
+      grid[chosen[1]][chosen[0]].visited=true;stack.push([cx,cy]);cx=chosen[0];cy=chosen[1];
+    }else{var pp=stack.pop();cx=pp[0];cy=pp[1]}
+  }
+  return grid;
+}
+
+/* ========== LEVEL INIT ========== */
+function initLevel(levelIdx){
+  var lvl=LEVELS[levelIdx];
+  var sz=lvl.size;
+  state.maze=generateMaze(sz,sz);
+  state.revealed=[];for(var y=0;y<sz;y++){state.revealed[y]=[];for(var x=0;x<sz;x++)state.revealed[y][x]=false}
+  state.player.x=0;state.player.y=0;
+  state.exit={x:sz-1,y:sz-1};
+  state.monsters=[];
+  var occupied={}; occupied['0,0']=true; occupied[(sz-1)+','+(sz-1)]=true;
+  for(var i=0;i<lvl.monsters;i++){
+    var mx,my;do{mx=rand(1,sz-2);my=rand(1,sz-2)}while(occupied[mx+','+my]);
+    occupied[mx+','+my]=true;
+    var typeIdx=lvl.pool[rand(0,lvl.pool.length-1)];
+    var mt=MONSTER_TYPES[typeIdx];
+    state.monsters.push({x:mx,y:my,alive:true,name:mt.name,emoji:mt.emoji,hp:mt.hp,damage:mt.damage,xp:mt.xp,desc:mt.desc,maxHpVal:mt.hp,currentHp:mt.hp});
+  }
+  state.items=[];
+  for(var ii=0;ii<lvl.items;ii++){
+    var ix,iy;do{ix=rand(1,sz-2);iy=rand(1,sz-2)}while(occupied[ix+','+iy]);
+    occupied[ix+','+iy]=true;
+    state.items.push({x:ix,y:iy,collected:false,type:'potion'});
+  }
+  if(sz>7){
+    var ccx,ccy;do{ccx=rand(1,sz-2);ccy=rand(1,sz-2)}while(occupied[ccx+','+ccy]);
+    occupied[ccx+','+ccy]=true;
+    state.items.push({x:ccx,y:ccy,collected:false,type:'chest'});
+  }
+  state.canMove=true;
+  updateVisibility();
+}
+
+function updateVisibility(){
+  var r=3,px=state.player.x,py=state.player.y;
+  var sz=state.maze.length;
+  for(var dy=-r;dy<=r;dy++){for(var dx=-r;dx<=r;dx++){
+    var nx=px+dx,ny=py+dy;
+    if(nx>=0&&nx<sz&&ny>=0&&ny<sz&&Math.abs(dx)+Math.abs(dy)<=r)state.revealed[ny][nx]=true;
+  }}
+}
+
+/* ========== CANVAS RENDERING ========== */
+function resizeCanvas(){
+  if(!canvas)return;
+  var container=document.querySelector('.canvas-container');
+  if(!container)return;
+  var rect=container.getBoundingClientRect();
+  var size=Math.min(rect.width,rect.height);
+  var dpr=window.devicePixelRatio||1;
+  canvas.width=size*dpr;canvas.height=size*dpr;
+  canvas.style.width=size+'px';canvas.style.height=size+'px';
+  ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  renderMaze();
+}
+
+function renderMaze(){
+  if(!ctx||!state.maze)return;
+  var w=parseInt(canvas.style.width)||300;
+  var h=parseInt(canvas.style.height)||300;
+  var mazeS=state.maze.length;
+  var viewC=Math.min(9,mazeS);
+  var cellSz=Math.floor(Math.min(w,h)/viewC);
+  var camX=state.player.x-Math.floor(viewC/2);
+  var camY=state.player.y-Math.floor(viewC/2);
+  if(mazeS<=viewC){camX=0;camY=0}else{camX=Math.max(0,Math.min(mazeS-viewC,camX));camY=Math.max(0,Math.min(mazeS-viewC,camY))}
+  var drawCells=Math.min(viewC,mazeS);
+  var offX=(w-drawCells*cellSz)/2;
+  var offY=(h-drawCells*cellSz)/2;
+  var time=Date.now()/1000;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='#080810';ctx.fillRect(0,0,w,h);
+
+  for(var vy=0;vy<drawCells;vy++){for(var vx=0;vx<drawCells;vx++){
+    var mx=Math.floor(camX)+vx,my=Math.floor(camY)+vy;
+    if(mx<0||mx>=mazeS||my<0||my>=mazeS)continue;
+    if(!state.revealed[my][mx])continue;
+    var px=offX+vx*cellSz,py=offY+vy*cellSz;
+    var dist=Math.abs(mx-state.player.x)+Math.abs(my-state.player.y);
+    var bright=dist===0?1:dist<=1?.85:dist<=2?.6:dist<=3?.35:.2;
+    var alt=(mx+my)%2===0;
+    var fr=alt?42:36,fg=alt?32:26,fb=alt?24:18;
+    ctx.fillStyle='rgb('+Math.floor(fr*bright)+','+Math.floor(fg*bright)+','+Math.floor(fb*bright)+')';
+    ctx.fillRect(px+1,py+1,cellSz-2,cellSz-2);
+    var cell=state.maze[my][mx];
+    var ww=Math.max(2,cellSz/7);
+    ctx.strokeStyle='rgba(110,90,65,'+bright+')';ctx.lineWidth=ww;ctx.lineCap='round';
+    if(cell.walls[0]){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+cellSz,py);ctx.stroke()}
+    if(cell.walls[1]){ctx.beginPath();ctx.moveTo(px+cellSz,py);ctx.lineTo(px+cellSz,py+cellSz);ctx.stroke()}
+    if(cell.walls[2]){ctx.beginPath();ctx.moveTo(px,py+cellSz);ctx.lineTo(px+cellSz,py+cellSz);ctx.stroke()}
+    if(cell.walls[3]){ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px,py+cellSz);ctx.stroke()}
+    // Exit
+    if(mx===state.exit.x&&my===state.exit.y){
+      var pulse=.5+.5*Math.sin(time*3);
+      ctx.fillStyle='rgba(200,160,50,'+(pulse*bright).toFixed(2)+')';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/3,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(255,220,120,'+(pulse*bright*.5).toFixed(2)+')';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/5,0,Math.PI*2);ctx.fill();
+    }
+    // Items
+    var item=null;
+    for(var ii=0;ii<state.items.length;ii++){if(state.items[ii].x===mx&&state.items[ii].y===my&&!state.items[ii].collected){item=state.items[ii];break}}
+    if(item){
+      var ip=.5+.5*Math.sin(time*4+mx);
+      ctx.fillStyle=item.type==='potion'?'rgba(50,200,80,'+(ip*bright).toFixed(2)+')':'rgba(200,180,50,'+(ip*bright).toFixed(2)+')';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/4,0,Math.PI*2);ctx.fill();
+      ctx.font=Math.floor(cellSz*.45)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.globalAlpha=bright;ctx.fillText(item.type==='potion'?'🧪':'💎',px+cellSz/2,py+cellSz/2);ctx.globalAlpha=1;
+    }
+    // Monsters
+    var mon=null;
+    for(var mi=0;mi<state.monsters.length;mi++){if(state.monsters[mi].x===mx&&state.monsters[mi].y===my&&state.monsters[mi].alive){mon=state.monsters[mi];break}}
+    if(mon){
+      var mp=.6+.4*Math.sin(time*2.5+mx*3);
+      ctx.fillStyle='rgba(160,40,40,'+(mp*bright).toFixed(2)+')';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/3,0,Math.PI*2);ctx.fill();
+      ctx.font=Math.floor(cellSz*.5)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.globalAlpha=bright;ctx.fillText(mon.emoji,px+cellSz/2,py+cellSz/2);ctx.globalAlpha=1;
+    }
+    // Player
+    if(mx===state.player.x&&my===state.player.y){
+      var glow=.4+.2*Math.sin(time*5);
+      ctx.fillStyle='rgba(220,170,60,'+glow.toFixed(2)+')';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/2.2,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='rgba(240,200,80,0.95)';
+      ctx.beginPath();ctx.arc(px+cellSz/2,py+cellSz/2,cellSz/3.5,0,Math.PI*2);ctx.fill();
+      ctx.font='bold '+Math.floor(cellSz*.4)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='#1a1008';ctx.fillText('🧙',px+cellSz/2,py+cellSz/2);
+    }
+  }}
+}
+
+var animLoopId=null;
+function startAnimLoop(){
+  if(animLoopId)return;
+  function loop(){state.animFrame++;renderMaze();animLoopId=requestAnimationFrame(loop)}
+  animLoopId=requestAnimationFrame(loop);
+}
+function stopAnimLoop(){if(animLoopId){cancelAnimationFrame(animLoopId);animLoopId=null}}
+
+/* ========== STATS UPDATE ========== */
+function updateStatsUI(){
+  var hpPct=Math.max(0,state.player.hp/state.player.maxHp*100);
+  document.getElementById('hp-fill').style.width=hpPct+'%';
+  document.getElementById('hp-text').textContent=Math.max(0,state.player.hp)+'/'+state.player.maxHp;
+  var nextXp=XP_THRESHOLDS[state.player.level]||999;
+  var prevXp=XP_THRESHOLDS[state.player.level-1]||0;
+  var xpPct=Math.min(100,(state.player.xp-prevXp)/(nextXp-prevXp)*100);
+  document.getElementById('xp-fill').style.width=xpPct+'%';
+  document.getElementById('xp-text').textContent=state.player.xp+'/'+nextXp+' XP';
+  var levelInd=document.getElementById('level-indicator');
+  levelInd.innerHTML='<i class="fas fa-dungeon"></i> '+LEVELS[state.currentLevel].name+' — Nv.'+state.player.level;
+  // Add mini connection badge
+  var miniSpan=document.createElement('span');
+  miniSpan.id='conn-mini-game';
+  miniSpan.className='conn-mini conn-'+ConnectionManager.getModeClass();
+  miniSpan.innerHTML='<span class="conn-dot"></span> '+ConnectionManager.getModeLabel();
+  levelInd.appendChild(miniSpan);
+}
+
+function checkLevelUp(){
+  while(state.player.level<XP_THRESHOLDS.length&&state.player.xp>=XP_THRESHOLDS[state.player.level]){
+    state.player.level++;state.player.maxHp+=20;state.player.hp=Math.min(state.player.hp+30,state.player.maxHp);
+    showNotification('⬆️ Level Up! Nível '+state.player.level+'! +20 HP máximo','success');
+  }
+}
+
+/* ========== PLAYER MOVEMENT ========== */
+function doMovePlayer(dx,dy){
+  if(!state.canMove||state.currentScreen!=='game')return;
+  var nx=state.player.x+dx,ny=state.player.y+dy;
+  var sz=state.maze.length;
+  if(nx<0||nx>=sz||ny<0||ny>=sz)return;
+  var cell=state.maze[state.player.y][state.player.x];
+  var wallIdx=dx===1?1:dx===-1?3:dy===-1?0:2;
+  if(cell.walls[wallIdx])return;
+  state.player.x=nx;state.player.y=ny;
+  updateVisibility();updateStatsUI();renderMaze();
+  // Check items
+  var item=null;
+  for(var ii=0;ii<state.items.length;ii++){if(state.items[ii].x===nx&&state.items[ii].y===ny&&!state.items[ii].collected){item=state.items[ii];break}}
+  if(item){
+    item.collected=true;state.stats.itemsCollected++;
+    if(item.type==='potion'){state.player.hp=Math.min(state.player.maxHp,state.player.hp+30);showNotification('🧪 Poção de vida! +30 HP','success')}
+    else{var xpGain=20+state.currentLevel*15;state.player.xp+=xpGain;checkLevelUp();showNotification('💎 Tesouro encontrado! +'+xpGain+' XP','success')}
+    updateStatsUI();
+  }
+  // Check monster
+  var mon=null;
+  for(var mi=0;mi<state.monsters.length;mi++){if(state.monsters[mi].x===nx&&state.monsters[mi].y===ny&&state.monsters[mi].alive){mon=state.monsters[mi];break}}
+  if(mon){startEncounter(mon);return}
+  // Check exit
+  if(nx===state.exit.x&&ny===state.exit.y){completeLevel()}
+}
+
+/* ========== ENCOUNTER ========== */
+function startEncounter(monster){
+  state.canMove=false;stopAnimLoop();
+  state.combat={monster:monster,monsterHp:monster.currentHp,action:null,round:0};
+  showScreen('encounter-screen');
+  document.getElementById('monster-emoji').textContent=monster.emoji;
+  document.getElementById('monster-name').textContent=monster.name;
+  document.getElementById('monster-desc').textContent=monster.desc;
+  updateMonsterHP();
+}
+function updateMonsterHP(){
+  var pct=state.combat.monsterHp/state.combat.monster.maxHpVal*100;
+  document.getElementById('monster-hp-fill').style.width=pct+'%';
+  document.getElementById('monster-hp-text').textContent=state.combat.monsterHp+'/'+state.combat.monster.maxHpVal+' HP';
+}
+
+/* ========== QUIZ SYSTEM ========== */
+function buildQuizPrompt(action,monster){
+  var langObj=null;
+  for(var li=0;li<LANGUAGES.length;li++){if(LANGUAGES[li].id===state.language){langObj=LANGUAGES[li];break}}
+  var langName=langObj?langObj.name:'Inglês';
+  var diffObj=null;
+  for(var di=0;di<DIFFICULTIES.length;di++){if(DIFFICULTIES[di].id===state.difficulty){diffObj=DIFFICULTIES[di];break}}
+  var diffName=diffObj?diffObj.name:'Iniciante';
+  var diffDesc={beginner:'vocabulário básico, palavras simples, saudações',intermediate:'gramática, conjugação de verbos, frases completas',advanced:'expressões idiomáticas, gramática avançada, nuances culturais'};
+  var actionTxt=action==='attack'?'está atacando um(a) '+monster.name+'. Faça uma pergunta DESAFIADORA.':'está tentando fugir de um(a) '+monster.name+'. Faça uma pergunta mais FÁCIL.';
+  return 'Você é um professor de '+langName+'. O jogador '+actionTxt+'\nGere 1 pergunta de '+langName+' nível '+diffName+' ('+diffDesc[state.difficulty]+').\nUse tema de RPG/fantasia quando possível.\nPergunta e explicação em PORTUGUÊS, opções no IDIOMA ALVO.\n\nRETORNE APENAS JSON PURO sem markdown:\n{"q":"pergunta em português","o":["op1","op2","op3","op4"],"c":0,"e":"explicação em português"}\nc = índice da correta (0 a 3). Embaralhe a posição da correta.';
+}
+
+function getRandomFallbackQuiz(){
+  var quizzes=FALLBACK_QUIZZES[state.language]||FALLBACK_QUIZZES.english;
+  return quizzes[rand(0,quizzes.length-1)];
+}
+
+function fetchQuizFromAPI(action,monster){
+  var prompt=buildQuizPrompt(action,monster);
+  var connMode=ConnectionManager.getMode();
+
+  // If offline, go straight to fallback
+  if(connMode==='offline'){
+    return Promise.reject(new Error('Offline'));
+  }
+
+  return ConnectionManager.fetchQuiz(prompt).then(function(content){
+    var quiz=parseQuizJSON(content);
+    if(quiz)return quiz;
+    throw new Error('Parse failed');
+  });
+}
+
+var quizTimerInterval=null;
+var quizTimeLeft=25;
+
+function startQuizTimer(){
+  quizTimeLeft=25;
+  var fill=document.getElementById('timer-fill');
+  fill.style.transition='none';fill.style.width='100%';
+  void fill.offsetWidth;
+  fill.style.transition='width 1s linear';
+  if(quizTimerInterval)clearInterval(quizTimerInterval);
+  quizTimerInterval=setInterval(function(){
+    quizTimeLeft--;
+    fill.style.width=Math.max(0,quizTimeLeft/25*100)+'%';
+    if(quizTimeLeft<=0){clearInterval(quizTimerInterval);quizTimerInterval=null;if(!state.quizAnswered){state.quizAnswered=true;processAnswer(false)}}
+  },1000);
+}
+function stopQuizTimer(){if(quizTimerInterval){clearInterval(quizTimerInterval);quizTimerInterval=null}}
+
+function chooseAction(action){
+  state.combat.action=action;
+  state.combat.round++;
+  showScreen('quiz-screen');
+  document.getElementById('quiz-loading').style.display='flex';
+  document.getElementById('quiz-content').style.display='none';
+  state.quizAnswered=false;
+
+  var loadingText=document.getElementById('quiz-loading-text');
+  var connMode=ConnectionManager.getMode();
+  if(connMode==='poe-embed'){
+    loadingText.textContent='Gerando pergunta via Poe...';
+  }else if(connMode==='poe-api'){
+    loadingText.textContent='Gerando pergunta via API...';
+  }else{
+    loadingText.textContent='Carregando pergunta...';
+  }
+
+  var ctxText=action==='attack'?'⚔️ Você ataca o '+state.combat.monster.name+'!':'🏃 Você tenta fugir do '+state.combat.monster.name+'!';
+  fetchQuizFromAPI(action,state.combat.monster).then(function(quiz){displayQuiz(quiz,ctxText)}).catch(function(){
+    var fb=getRandomFallbackQuiz();displayQuiz(fb,ctxText);
+  });
+}
+
+function displayQuiz(quiz,ctxText){
+  state.currentQuiz=quiz;
+  document.getElementById('quiz-loading').style.display='none';
+  document.getElementById('quiz-content').style.display='block';
+  document.getElementById('quiz-context').textContent=ctxText||'';
+  document.getElementById('quiz-question').textContent=quiz.q;
+  var optContainer=document.getElementById('quiz-options');
+  optContainer.innerHTML='';
+  var labels=['A','B','C','D'];
+  quiz.o.forEach(function(opt,i){
+    var btn=document.createElement('button');btn.className='quiz-opt';
+    btn.textContent=labels[i]+') '+opt;
+    btn.addEventListener('click',function(){if(!state.quizAnswered)answerQuiz(i)});
+    optContainer.appendChild(btn);
+  });
+  startQuizTimer();
+}
+
+function answerQuiz(idx){
+  if(state.quizAnswered)return;
+  state.quizAnswered=true;
+  stopQuizTimer();
+  state.stats.questionsTotal++;
+  var correct=idx===state.currentQuiz.c;
+  if(correct)state.stats.questionsCorrect++;
+  var btns=document.querySelectorAll('.quiz-opt');
+  btns.forEach(function(b,i){
+    b.disabled=true;b.setAttribute('disabled','true');
+    if(i===state.currentQuiz.c)b.classList.add('correct');
+    if(i===idx&&!correct)b.classList.add('wrong');
+  });
+  setTimeout(function(){processAnswer(correct)},1200);
+}
+
+/* ========== COMBAT RESOLUTION ========== */
+function processAnswer(correct){
+  var action=state.combat.action;
+  var mon=state.combat.monster;
+  var title,detail,icon,isSuccess;
+  if(action==='attack'){
+    if(correct){
+      state.combat.monsterHp--;
+      if(state.combat.monsterHp<=0){
+        title='Golpe Fatal!';detail='Você derrotou o '+mon.name+'! +'+mon.xp+' XP';icon='⚔️';isSuccess=true;
+        mon.alive=false;mon.currentHp=0;
+        state.player.xp+=mon.xp;state.stats.monstersKilled++;checkLevelUp();
+      }else{
+        title='Acertou!';detail='Você causou dano ao '+mon.name+'! ('+state.combat.monsterHp+'/'+mon.maxHpVal+' HP restante)';icon='💥';isSuccess=true;
+      }
+    }else{
+      var dmg=mon.damage;state.player.hp-=dmg;
+      title='Errou!';detail='O '+mon.name+' atacou você! -'+dmg+' HP';icon='💔';isSuccess=false;
+      if(state.player.hp<=0){state.player.hp=0;showQuizResult(title,detail,icon,isSuccess,function(){gameOver()});return}
+    }
+  }else{
+    if(correct){
+      title='Fuga Bem-sucedida!';detail='Você escapou do '+mon.name+'!';icon='🏃';isSuccess=true;
+      state.player.x=Math.max(0,state.player.x-(state.player.x>0?1:-1));
+    }else{
+      var fdmg=Math.ceil(mon.damage*.5);state.player.hp-=fdmg;
+      title='Fuga Falhou!';detail='O '+mon.name+' te alcançou! -'+fdmg+' HP';icon='😰';isSuccess=false;
+      if(state.player.hp<=0){state.player.hp=0;showQuizResult(title,detail,icon,isSuccess,function(){gameOver()});return}
+    }
+  }
+  var afterAction=function(){
+    updateStatsUI();
+    if(action==='attack'&&correct&&state.combat.monsterHp<=0){returnToMaze()}
+    else if(action==='flee'&&correct){returnToMaze()}
+    else{showScreen('encounter-screen');updateMonsterHP()}
+  };
+  showQuizResult(title,detail,icon,isSuccess,afterAction);
+}
+
+function showQuizResult(title,detail,icon,isSuccess,afterFn){
+  showScreen('quiz-result');
+  var card=document.getElementById('result-card');
+  card.className='result-card '+(isSuccess?'success':'failure');
+  document.getElementById('result-icon').textContent=icon;
+  document.getElementById('result-title').textContent=title;
+  document.getElementById('result-detail').textContent=detail;
+  var expEl=document.getElementById('result-explanation');
+  if(state.currentQuiz&&state.currentQuiz.e){expEl.style.display='block';expEl.innerHTML='<strong>📖 Explicação:</strong> '+state.currentQuiz.e}
+  else{expEl.style.display='none'}
+  if(!isSuccess){var appEl=document.getElementById('app');appEl.classList.add('shake');setTimeout(function(){appEl.classList.remove('shake')},400)}
+  var btn=document.getElementById('result-continue-btn');
+  var newBtn=btn.cloneNode(true);btn.parentNode.replaceChild(newBtn,btn);
+  newBtn.addEventListener('click',function(){if(afterFn)afterFn()});
+}
+
+function returnToMaze(){
+  showScreen('game-screen');state.canMove=true;
+  updateStatsUI();startAnimLoop();renderMaze();
+}
+
+/* ========== LEVEL MANAGEMENT ========== */
+function completeLevel(){
+  state.canMove=false;stopAnimLoop();
+  state.stats.levelsCompleted++;
+  showScreen('level-complete');
+  var statsEl=document.getElementById('level-stats');
+  statsEl.innerHTML=
+    '<div class="stat-row"><span class="sr-label">Nível</span><span class="sr-value">'+LEVELS[state.currentLevel].name+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Monstros Derrotados</span><span class="sr-value">'+state.stats.monstersKilled+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Quiz Corretos</span><span class="sr-value">'+state.stats.questionsCorrect+'/'+state.stats.questionsTotal+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Itens Coletados</span><span class="sr-value">'+state.stats.itemsCollected+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">XP Total</span><span class="sr-value">'+state.player.xp+'</span></div>';
+  if(state.currentLevel>=LEVELS.length-1){
+    document.getElementById('next-level-btn').innerHTML='<i class="fas fa-trophy"></i> Ver Resultado Final';
+  }else{
+    document.getElementById('next-level-btn').innerHTML='<i class="fas fa-arrow-right"></i> Próximo Nível';
+  }
+}
+
+function nextLevel(){
+  if(state.currentLevel>=LEVELS.length-1){showVictory();return}
+  state.currentLevel++;showLevelIntro();
+}
+
+function showLevelIntro(){
+  var lvl=LEVELS[state.currentLevel];
+  showScreen('level-intro');
+  document.getElementById('level-badge').textContent=['🏚️','🌲','⛏️','🗼','🐉'][state.currentLevel]||'🏰';
+  document.getElementById('level-name-intro').textContent='Nível '+(state.currentLevel+1)+': '+lvl.name;
+  document.getElementById('level-desc-intro').innerHTML=lvl.desc+'<br><br><i class="fas fa-skull"></i> '+lvl.monsters+' monstros &nbsp;|&nbsp; <i class="fas fa-flask"></i> '+lvl.items+' itens &nbsp;|&nbsp; Tamanho: '+lvl.size+'×'+lvl.size;
+}
+
+function enterLevel(){
+  initLevel(state.currentLevel);
+  showScreen('game-screen');
+  resizeCanvas();
+  updateStatsUI();
+  startAnimLoop();
+}
+
+function gameOver(){
+  stopAnimLoop();
+  showScreen('gameover-screen');
+  document.getElementById('gameover-text').textContent=state.playerName+' caiu em batalha no nível '+(state.currentLevel+1)+'...';
+  document.getElementById('gameover-stats').innerHTML=
+    '<div class="stat-row"><span class="sr-label">Níveis Completados</span><span class="sr-value">'+state.stats.levelsCompleted+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Monstros Derrotados</span><span class="sr-value">'+state.stats.monstersKilled+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Quiz Corretos</span><span class="sr-value">'+state.stats.questionsCorrect+'/'+state.stats.questionsTotal+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">XP Total</span><span class="sr-value">'+state.player.xp+'</span></div>';
+}
+
+function showVictory(){
+  showScreen('victory-screen');
+  document.getElementById('victory-stats').innerHTML=
+    '<div class="stat-row"><span class="sr-label">Aventureiro</span><span class="sr-value">'+state.playerName+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Nível do Herói</span><span class="sr-value">'+state.player.level+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Monstros Derrotados</span><span class="sr-value">'+state.stats.monstersKilled+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Quiz Corretos</span><span class="sr-value">'+state.stats.questionsCorrect+'/'+state.stats.questionsTotal+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">Itens Coletados</span><span class="sr-value">'+state.stats.itemsCollected+'</span></div>'+
+    '<div class="stat-row"><span class="sr-label">XP Total</span><span class="sr-value">'+state.player.xp+'</span></div>';
+}
+
+function restartGame(){
+  state.currentLevel=0;state.player={x:0,y:0,hp:100,maxHp:100,xp:0,level:1};
+  state.stats={monstersKilled:0,questionsCorrect:0,questionsTotal:0,itemsCollected:0,levelsCompleted:0};
+  state.combat={monster:null,monsterHp:0,action:null,round:0};
+  showScreen('start-screen');
+}
+
+/* ========== GAME START ========== */
+function startGame(){
+  var nameInput=document.getElementById('player-name').value.trim();
+  state.playerName=nameInput||'Aventureiro';
+  if(!state.language){showNotification('Escolha um idioma!','danger');return}
+  if(!state.difficulty){showNotification('Escolha a dificuldade!','danger');return}
+  state.currentLevel=0;
+  state.player={x:0,y:0,hp:100,maxHp:100,xp:0,level:1};
+  state.stats={monstersKilled:0,questionsCorrect:0,questionsTotal:0,itemsCollected:0,levelsCompleted:0};
+  showLevelIntro();
+}
+
+/* ========== EVENT LISTENERS ========== */
+document.addEventListener('keydown',function(e){
+  if(state.currentScreen==='game'){
+    var keyMap={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
+    var dir=keyMap[e.key];
+    if(dir){e.preventDefault();doMovePlayer(dir[0],dir[1])}
+  }
+});
+
+// D-pad buttons
+document.querySelectorAll('.dpad-btn').forEach(function(btn){
+  var active=false;
+  btn.addEventListener('touchstart',function(e){
+    e.preventDefault();
+    if(!active){active=true;doMovePlayer(parseInt(btn.dataset.dx),parseInt(btn.dataset.dy));setTimeout(function(){active=false},180)}
+  },{passive:false});
+  btn.addEventListener('click',function(){
+    if(!active){doMovePlayer(parseInt(btn.dataset.dx),parseInt(btn.dataset.dy))}
+  });
+});
+
+// Swipe on canvas
+var touchSX=0,touchSY=0;
+document.getElementById('maze-canvas').addEventListener('touchstart',function(e){touchSX=e.touches[0].clientX;touchSY=e.touches[0].clientY},{passive:true});
+document.getElementById('maze-canvas').addEventListener('touchend',function(e){
+  var dx=e.changedTouches[0].clientX-touchSX,dy=e.changedTouches[0].clientY-touchSY;
+  var ax=Math.abs(dx),ay=Math.abs(dy);
+  if(Math.max(ax,ay)<25)return;
+  if(ax>ay){doMovePlayer(dx>0?1:-1,0)}else{doMovePlayer(0,dy>0?1:-1)}
+},{passive:true});
+
+// Button listeners
+document.getElementById('start-btn').addEventListener('click',startGame);
+document.getElementById('enter-level-btn').addEventListener('click',enterLevel);
+document.getElementById('attack-btn').addEventListener('click',function(){chooseAction('attack')});
+document.getElementById('flee-btn').addEventListener('click',function(){chooseAction('flee')});
+document.getElementById('next-level-btn').addEventListener('click',nextLevel);
+document.getElementById('restart-btn').addEventListener('click',restartGame);
+document.getElementById('victory-restart-btn').addEventListener('click',restartGame);
+
+window.addEventListener('resize',function(){if(state.currentScreen==='game')resizeCanvas()});
+
+/* ========== INIT ========== */
+function init(){
+  canvas=document.getElementById('maze-canvas');
+  ctx=canvas.getContext('2d');
+  createParticles();
+  initStartScreen();
+  showScreen('start-screen');
+  // Detect connection after a short delay (Poe Embed may need time to init)
+  setTimeout(function(){ConnectionManager.detect()},400);
+}
+init();
+</script>
+</body>
+</html>
