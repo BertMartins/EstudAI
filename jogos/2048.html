@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>2048</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8ef;
+    --bg-secondary: #eee4da;
+    --text-primary: #776e65;
+    --text-light: #f9f6f2;
+    --grid-bg: #bbada0;
+    --cell-empty: rgba(238, 228, 218, 0.35);
+    --header-bg: rgba(250, 248, 239, 0.9);
+    --score-bg: #bbada0;
+    --score-text: #eee4da;
+    --btn-bg: #8f7a66;
+    --btn-hover: #9f8b77;
+    --overlay-bg: rgba(238, 228, 218, 0.85);
+    --modal-bg: #faf8ef;
+    --modal-shadow: rgba(0,0,0,0.15);
+    --best-label: #eee4da;
+  }
+
+  html.dark {
+    --bg: #1a1a2e;
+    --bg-secondary: #16213e;
+    --text-primary: #e0d6cc;
+    --text-light: #f0ece8;
+    --grid-bg: #2a2a4a;
+    --cell-empty: rgba(60, 60, 90, 0.5);
+    --header-bg: rgba(26, 26, 46, 0.95);
+    --score-bg: #2a2a4a;
+    --score-text: #b8a99a;
+    --btn-bg: #4a3f6b;
+    --btn-hover: #5a4f7b;
+    --overlay-bg: rgba(26, 26, 46, 0.88);
+    --modal-bg: #1a1a2e;
+    --modal-shadow: rgba(0,0,0,0.4);
+    --best-label: #888;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Fredoka', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .game-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .title {
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #edc22e, #f2b179);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .scores-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .score-box {
+    background: var(--score-bg);
+    border-radius: 8px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 72px;
+    position: relative;
+  }
+
+  .score-box .label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--best-label);
+  }
+
+  .score-box .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-light);
+    line-height: 1.2;
+  }
+
+  .score-addition {
+    position: absolute;
+    top: -8px;
+    right: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #776e65;
+    animation: scorePopUp 0.8s ease forwards;
+    pointer-events: none;
+  }
+
+  html.dark .score-addition { color: #e0d6cc; }
+
+  @keyframes scorePopUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-28px); }
+  }
+
+  .controls-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    background: var(--btn-bg);
+    color: var(--text-light);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .btn:hover { background: var(--btn-hover); }
+  .btn:active { transform: scale(0.95); }
+
+  .grid-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 500px;
+    background: var(--grid-bg);
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .grid-bg {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cell-bg {
+    background: var(--cell-empty);
+    border-radius: 8px;
+  }
+
+  .tile-layer {
+    position: absolute;
+    inset: 10px;
+  }
+
+  .tile {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: top 0.12s ease, left 0.12s ease;
+    z-index: 1;
+  }
+
+  .tile.merged {
+    animation: tilePop 0.2s ease;
+    z-index: 2;
+  }
+
+  .tile.new-tile {
+    animation: tileAppear 0.2s ease;
+  }
+
+  @keyframes tileAppear {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes tilePop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: var(--overlay-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 10;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .overlay.hidden { display: none; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .overlay-title {
+    font-size: 42px;
+    font-weight: 700;
+  }
+
+  .overlay-title.win {
+    background: linear-gradient(135deg, #edc22e, #f2b179);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .overlay-title.lose {
+    opacity: 0.8;
+  }
+
+  .overlay .btn {
+    font-size: 18px;
+    padding: 12px 32px;
+  }
+
+  /* Tile colors */
+  .tile-2    { background: #eee4da; color: #776e65; }
+  .tile-4    { background: #ede0c8; color: #776e65; }
+  .tile-8    { background: #f2b179; color: #f9f6f2; }
+  .tile-16   { background: #f59563; color: #f9f6f2; }
+  .tile-32   { background: #f67c5f; color: #f9f6f2; }
+  .tile-64   { background: #f65e3b; color: #f9f6f2; }
+  .tile-128  { background: #edcf72; color: #f9f6f2; box-shadow: 0 0 20px 4px rgba(237,207,114,0.35); }
+  .tile-256  { background: #edcc61; color: #f9f6f2; box-shadow: 0 0 20px 6px rgba(237,204,97,0.4); }
+  .tile-512  { background: #edc850; color: #f9f6f2; box-shadow: 0 0 24px 8px rgba(237,200,80,0.45); }
+  .tile-1024 { background: #edc53f; color: #f9f6f2; box-shadow: 0 0 28px 10px rgba(237,197,63,0.5); }
+  .tile-2048 { background: #edc22e; color: #f9f6f2; box-shadow: 0 0 32px 12px rgba(237,194,46,0.55); }
+  .tile-super { background: #3c3a32; color: #f9f6f2; font-size: inherit; }
+
+  html.dark .tile-2   { background: #3d3d5c; color: #e0d6cc; }
+  html.dark .tile-4   { background: #4a4a6a; color: #e0d6cc; }
+  html.dark .tile-8   { background: #c47a3a; color: #f0ece8; }
+  html.dark .tile-16  { background: #c46030; color: #f0ece8; }
+  html.dark .tile-32  { background: #c44a30; color: #f0ece8; }
+  html.dark .tile-64  { background: #c43020; color: #f0ece8; }
+  html.dark .tile-128 { background: #b5993a; color: #f0ece8; box-shadow: 0 0 20px 4px rgba(181,153,58,0.35); }
+  html.dark .tile-256 { background: #b59530; color: #f0ece8; box-shadow: 0 0 20px 6px rgba(181,149,48,0.4); }
+  html.dark .tile-512 { background: #b59020; color: #f0ece8; box-shadow: 0 0 24px 8px rgba(181,144,32,0.45); }
+  html.dark .tile-1024 { background: #b58b18; color: #f0ece8; box-shadow: 0 0 28px 10px rgba(181,139,24,0.5); }
+  html.dark .tile-2048 { background: #b58610; color: #f0ece8; box-shadow: 0 0 32px 12px rgba(181,134,16,0.55); }
+  html.dark .tile-super { background: #1a1a2e; color: #f0ece8; border: 2px solid #b58610; }
+
+  @media (max-width: 440px) {
+    .game-container { padding: 10px; }
+    .grid-wrapper { border-radius: 8px; padding: 7px; }
+    .grid-bg { gap: 7px; }
+    .cell-bg { border-radius: 6px; }
+    .tile { border-radius: 6px; }
+    .title { font-size: 40px; }
+    .score-box { padding: 6px 10px; min-width: 60px; }
+    .score-box .value { font-size: 18px; }
+    .btn { padding: 8px 14px; font-size: 14px; }
+  }
+
+  .btn-home {
+                max-width: 250px;
+                margin: 15px auto 5px;
+                
+                background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%);
+                color: var(--text-dark);
+
+                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+            }
+
+            .btn-home:hover {
+                transform: translateY(-2px) scale(1.03);
+                box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+            }
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  <div class="header">
+    <div class="title">2048</div>
+    <div class="scores-row">
+      <div class="score-box" id="scoreBox">
+        <div class="label">Score</div>
+        <div class="value" id="scoreValue">0</div>
+      </div>
+      <div class="score-box">
+        <div class="label">Best</div>
+        <div class="value" id="bestValue">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls-row">
+    <div class="subtitle">Junte os números até chegar a <b>2048!</b></div>
+    <div class="btn-row">
+      <button class="btn" id="newGameBtn">Novo Jogo</button>
+      <button class="btn btn-home" onclick="window.location.href='/EstudAI/index.html'"><span>🏠</span> Tela Inicial</button>
+    </div>
+  </div>
+
+  <div class="grid-wrapper" id="gridWrapper">
+    <div class="grid-bg" id="gridBg"></div>
+    <div class="tile-layer" id="tileLayer"></div>
+    <div class="overlay hidden" id="overlay">
+      <div class="overlay-title" id="overlayTitle"></div>
+      <button class="btn" id="overlayBtn">Tentar Novamente</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  // Dark mode detection
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    document.documentElement.classList.add("dark");
+  }
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function(event) {
+    if (event.matches) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  });
+
+  var SIZE = 4;
+  var grid = [];
+  var score = 0;
+  var best = 0;
+  var won = false;
+  var gameOver = false;
+  var moving = false;
+
+  var scoreValueEl = document.getElementById("scoreValue");
+  var bestValueEl = document.getElementById("bestValue");
+  var scoreBoxEl = document.getElementById("scoreBox");
+  var tileLayerEl = document.getElementById("tileLayer");
+  var gridBgEl = document.getElementById("gridBg");
+  var overlayEl = document.getElementById("overlay");
+  var overlayTitleEl = document.getElementById("overlayTitle");
+  var overlayBtnEl = document.getElementById("overlayBtn");
+  var newGameBtnEl = document.getElementById("newGameBtn");
+  var gridWrapperEl = document.getElementById("gridWrapper");
+
+  // Build background cells
+  for (var i = 0; i < SIZE * SIZE; i++) {
+    var cell = document.createElement("div");
+    cell.className = "cell-bg";
+    gridBgEl.appendChild(cell);
+  }
+
+  function initGrid() {
+    grid = [];
+    for (var r = 0; r < SIZE; r++) {
+      grid[r] = [];
+      for (var c = 0; c < SIZE; c++) {
+        grid[r][c] = 0;
+      }
+    }
+  }
+
+  function getEmptyCells() {
+    var cells = [];
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] === 0) cells.push({ r: r, c: c });
+      }
+    }
+    return cells;
+  }
+
+  function addRandomTile() {
+    var empty = getEmptyCells();
+    if (empty.length === 0) return null;
+    var cell = empty[Math.floor(Math.random() * empty.length)];
+    var val = Math.random() < 0.9 ? 2 : 4;
+    grid[cell.r][cell.c] = val;
+    return { r: cell.r, c: cell.c, val: val };
+  }
+
+  function getTileSize() {
+    var wrapperRect = tileLayerEl.getBoundingClientRect();
+    var w = wrapperRect.width;
+    var gap = w < 400 ? 7 : 10;
+    var tileSize = (w - gap * (SIZE - 1)) / SIZE;
+    return { tileSize: tileSize, gap: gap };
+  }
+
+  function getTilePos(r, c) {
+    var info = getTileSize();
+    var x = c * (info.tileSize + info.gap);
+    var y = r * (info.tileSize + info.gap);
+    return { x: x, y: y, size: info.tileSize };
+  }
+
+  function getTileFontSize(val, size) {
+    if (val < 100) return size * 0.45 + "px";
+    if (val < 1000) return size * 0.38 + "px";
+    if (val < 10000) return size * 0.3 + "px";
+    return size * 0.24 + "px";
+  }
+
+  function getTileClass(val) {
+    if (val <= 2048) return "tile-" + val;
+    return "tile-super";
+  }
+
+  function renderTiles(newTiles, mergedPositions) {
+    tileLayerEl.innerHTML = "";
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] === 0) continue;
+        var val = grid[r][c];
+        var pos = getTilePos(r, c);
+        var tile = document.createElement("div");
+        tile.className = "tile " + getTileClass(val);
+        tile.style.width = pos.size + "px";
+        tile.style.height = pos.size + "px";
+        tile.style.top = pos.y + "px";
+        tile.style.left = pos.x + "px";
+        tile.style.fontSize = getTileFontSize(val, pos.size);
+        tile.style.lineHeight = pos.size + "px";
+        tile.textContent = val;
+
+        var isNew = false;
+        var isMerged = false;
+        if (newTiles) {
+          for (var n = 0; n < newTiles.length; n++) {
+            if (newTiles[n] && newTiles[n].r === r && newTiles[n].c === c) isNew = true;
+          }
+        }
+        if (mergedPositions) {
+          for (var m = 0; m < mergedPositions.length; m++) {
+            if (mergedPositions[m].r === r && mergedPositions[m].c === c) isMerged = true;
+          }
+        }
+        if (isMerged) tile.classList.add("merged");
+        else if (isNew) tile.classList.add("new-tile");
+
+        tileLayerEl.appendChild(tile);
+      }
+    }
+  }
+
+  function updateScore(add) {
+    score += add;
+    scoreValueEl.textContent = score;
+    if (score > best) {
+      best = score;
+      bestValueEl.textContent = best;
+    }
+    if (add > 0) {
+      var popup = document.createElement("div");
+      popup.className = "score-addition";
+      popup.textContent = "+" + add;
+      scoreBoxEl.appendChild(popup);
+      setTimeout(function() { if (popup.parentNode) popup.parentNode.removeChild(popup); }, 800);
+    }
+  }
+
+  function canMove() {
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (grid[r][c] === 0) return true;
+        if (c < SIZE - 1 && grid[r][c] === grid[r][c + 1]) return true;
+        if (r < SIZE - 1 && grid[r][c] === grid[r + 1][c]) return true;
+      }
+    }
+    return false;
+  }
+
+  function showOverlay(text, isWin) {
+    overlayTitleEl.textContent = text;
+    overlayTitleEl.className = "overlay-title " + (isWin ? "win" : "lose");
+    overlayBtnEl.textContent = isWin ? "Continuar" : "Tentar Novamente";
+    overlayEl.classList.remove("hidden");
+  }
+
+  function hideOverlay() {
+    overlayEl.classList.add("hidden");
+  }
+
+  function move(direction) {
+    if (moving || gameOver) return;
+    moving = true;
+
+    var moved = false;
+    var scoreAdd = 0;
+    var mergedPositions = [];
+
+    // Clone grid
+    var oldGrid = [];
+    for (var r = 0; r < SIZE; r++) {
+      oldGrid[r] = grid[r].slice();
+    }
+
+    // direction: 0=up, 1=right, 2=down, 3=left
+    function getLine(i, dir) {
+      var line = [];
+      for (var j = 0; j < SIZE; j++) {
+        if (dir === 0) line.push({ r: j, c: i });
+        else if (dir === 1) line.push({ r: i, c: SIZE - 1 - j });
+        else if (dir === 2) line.push({ r: SIZE - 1 - j, c: i });
+        else line.push({ r: i, c: j });
+      }
+      return line;
+    }
+
+    for (var i = 0; i < SIZE; i++) {
+      var line = getLine(i, direction);
+      var vals = [];
+      for (var j = 0; j < SIZE; j++) {
+        var cell = line[j];
+        if (grid[cell.r][cell.c] !== 0) vals.push(grid[cell.r][cell.c]);
+      }
+
+      // Merge
+      var merged = [];
+      var k = 0;
+      while (k < vals.length) {
+        if (k + 1 < vals.length && vals[k] === vals[k + 1]) {
+          merged.push(vals[k] * 2);
+          scoreAdd += vals[k] * 2;
+          k += 2;
+        } else {
+          merged.push(vals[k]);
+          k++;
+        }
+      }
+
+      // Place back
+      for (var j2 = 0; j2 < SIZE; j2++) {
+        var cell2 = line[j2];
+        var newVal = j2 < merged.length ? merged[j2] : 0;
+        if (newVal !== oldGrid[cell2.r][cell2.c]) moved = true;
+        grid[cell2.r][cell2.c] = newVal;
+        // Track merged positions
+        if (j2 < merged.length && merged[j2] > 0) {
+          // Check if this value resulted from a merge
+          var wasMerge = false;
+          var prev = [];
+          var pk = 0;
+          var origVals = [];
+          for (var pj = 0; pj < SIZE; pj++) {
+            var pc = line[pj];
+            if (oldGrid[pc.r][pc.c] !== 0) origVals.push(oldGrid[pc.r][pc.c]);
+          }
+          // Reconstruct to find merges
+          var mk = 0;
+          var mIdx = 0;
+          while (mk < origVals.length) {
+            if (mk + 1 < origVals.length && origVals[mk] === origVals[mk + 1]) {
+              if (mIdx === j2) { wasMerge = true; break; }
+              mIdx++;
+              mk += 2;
+            } else {
+              mIdx++;
+              mk++;
+            }
+          }
+          if (wasMerge) {
+            mergedPositions.push({ r: cell2.r, c: cell2.c });
+            // Check for 2048
+            if (merged[j2] === 2048 && !won) {
+              won = true;
+            }
+          }
+        }
+      }
+    }
+
+    if (!moved) {
+      moving = false;
+      return;
+    }
+
+    updateScore(scoreAdd);
+    var newTile = addRandomTile();
+    renderTiles(newTile ? [newTile] : [], mergedPositions);
+
+    setTimeout(function() {
+      moving = false;
+      if (won) {
+        won = false; // only show once
+        showOverlay("Você venceu! 🎉", true);
+      } else if (!canMove()) {
+        gameOver = true;
+        showOverlay("Fim de Jogo", false);
+      }
+    }, 150);
+  }
+
+  function newGame() {
+    initGrid();
+    score = 0;
+    scoreValueEl.textContent = "0";
+    won = false;
+    gameOver = false;
+    moving = false;
+    hideOverlay();
+    var t1 = addRandomTile();
+    var t2 = addRandomTile();
+    renderTiles([t1, t2], []);
+  }
+
+  // Keyboard controls
+  document.addEventListener("keydown", function(e) {
+    var dir = -1;
+    switch (e.key) {
+      case "ArrowUp": case "w": case "W": dir = 0; break;
+      case "ArrowRight": case "d": case "D": dir = 1; break;
+      case "ArrowDown": case "s": case "S": dir = 2; break;
+      case "ArrowLeft": case "a": case "A": dir = 3; break;
+    }
+    if (dir >= 0) {
+      e.preventDefault();
+      move(dir);
+    }
+  });
+
+  // Touch controls
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var touchActive = false;
+
+  gridWrapperEl.addEventListener("touchstart", function(e) {
+    if (e.touches.length === 1) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchActive = true;
+    }
+  }, { passive: true });
+
+  gridWrapperEl.addEventListener("touchmove", function(e) {
+    if (touchActive) e.preventDefault();
+  }, { passive: false });
+
+  gridWrapperEl.addEventListener("touchend", function(e) {
+    if (!touchActive) return;
+    touchActive = false;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var absDx = Math.abs(dx);
+    var absDy = Math.abs(dy);
+    if (Math.max(absDx, absDy) < 20) return;
+
+    if (absDx > absDy) {
+      move(dx > 0 ? 1 : 3);
+    } else {
+      move(dy > 0 ? 2 : 0);
+    }
+  }, { passive: true });
+
+  // Mouse swipe for desktop
+  var mouseDown = false;
+  var mouseStartX = 0;
+  var mouseStartY = 0;
+
+  gridWrapperEl.addEventListener("mousedown", function(e) {
+    mouseDown = true;
+    mouseStartX = e.clientX;
+    mouseStartY = e.clientY;
+  });
+
+  document.addEventListener("mousemove", function(e) {
+    if (mouseDown) e.preventDefault();
+  });
+
+  document.addEventListener("mouseup", function(e) {
+    if (!mouseDown) return;
+    mouseDown = false;
+    var dx = e.clientX - mouseStartX;
+    var dy = e.clientY - mouseStartY;
+    var absDx = Math.abs(dx);
+    var absDy = Math.abs(dy);
+    if (Math.max(absDx, absDy) < 20) return;
+    if (absDx > absDy) {
+      move(dx > 0 ? 1 : 3);
+    } else {
+      move(dy > 0 ? 2 : 0);
+    }
+  });
+
+  // Resize handler
+  window.addEventListener("resize", function() {
+    renderTiles([], []);
+  });
+
+  newGameBtnEl.addEventListener("click", newGame);
+  overlayBtnEl.addEventListener("click", function() {
+    if (overlayTitleEl.textContent.indexOf("venceu") >= 0) {
+      hideOverlay();
+    } else {
+      newGame();
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>
