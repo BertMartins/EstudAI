@@ -7,1336 +7,413 @@
         <link
             href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
             rel="stylesheet">
-        <!-- Favicon SVG -->
         <link rel="icon" type="image/svg+xml"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='%230a0f0c'/%3E%3Ctext x='50' y='32' font-size='18' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M50 38 C38 38 34 48 34 54 C34 66 46 70 50 78 C54 70 66 66 66 54 C66 48 62 38 50 38 Z' fill='url(%23g)'/%3E%3Crect x='47' y='70' width='6' height='10' rx='2' fill='%238b5a2b'/%3E%3C/svg%3E">
-
-        <!-- Atalho iPhone -->
-        <link rel="apple-touch-icon" sizes="180x180"
-            href="img/CodeFarm_LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="32x32"
-            href="img/CodeFarm_LOGO_ATALHO.png">
-        <link rel="icon" type="image/png" sizes="16x16"
-            href="img/CodeFarm_LOGO_ATALHO.png">
-
-        <!-- Apple Touch Icon -->
         <link rel="apple-touch-icon" sizes="180x180"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%2334d399'/%3E%3Cstop offset='100%25' stop-color='%2316a34a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='%230a0f0c'/%3E%3Ctext x='90' y='55' font-size='36' text-anchor='middle' fill='%2334d399'%3E%7B%20%7D%3C/text%3E%3Cpath d='M90 70 C68 70 60 88 60 100 C60 126 82 134 90 154 C98 134 120 126 120 100 C120 88 112 70 90 70 Z' fill='url(%23g)'/%3E%3Crect x='86' y='140' width='8' height='18' rx='3' fill='%238b5a2b'/%3E%3C/svg%3E">
-
-        <!-- PWA / Mobile -->
         <meta name="theme-color" content="#16a34a">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="apple-mobile-web-app-title" content="CodeFarm">
         <meta name="application-name" content="CodeFarm">
-        <meta name="description"
-            content="Aprenda lógica de programação cultivando código 🌱">
-
+        <meta name="description" content="Aprenda lógica de programação cultivando código 🌱">
         <style>
-                :root {
-                    --soil-dark: #5D4037;
-                    --soil-light: #8D6E63;
-                    --grass-dark: #2E7D32;
-                    --grass-light: #66BB6A;
-                    --sky-day: #87CEEB;
-                    --sky-night: #1a1a2e;
-                    --sun: #FFD54F;
-                    --water: #4FC3F7;
-                    --gold: #FFD700;
-                    --wood: #A1887F;
-                    --wood-dark: #6D4C41;
-                    --text-dark: #3E2723;
-                    --text-light: #EFEBE9;
-                    --success: #4CAF50;
-                    --error: #E53935;
-                    --warning: #FF9800;
-                    --card-bg: rgba(255, 255, 255, 0.95);
-                    --card-bg-dark: rgba(30, 30, 40, 0.95);
-                    --code-bg: #1e1e2e;
-                    --code-comment: #6a737d;
-                    --code-keyword: #ff79c6;
-                    --code-string: #a5d6ff;
-                    --code-function: #d2a8ff;
-                }
-
-                .dark {
-                    --sky-day: #1a1a2e;
-                    --grass-dark: #1B5E20;
-                    --grass-light: #388E3C;
-                    --card-bg: var(--card-bg-dark);
-                    --text-dark: var(--text-light);
-                }
-
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-
-                body {
-                    font-family: 'Fredoka', sans-serif;
-                    min-height: 100vh;
-                    background: linear-gradient(180deg, var(--sky-day) 0%, var(--sky-day) 40%, var(--grass-light) 40%, var(--grass-dark) 100%);
-                    color: var(--text-dark);
-                    overflow-x: hidden;
-                    transition: background 0.5s ease;
-                }
-
-                .dark body {
-                    background: linear-gradient(180deg, var(--sky-night) 0%, var(--sky-night) 40%, var(--grass-dark) 40%, #0d3d0d 100%);
-                }
-
-                /* Clouds */
-                .clouds {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 40vh;
-                    pointer-events: none;
-                    overflow: hidden;
-                    z-index: 0;
-                }
-
-                .cloud {
-                    position: absolute;
-                    font-size: 4rem;
-                    opacity: 0.8;
-                    animation: float-cloud linear infinite;
-                    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-                }
-
-                .cloud:nth-child(1) {
-                    top: 5%;
-                    animation-duration: 25s;
-                    font-size: 3rem;
-                }
-
-                .cloud:nth-child(2) {
-                    top: 15%;
-                    animation-duration: 35s;
-                    animation-delay: -10s;
-                }
-
-                .cloud:nth-child(3) {
-                    top: 8%;
-                    animation-duration: 30s;
-                    animation-delay: -20s;
-                    font-size: 2.5rem;
-                }
-
-                @keyframes float-cloud {
-                    from {
-                        transform: translateX(-100px);
-                    }
-
-                    to {
-                        transform: translateX(calc(100vw + 100px));
-                    }
-                }
-
-                /* Celestial */
-                .celestial {
-                    position: fixed;
-                    top: 30px;
-                    right: 40px;
-                    font-size: 4rem;
-                    z-index: 1;
-                    animation: pulse-glow 3s ease-in-out infinite;
-                    cursor: pointer;
-                    transition: transform 0.3s;
-                }
-
-                .celestial:hover {
-                    transform: scale(1.1) rotate(10deg);
-                }
-
-                @keyframes pulse-glow {
-
-                    0%,
-                    100% {
-                        filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
-                    }
-
-                    50% {
-                        filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.9));
-                    }
-                }
-
-                .dark .celestial {
-                    animation-name: pulse-glow-moon;
-                }
-
-                @keyframes pulse-glow-moon {
-
-                    0%,
-                    100% {
-                        filter: drop-shadow(0 0 15px rgba(200, 200, 255, 0.5));
-                    }
-
-                    50% {
-                        filter: drop-shadow(0 0 30px rgba(200, 200, 255, 0.8));
-                    }
-                }
-
-                /* Header */
-                header {
-                    position: relative;
-                    z-index: 10;
-                    text-align: center;
-                    padding: 25px 20px 15px;
-                }
-
-                .logo {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 15px;
-                    background: var(--card-bg);
-                    padding: 12px 30px;
-                    border-radius: 50px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .logo h1 {
-                    font-size: 2rem;
-                    font-weight: 700;
-                    color: var(--grass-dark);
-                }
-
-                .dark .logo h1 {
-                    color: var(--grass-light);
-                }
-
-                .logo-icon {
-                    font-size: 2.2rem;
-                    animation: bounce-plant 2s ease-in-out infinite;
-                }
-
-                @keyframes bounce-plant {
-
-                    0%,
-                    100% {
-                        transform: translateY(0) rotate(-5deg);
-                    }
-
-                    50% {
-                        transform: translateY(-8px) rotate(5deg);
-                    }
-                }
-
-                /* Stats Bar */
-                .stats-bar {
-                    display: flex;
-                    justify-content: center;
-                    gap: 15px;
-                    flex-wrap: wrap;
-                    padding: 15px;
-                    margin: 5px auto;
-                    max-width: 800px;
-                }
-
-                .stat {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    background: var(--card-bg);
-                    padding: 10px 18px;
-                    border-radius: 30px;
-                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-                    border: 3px solid var(--wood);
-                    font-weight: 600;
-                    transition: transform 0.2s;
-                }
-
-                .stat:hover {
-                    transform: translateY(-3px);
-                }
-
-                .stat-icon {
-                    font-size: 1.3rem;
-                }
-
-                .stat-value {
-                    font-size: 1.1rem;
-                    min-width: 30px;
-                }
-
-                .stat-value.money {
-                    color: #d4a017;
-                }
-
-                .stat-value.level {
-                    color: var(--grass-dark);
-                }
-
-                .dark .stat-value.level {
-                    color: var(--grass-light);
-                }
-
-                .level-badge {
-                    padding: 4px 12px;
-                    border-radius: 15px;
-                    font-size: 0.85rem;
-                    font-weight: 700;
-                }
-
-                .level-badge.beginner {
-                    background: #81C784;
-                    color: #1B5E20;
-                }
-
-                .level-badge.intermediate {
-                    background: #FFB74D;
-                    color: #E65100;
-                }
-
-                .level-badge.advanced {
-                    background: #EF5350;
-                    color: #fff;
-                }
-
-                .level-badge.master {
-                    background: linear-gradient(135deg, #9C27B0, #E91E63);
-                    color: #fff;
-                }
-
-                /* Main Container */
-                .container {
-                    position: relative;
-                    z-index: 10;
-                    max-width: 1500px;
-                    margin: 0 auto;
-                    padding: 15px;
-                    display: grid;
-                    grid-template-columns: 320px 1fr;
-                    gap: 20px;
-                }
-
-                @media (max-width: 1100px) {
-                    .container {
-                        grid-template-columns: 1fr;
-                    }
-                }
-
-                /* Sidebar */
-                .sidebar {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                /* Farm Section */
-                .farm-card {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .section-title {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    font-size: 1.3rem;
-                    margin-bottom: 15px;
-                    color: var(--wood-dark);
-                }
-
-                .dark .section-title {
-                    color: var(--wood);
-                }
-
-                /* Farm Field */
-                .farm-field {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 10px;
-                    background: linear-gradient(135deg, var(--soil-dark) 0%, var(--soil-light) 100%);
-                    padding: 15px;
-                    border-radius: 15px;
-                    border: 3px solid var(--wood-dark);
-                    box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.3);
-                }
-
-                .plot {
-                    aspect-ratio: 1;
-                    background: radial-gradient(circle at center, var(--soil-light) 0%, var(--soil-dark) 100%);
-                    border-radius: 12px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 2.2rem;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    border: 2px dashed rgba(255, 255, 255, 0.2);
-                    position: relative;
-                    overflow: hidden;
-                    gap: 2px;
-                }
-
-                .plot:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-                }
-
-                .plot.empty {
-                    opacity: 0.5;
-                }
-
-                .plot .plant-emoji {
-                    transition: all 0.4s ease;
-                    filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.3));
-                }
-
-                .plot .plant-state {
-                    font-size: 0.6rem;
-                    color: white;
-                    background: rgba(0, 0, 0, 0.5);
-                    padding: 2px 6px;
-                    border-radius: 8px;
-                    text-transform: uppercase;
-                    font-weight: 600;
-                }
-
-                .plot.watered {
-                    animation: water-splash 0.6s ease-out;
-                }
-
-                @keyframes water-splash {
-                    0% {
-                        box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.7);
-                    }
-
-                    100% {
-                        box-shadow: 0 0 0 15px rgba(79, 195, 247, 0);
-                    }
-                }
-
-                .plot .water-drops {
-                    position: absolute;
-                    top: 0;
-                    font-size: 1rem;
-                    animation: drops-fall 0.8s ease-out forwards;
-                }
-
-                @keyframes drops-fall {
-                    0% {
-                        transform: translateY(-10px);
-                        opacity: 1;
-                    }
-
-                    100% {
-                        transform: translateY(30px);
-                        opacity: 0;
-                    }
-                }
-
-                .plot.growing .plant-emoji {
-                    animation: grow-pulse 0.6s ease-out;
-                }
-
-                @keyframes grow-pulse {
-                    0% {
-                        transform: scale(0.7);
-                    }
-
-                    50% {
-                        transform: scale(1.2);
-                    }
-
-                    100% {
-                        transform: scale(1);
-                    }
-                }
-
-                .plot.dead .plant-emoji {
-                    filter: grayscale(1) brightness(0.5);
-                    transform: rotate(20deg);
-                }
-
-                .plot.harvested {
-                    animation: harvest-pop 0.5s ease;
-                }
-
-                @keyframes harvest-pop {
-
-                    0%,
-                    100% {
-                        transform: scale(1);
-                    }
-
-                    50% {
-                        transform: scale(1.15);
-                    }
-                }
-
-                /* Resources Panel */
-                .resources-panel {
-                    display: flex;
-                    gap: 10px;
-                    margin-top: 10px;
-                    flex-wrap: wrap;
-                }
-
-                .resource {
-                    flex: 1;
-                    min-width: 80px;
-                    background: rgba(0, 0, 0, 0.05);
-                    padding: 10px;
-                    border-radius: 12px;
-                    text-align: center;
-                    border: 2px solid rgba(0, 0, 0, 0.1);
-                }
-
-                .dark .resource {
-                    background: rgba(255, 255, 255, 0.05);
-                    border-color: rgba(255, 255, 255, 0.1);
-                }
-
-                .resource-icon {
-                    font-size: 1.5rem;
-                }
-
-                .resource-value {
-                    font-size: 1.2rem;
-                    font-weight: 700;
-                }
-
-                .resource-label {
-                    font-size: 0.75rem;
-                    opacity: 0.7;
-                }
-
-                /* Simulation Panel */
-                .simulation-panel {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .sim-log {
-                    background: var(--code-bg);
-                    border-radius: 12px;
-                    padding: 12px;
-                    max-height: 150px;
-                    overflow-y: auto;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 0.8rem;
-                }
-
-                .sim-log-entry {
-                    display: flex;
-                    gap: 8px;
-                    padding: 4px 0;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-                    animation: slide-in 0.2s ease;
-                }
-
-                @keyframes slide-in {
-                    from {
-                        opacity: 0;
-                        transform: translateX(-10px);
-                    }
-
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-
-                .sim-log-entry .step {
-                    color: #888;
-                    min-width: 35px;
-                }
-
-                .sim-log-entry .action {
-                    color: var(--water);
-                }
-
-                .sim-log-entry .action.plant {
-                    color: var(--grass-light);
-                }
-
-                .sim-log-entry .action.harvest {
-                    color: var(--gold);
-                }
-
-                .sim-log-entry .action.wait {
-                    color: #888;
-                }
-
-                .sim-log-entry .action.error {
-                    color: var(--error);
-                }
-
-                /* Docs Panel */
-                .docs-panel {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .docs-content {
-                    background: rgba(0, 0, 0, 0.03);
-                    border-radius: 12px;
-                    padding: 12px;
-                    font-size: 0.85rem;
-                    max-height: 200px;
-                    overflow-y: auto;
-                }
-
-                .dark .docs-content {
-                    background: rgba(255, 255, 255, 0.03);
-                }
-
-                .docs-content code {
-                    background: rgba(0, 0, 0, 0.1);
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 0.8rem;
-                }
-
-                .dark .docs-content code {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-
-                .docs-content h4 {
-                    margin: 10px 0 5px;
-                    color: var(--grass-dark);
-                }
-
-                .dark .docs-content h4 {
-                    color: var(--grass-light);
-                }
-
-                .docs-content ul {
-                    margin-left: 20px;
-                    margin-bottom: 10px;
-                }
-
-                /* Main Content */
-                .main-content {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                /* Challenge Card */
-                .challenge-card {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .challenge-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 12px;
-                    flex-wrap: wrap;
-                    gap: 10px;
-                }
-
-                .challenge-meta {
-                    display: flex;
-                    gap: 10px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                }
-
-                .challenge-badge {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    background: linear-gradient(135deg, var(--warning) 0%, #F57C00 100%);
-                    color: white;
-                    padding: 6px 14px;
-                    border-radius: 20px;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                }
-
-                .difficulty-badge {
-                    padding: 6px 12px;
-                    border-radius: 20px;
-                    font-size: 0.8rem;
-                    font-weight: 600;
-                }
-
-                .difficulty-badge.easy {
-                    background: #C8E6C9;
-                    color: #2E7D32;
-                }
-
-                .difficulty-badge.medium {
-                    background: #FFE0B2;
-                    color: #E65100;
-                }
-
-                .difficulty-badge.hard {
-                    background: #FFCDD2;
-                    color: #C62828;
-                }
-
-                .difficulty-badge.expert {
-                    background: linear-gradient(135deg, #9C27B0, #E91E63);
-                    color: white;
-                }
-
-                .challenge-reward {
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                    background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%);
-                    color: var(--text-dark);
-                    padding: 6px 14px;
-                    border-radius: 20px;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                }
-
-                .challenge-title {
-                    font-size: 1.3rem;
-                    margin-bottom: 10px;
-                    color: var(--wood-dark);
-                }
-
-                .dark .challenge-title {
-                    color: var(--wood);
-                }
-
-                .challenge-text {
-                    font-size: 1.05rem;
-                    line-height: 1.6;
-                    margin-bottom: 12px;
-                }
-
-                .challenge-text code {
-                    background: rgba(0, 0, 0, 0.08);
-                    padding: 2px 8px;
-                    border-radius: 6px;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 0.9rem;
-                    color: var(--grass-dark);
-                }
-
-                .dark .challenge-text code {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: var(--grass-light);
-                }
-
-                .concept-box {
-                    background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(233, 30, 99, 0.1) 100%);
-                    border-left: 4px solid #9C27B0;
-                    padding: 12px 16px;
-                    border-radius: 0 12px 12px 0;
-                    margin-bottom: 12px;
-                }
-
-                .concept-box h4 {
-                    font-size: 0.9rem;
-                    margin-bottom: 5px;
-                    color: #9C27B0;
-                }
-
-                .concept-box p {
-                    font-size: 0.9rem;
-                    opacity: 0.9;
-                }
-
-                .hint-box {
-                    background: linear-gradient(135deg, rgba(79, 195, 247, 0.15) 0%, rgba(79, 195, 247, 0.05) 100%);
-                    border-left: 4px solid var(--water);
-                    padding: 10px 14px;
-                    border-radius: 0 12px 12px 0;
-                    font-size: 0.9rem;
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 10px;
-                }
-
-                .hint-toggle {
-                    background: none;
-                    border: none;
-                    color: var(--water);
-                    cursor: pointer;
-                    font-family: inherit;
-                    font-size: 0.9rem;
-                    padding: 0;
-                    text-decoration: underline;
-                }
-
-                .hint-content {
-                    display: none;
-                }
-
-                .hint-content.visible {
-                    display: block;
-                }
-
-                /* Editor */
-                .editor-card {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .editor-header {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-bottom: 12px;
-                }
-
-                .editor-dot {
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 50%;
-                }
-
-                .editor-dot.red {
-                    background: #ff5f56;
-                }
-
-                .editor-dot.yellow {
-                    background: #ffbd2e;
-                }
-
-                .editor-dot.green {
-                    background: #27ca3f;
-                }
-
-                .editor-title {
-                    margin-left: 8px;
-                    opacity: 0.6;
-                    font-size: 0.9rem;
-                }
-
-                .code-editor {
-                    width: 100%;
-                    min-height: 220px;
-                    background: var(--code-bg);
-                    color: #cdd6f4;
-                    border: none;
-                    border-radius: 12px;
-                    padding: 16px;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 14px;
-                    line-height: 1.6;
-                    resize: vertical;
-                    outline: none;
-                    box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.3);
-                    tab-size: 2;
-                }
-
-                .code-editor:focus {
-                    box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 3px var(--grass-light);
-                }
-
-                .button-row {
-                    display: flex;
-                    gap: 10px;
-                    margin-top: 12px;
-                    flex-wrap: wrap;
-                }
-
-                .btn {
-                    flex: 1;
-                    min-width: 100px;
-                    padding: 12px 20px;
-                    border: none;
-                    border-radius: 12px;
-                    font-family: 'Fredoka', sans-serif;
-                    font-size: 1rem;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                }
-
-                .btn-primary {
-                    background: linear-gradient(135deg, var(--grass-light) 0%, var(--grass-dark) 100%);
-                    color: white;
-                    box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4);
-                }
-
-                .btn-primary:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.5);
-                }
-
-                .btn-secondary {
-                    background: linear-gradient(135deg, var(--wood) 0%, var(--wood-dark) 100%);
-                    color: white;
-                    box-shadow: 0 4px 15px rgba(109, 76, 65, 0.3);
-                }
-
-                .btn-secondary:hover {
-                    transform: translateY(-2px);
-                }
-
-                .btn-outline {
-                    background: transparent;
-                    border: 2px solid var(--wood);
-                    color: var(--wood-dark);
-                }
-
-                .dark .btn-outline {
-                    color: var(--wood);
-                }
-
-                .btn-outline:hover {
-                    background: var(--wood);
-                    color: white;
-                }
-
-                .btn:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                    transform: none !important;
-                }
-
-                /* Output Console */
-                .output-console {
-                    margin-top: 12px;
-                    background: var(--code-bg);
-                    border-radius: 12px;
-                    padding: 12px 16px;
-                    font-family: 'JetBrains Mono', monospace;
-                    font-size: 0.85rem;
-                    min-height: 70px;
-                    max-height: 150px;
-                    overflow-y: auto;
-                    box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.3);
-                }
-
-                .output-line {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 8px;
-                    margin-bottom: 6px;
-                    animation: fade-in 0.3s ease;
-                }
-
-                @keyframes fade-in {
-                    from {
-                        opacity: 0;
-                        transform: translateY(-5px);
-                    }
-
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-
-                .output-line.success {
-                    color: var(--success);
-                }
-
-                .output-line.error {
-                    color: var(--error);
-                }
-
-                .output-line.info {
-                    color: var(--water);
-                }
-
-                .output-line.warning {
-                    color: var(--warning);
-                }
-
-                .output-line.neutral {
-                    color: #888;
-                }
-
-                /* Progress Bar */
-                .progress-section {
-                    background: var(--card-bg);
-                    border-radius: 20px;
-                    padding: 15px 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-                    border: 4px solid var(--wood-dark);
-                }
-
-                .progress-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 10px;
-                    font-size: 0.95rem;
-                }
-
-                .progress-bar-container {
-                    background: rgba(0, 0, 0, 0.1);
-                    border-radius: 12px;
-                    height: 20px;
-                    overflow: hidden;
-                }
-
-                .dark .progress-bar-container {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-
-                .progress-bar {
-                    height: 100%;
-                    background: linear-gradient(90deg, var(--grass-light) 0%, var(--success) 100%);
-                    border-radius: 12px;
-                    transition: width 0.5s ease;
-                    position: relative;
-                }
-
-                .progress-bar::after {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-                    animation: shimmer 2s infinite;
-                }
-
-                @keyframes shimmer {
-                    0% {
-                        transform: translateX(-100%);
-                    }
-
-                    100% {
-                        transform: translateX(100%);
-                    }
-                }
-
-                /* Level Select */
-                .level-select {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 8px;
-                    margin-top: 12px;
-                }
-
-                .level-btn {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 10px;
-                    border: 2px solid rgba(0, 0, 0, 0.1);
-                    background: rgba(0, 0, 0, 0.05);
-                    font-family: 'Fredoka', sans-serif;
-                    font-weight: 600;
-                    font-size: 0.9rem;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    position: relative;
-                }
-
-                .dark .level-btn {
-                    background: rgba(255, 255, 255, 0.05);
-                    border-color: rgba(255, 255, 255, 0.1);
-                    color: var(--text-light);
-                }
-
-                .level-btn:hover:not(:disabled) {
-                    transform: scale(1.1);
-                }
-
-                .level-btn.completed {
-                    background: var(--success);
-                    color: white;
-                    border-color: var(--success);
-                }
-
-                .level-btn.current {
-                    background: var(--warning);
-                    color: white;
-                    border-color: var(--warning);
-                    animation: pulse-current 2s infinite;
-                }
-
-                @keyframes pulse-current {
-
-                    0%,
-                    100% {
-                        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
-                    }
-
-                    50% {
-                        box-shadow: 0 0 0 8px rgba(255, 152, 0, 0);
-                    }
-                }
-
-                .level-btn.locked {
-                    opacity: 0.4;
-                    cursor: not-allowed;
-                }
-
-                .level-btn.locked::after {
-                    content: '🔒';
-                    font-size: 0.6rem;
-                    position: absolute;
-                    bottom: -2px;
-                    right: -2px;
-                }
-
-                /* Modal */
-                .modal-overlay {
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(0, 0, 0, 0.75);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                    opacity: 0;
-                    visibility: hidden;
-                    transition: all 0.3s ease;
-                    padding: 20px;
-                }
-
-                .modal-overlay.active {
-                    opacity: 1;
-                    visibility: visible;
-                }
-
-                .modal {
-                    background: var(--card-bg);
-                    border-radius: 25px;
-                    padding: 35px;
-                    max-width: 480px;
-                    width: 100%;
-                    text-align: center;
-                    transform: scale(0.8);
-                    transition: transform 0.3s ease;
-                    border: 5px solid var(--gold);
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                }
-
-                .modal-overlay.active .modal {
-                    transform: scale(1);
-                }
-
-                .modal-icon {
-                    font-size: 4.5rem;
-                    margin-bottom: 15px;
-                    animation: celebrate 0.6s ease;
-                }
-
-                @keyframes celebrate {
-                    0% {
-                        transform: scale(0) rotate(-180deg);
-                    }
-
-                    50% {
-                        transform: scale(1.2) rotate(10deg);
-                    }
-
-                    100% {
-                        transform: scale(1) rotate(0);
-                    }
-                }
-
-                .modal h2 {
-                    font-size: 1.8rem;
-                    margin-bottom: 10px;
-                    color: var(--grass-dark);
-                }
-
-                .dark .modal h2 {
-                    color: var(--grass-light);
-                }
-
-                .modal p {
-                    font-size: 1rem;
-                    margin-bottom: 20px;
-                    opacity: 0.9;
-                }
-
-                .modal .reward-display {
-                    display: flex;
-                    justify-content: center;
-                    gap: 25px;
-                    margin-bottom: 20px;
-                }
-
-                .reward-item {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 4px;
-                }
-
-                .reward-item span:first-child {
-                    font-size: 2.2rem;
-                }
-
-                .reward-item span:last-child {
-                    font-weight: 600;
-                    color: var(--gold);
-                }
-
-                .unlock-badge {
-                    background: linear-gradient(135deg, #9C27B0, #E91E63);
-                    color: white;
-                    padding: 8px 20px;
-                    border-radius: 20px;
-                    margin-bottom: 20px;
-                    display: inline-block;
-                    font-weight: 600;
-                }
-
-                /* Footer */
-                footer {
-                    text-align: center;
-                    padding: 25px;
-                    color: var(--text-dark);
-                    opacity: 0.8;
-                    position: relative;
-                    z-index: 10;
-                    font-size: 0.95rem;
-                }
-
-                .dark footer {
-                    color: var(--text-light);
-                }
-
-                /* Confetti */
-                .confetti {
-                    position: fixed;
-                    pointer-events: none;
-                    z-index: 999;
-                }
-
-                .confetti-piece {
-                    position: absolute;
-                    width: 10px;
-                    height: 10px;
-                    animation: confetti-fall 3s ease-out forwards;
-                }
-
-                @keyframes confetti-fall {
-                    0% {
-                        transform: translateY(0) rotate(0deg);
-                        opacity: 1;
-                    }
-
-                    100% {
-                        transform: translateY(100vh) rotate(720deg);
-                        opacity: 0;
-                    }
-                }
-
-                /* Responsive */
-                @media (max-width: 600px) {
-                    .logo h1 {
-                        font-size: 1.5rem;
-                    }
-
-                    .logo {
-                        padding: 10px 20px;
-                    }
-
-                    .farm-field {
-                        gap: 8px;
-                        padding: 12px;
-                    }
-
-                    .plot {
-                        font-size: 1.8rem;
-                    }
-
-                    .stats-bar {
-                        gap: 8px;
-                    }
-
-                    .stat {
-                        padding: 8px 12px;
-                        font-size: 0.85rem;
-                    }
-
-                    .code-editor {
-                        font-size: 13px;
-                        min-height: 180px;
-                    }
-
-                    .btn {
-                        padding: 10px 16px;
-                        font-size: 0.9rem;
-                    }
-
-                    .container {
-                        padding: 10px;
-                        gap: 15px;
-                    }
-
-                    .celestial {
-                        font-size: 2.5rem;
-                        top: 15px;
-                        right: 15px;
-                    }
-
-                    .challenge-title {
-                        font-size: 1.1rem;
-                    }
-
-                    .challenge-text {
-                        font-size: 0.95rem;
-                    }
-
-                    .level-btn {
-                        width: 32px;
-                        height: 32px;
-                        font-size: 0.8rem;
-                    }
-                }
-
-                /* Scrollbar */
-                ::-webkit-scrollbar {
-                    width: 8px;
-                    height: 8px;
-                }
-
-                ::-webkit-scrollbar-track {
-                    background: rgba(0, 0, 0, 0.1);
-                    border-radius: 10px;
-                }
-
-                ::-webkit-scrollbar-thumb {
-                    background: var(--wood);
-                    border-radius: 10px;
-                }
-
-                ::-webkit-scrollbar-thumb:hover {
-                    background: var(--wood-dark);
-                }
-        .btn-home {
-                max-width: 250px;
-                margin: 15px auto 5px;
-                
-                background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%);
+            :root {
+                --soil-dark: #5D4037;
+                --soil-light: #8D6E63;
+                --grass-dark: #2E7D32;
+                --grass-light: #66BB6A;
+                --sky-day: #87CEEB;
+                --sky-night: #1a1a2e;
+                --sun: #FFD54F;
+                --water: #4FC3F7;
+                --gold: #FFD700;
+                --wood: #A1887F;
+                --wood-dark: #6D4C41;
+                --text-dark: #3E2723;
+                --text-light: #EFEBE9;
+                --success: #4CAF50;
+                --error: #E53935;
+                --warning: #FF9800;
+                --card-bg: rgba(255, 255, 255, 0.95);
+                --card-bg-dark: rgba(30, 30, 40, 0.95);
+                --code-bg: #1e1e2e;
+                --code-comment: #6a737d;
+                --code-keyword: #ff79c6;
+                --code-string: #a5d6ff;
+                --code-function: #d2a8ff;
+            }
+
+            .dark {
+                --sky-day: #1a1a2e;
+                --grass-dark: #1B5E20;
+                --grass-light: #388E3C;
+                --card-bg: var(--card-bg-dark);
+                --text-dark: var(--text-light);
+            }
+
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+
+            body {
+                font-family: 'Fredoka', sans-serif;
+                min-height: 100vh;
+                background: linear-gradient(180deg, var(--sky-day) 0%, var(--sky-day) 40%, var(--grass-light) 40%, var(--grass-dark) 100%);
                 color: var(--text-dark);
-
-                box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+                overflow-x: hidden;
+                transition: background 0.5s ease;
             }
 
-            .btn-home:hover {
-                transform: translateY(-2px) scale(1.03);
-                box-shadow: 0 6px 20px rgba(255, 193, 7, 0.6);
+            .dark body {
+                background: linear-gradient(180deg, var(--sky-night) 0%, var(--sky-night) 40%, var(--grass-dark) 40%, #0d3d0d 100%);
             }
+
+            .clouds { position: fixed; top: 0; left: 0; width: 100%; height: 40vh; pointer-events: none; overflow: hidden; z-index: 0; }
+            .cloud { position: absolute; font-size: 4rem; opacity: 0.8; animation: float-cloud linear infinite; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+            .cloud:nth-child(1) { top: 5%; animation-duration: 25s; font-size: 3rem; }
+            .cloud:nth-child(2) { top: 15%; animation-duration: 35s; animation-delay: -10s; }
+            .cloud:nth-child(3) { top: 8%; animation-duration: 30s; animation-delay: -20s; font-size: 2.5rem; }
+            @keyframes float-cloud { from { transform: translateX(-100px); } to { transform: translateX(calc(100vw + 100px)); } }
+
+            .celestial { position: fixed; top: 30px; right: 40px; font-size: 4rem; z-index: 1; animation: pulse-glow 3s ease-in-out infinite; cursor: pointer; transition: transform 0.3s; }
+            .celestial:hover { transform: scale(1.1) rotate(10deg); }
+            @keyframes pulse-glow { 0%, 100% { filter: drop-shadow(0 0 20px rgba(255,215,0,0.6)); } 50% { filter: drop-shadow(0 0 40px rgba(255,215,0,0.9)); } }
+            .dark .celestial { animation-name: pulse-glow-moon; }
+            @keyframes pulse-glow-moon { 0%, 100% { filter: drop-shadow(0 0 15px rgba(200,200,255,0.5)); } 50% { filter: drop-shadow(0 0 30px rgba(200,200,255,0.8)); } }
+
+            header { position: relative; z-index: 10; text-align: center; padding: 25px 20px 15px; }
+            .logo { display: inline-flex; align-items: center; gap: 15px; background: var(--card-bg); padding: 12px 30px; border-radius: 50px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .logo h1 { font-size: 2rem; font-weight: 700; color: var(--grass-dark); }
+            .dark .logo h1 { color: var(--grass-light); }
+            .logo-icon { font-size: 2.2rem; animation: bounce-plant 2s ease-in-out infinite; }
+            @keyframes bounce-plant { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-8px) rotate(5deg); } }
+
+            .stats-bar { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 15px; margin: 5px auto; max-width: 800px; }
+            .stat { display: flex; align-items: center; gap: 8px; background: var(--card-bg); padding: 10px 18px; border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 3px solid var(--wood); font-weight: 600; transition: transform 0.2s; }
+            .stat:hover { transform: translateY(-3px); }
+            .stat-icon { font-size: 1.3rem; }
+            .stat-value { font-size: 1.1rem; min-width: 30px; }
+            .stat-value.money { color: #d4a017; }
+            .stat-value.level { color: var(--grass-dark); }
+            .dark .stat-value.level { color: var(--grass-light); }
+
+            .level-badge { padding: 4px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 700; }
+            .level-badge.beginner { background: #81C784; color: #1B5E20; }
+            .level-badge.intermediate { background: #FFB74D; color: #E65100; }
+            .level-badge.advanced { background: #EF5350; color: #fff; }
+            .level-badge.master { background: linear-gradient(135deg, #9C27B0, #E91E63); color: #fff; }
+
+            .container { position: relative; z-index: 10; max-width: 1500px; margin: 0 auto; padding: 15px; display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+            @media (max-width: 1100px) { .container { grid-template-columns: 1fr; } }
+
+            .sidebar { display: flex; flex-direction: column; gap: 15px; }
+
+            .farm-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .section-title { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; margin-bottom: 15px; color: var(--wood-dark); }
+            .dark .section-title { color: var(--wood); }
+
+            .farm-field { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: linear-gradient(135deg, var(--soil-dark) 0%, var(--soil-light) 100%); padding: 15px; border-radius: 15px; border: 3px solid var(--wood-dark); box-shadow: inset 0 4px 20px rgba(0,0,0,0.3); }
+
+            .plot { aspect-ratio: 1; background: radial-gradient(circle at center, var(--soil-light) 0%, var(--soil-dark) 100%); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2.2rem; cursor: pointer; transition: all 0.3s ease; border: 2px dashed rgba(255,255,255,0.2); position: relative; overflow: hidden; gap: 2px; }
+            .plot:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+            .plot.empty { opacity: 0.5; }
+            .plot .plant-emoji { transition: all 0.4s ease; filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.3)); }
+            .plot .plant-state { font-size: 0.6rem; color: white; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 8px; text-transform: uppercase; font-weight: 600; }
+            .plot.watered { animation: water-splash 0.6s ease-out; }
+            @keyframes water-splash { 0% { box-shadow: 0 0 0 0 rgba(79,195,247,0.7); } 100% { box-shadow: 0 0 0 15px rgba(79,195,247,0); } }
+            .plot .water-drops { position: absolute; top: 0; font-size: 1rem; animation: drops-fall 0.8s ease-out forwards; }
+            @keyframes drops-fall { 0% { transform: translateY(-10px); opacity: 1; } 100% { transform: translateY(30px); opacity: 0; } }
+            .plot.growing .plant-emoji { animation: grow-pulse 0.6s ease-out; }
+            @keyframes grow-pulse { 0% { transform: scale(0.7); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+            .plot.dead .plant-emoji { filter: grayscale(1) brightness(0.5); transform: rotate(20deg); }
+            .plot.harvested { animation: harvest-pop 0.5s ease; }
+            @keyframes harvest-pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+            .resources-panel { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+            .resource { flex: 1; min-width: 80px; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 12px; text-align: center; border: 2px solid rgba(0,0,0,0.1); }
+            .dark .resource { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+            .resource-icon { font-size: 1.5rem; }
+            .resource-value { font-size: 1.2rem; font-weight: 700; }
+            .resource-label { font-size: 0.75rem; opacity: 0.7; }
+
+            .simulation-panel { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .sim-log { background: var(--code-bg); border-radius: 12px; padding: 12px; max-height: 150px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+            .sim-log-entry { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); animation: slide-in 0.2s ease; }
+            @keyframes slide-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+            .sim-log-entry .step { color: #888; min-width: 35px; }
+            .sim-log-entry .action { color: var(--water); }
+            .sim-log-entry .action.plant { color: var(--grass-light); }
+            .sim-log-entry .action.harvest { color: var(--gold); }
+            .sim-log-entry .action.wait { color: #888; }
+            .sim-log-entry .action.error { color: var(--error); }
+
+            .docs-panel { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .docs-content { background: rgba(0,0,0,0.03); border-radius: 12px; padding: 12px; font-size: 0.85rem; max-height: 200px; overflow-y: auto; }
+            .dark .docs-content { background: rgba(255,255,255,0.03); }
+            .docs-content code { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+            .dark .docs-content code { background: rgba(255,255,255,0.1); }
+            .docs-content h4 { margin: 10px 0 5px; color: var(--grass-dark); }
+            .dark .docs-content h4 { color: var(--grass-light); }
+            .docs-content ul { margin-left: 20px; margin-bottom: 10px; }
+
+            .main-content { display: flex; flex-direction: column; gap: 15px; }
+
+            .challenge-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .challenge-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+            .challenge-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+            .challenge-badge { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--warning) 0%, #F57C00 100%); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+            .difficulty-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+            .difficulty-badge.easy { background: #C8E6C9; color: #2E7D32; }
+            .difficulty-badge.medium { background: #FFE0B2; color: #E65100; }
+            .difficulty-badge.hard { background: #FFCDD2; color: #C62828; }
+            .difficulty-badge.expert { background: linear-gradient(135deg, #9C27B0, #E91E63); color: white; }
+            .challenge-reward { display: flex; align-items: center; gap: 5px; background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%); color: var(--text-dark); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+            .challenge-title { font-size: 1.3rem; margin-bottom: 10px; color: var(--wood-dark); }
+            .dark .challenge-title { color: var(--wood); }
+            .challenge-text { font-size: 1.05rem; line-height: 1.6; margin-bottom: 12px; }
+            .challenge-text code { background: rgba(0,0,0,0.08); padding: 2px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--grass-dark); }
+            .dark .challenge-text code { background: rgba(255,255,255,0.1); color: var(--grass-light); }
+
+            .concept-box { background: linear-gradient(135deg, rgba(156,39,176,0.1) 0%, rgba(233,30,99,0.1) 100%); border-left: 4px solid #9C27B0; padding: 12px 16px; border-radius: 0 12px 12px 0; margin-bottom: 12px; }
+            .concept-box h4 { font-size: 0.9rem; margin-bottom: 5px; color: #9C27B0; }
+            .concept-box p { font-size: 0.9rem; opacity: 0.9; }
+
+            .hint-box { background: linear-gradient(135deg, rgba(79,195,247,0.15) 0%, rgba(79,195,247,0.05) 100%); border-left: 4px solid var(--water); padding: 10px 14px; border-radius: 0 12px 12px 0; font-size: 0.9rem; display: flex; align-items: flex-start; gap: 10px; }
+            .hint-toggle { background: none; border: none; color: var(--water); cursor: pointer; font-family: inherit; font-size: 0.9rem; padding: 0; text-decoration: underline; }
+            .hint-content { display: none; }
+            .hint-content.visible { display: block; }
+
+            .editor-card { background: var(--card-bg); border-radius: 20px; padding: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); flex: 1; display: flex; flex-direction: column; }
+            .editor-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+            .editor-dot { width: 12px; height: 12px; border-radius: 50%; }
+            .editor-dot.red { background: #ff5f56; }
+            .editor-dot.yellow { background: #ffbd2e; }
+            .editor-dot.green { background: #27ca3f; }
+            .editor-title { margin-left: 8px; opacity: 0.6; font-size: 0.9rem; }
+
+            .code-editor { width: 100%; min-height: 220px; background: var(--code-bg); color: #cdd6f4; border: none; border-radius: 12px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 16px; line-height: 1.6; resize: vertical; outline: none; box-shadow: inset 0 4px 20px rgba(0,0,0,0.3); tab-size: 2; }
+            .code-editor:focus { box-shadow: inset 0 4px 20px rgba(0,0,0,0.3), 0 0 0 3px var(--grass-light); }
+
+            .button-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+            .btn { flex: 1; min-width: 100px; padding: 12px 20px; border: none; border-radius: 12px; font-family: 'Fredoka', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+            .btn-primary { background: linear-gradient(135deg, var(--grass-light) 0%, var(--grass-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(46,125,50,0.4); }
+            .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,125,50,0.5); }
+            .btn-secondary { background: linear-gradient(135deg, var(--wood) 0%, var(--wood-dark) 100%); color: white; box-shadow: 0 4px 15px rgba(109,76,65,0.3); }
+            .btn-secondary:hover { transform: translateY(-2px); }
+            .btn-outline { background: transparent; border: 2px solid var(--wood); color: var(--wood-dark); }
+            .dark .btn-outline { color: var(--wood); }
+            .btn-outline:hover { background: var(--wood); color: white; }
+            .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+            .output-console { margin-top: 12px; background: var(--code-bg); border-radius: 12px; padding: 12px 16px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; min-height: 70px; max-height: 150px; overflow-y: auto; box-shadow: inset 0 4px 15px rgba(0,0,0,0.3); }
+            .output-line { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; animation: fade-in 0.3s ease; }
+            @keyframes fade-in { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+            .output-line.success { color: var(--success); }
+            .output-line.error { color: var(--error); }
+            .output-line.info { color: var(--water); }
+            .output-line.warning { color: var(--warning); }
+            .output-line.neutral { color: #888; }
+
+            .progress-section { background: var(--card-bg); border-radius: 20px; padding: 15px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); border: 4px solid var(--wood-dark); }
+            .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.95rem; }
+            .progress-bar-container { background: rgba(0,0,0,0.1); border-radius: 12px; height: 20px; overflow: hidden; }
+            .dark .progress-bar-container { background: rgba(255,255,255,0.1); }
+            .progress-bar { height: 100%; background: linear-gradient(90deg, var(--grass-light) 0%, var(--success) 100%); border-radius: 12px; transition: width 0.5s ease; position: relative; }
+            .progress-bar::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); animation: shimmer 2s infinite; }
+            @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+            .level-select { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+            .level-btn { width: 36px; height: 36px; border-radius: 10px; border: 2px solid rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; position: relative; }
+            .dark .level-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--text-light); }
+            .level-btn:hover:not(:disabled) { transform: scale(1.1); }
+            .level-btn.completed { background: var(--success); color: white; border-color: var(--success); }
+            .level-btn.current { background: var(--warning); color: white; border-color: var(--warning); animation: pulse-current 2s infinite; }
+            @keyframes pulse-current { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,152,0,0.4); } 50% { box-shadow: 0 0 0 8px rgba(255,152,0,0); } }
+            .level-btn.locked { opacity: 0.4; cursor: not-allowed; }
+            .level-btn.locked::after { content: '🔒'; font-size: 0.6rem; position: absolute; bottom: -2px; right: -2px; }
+
+            .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 20px; }
+            .modal-overlay.active { opacity: 1; visibility: visible; }
+            .modal { background: var(--card-bg); border-radius: 25px; padding: 35px; max-width: 480px; width: 100%; text-align: center; transform: scale(0.8); transition: transform 0.3s ease; border: 5px solid var(--gold); box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+            .modal-overlay.active .modal { transform: scale(1); }
+            .modal-icon { font-size: 4.5rem; margin-bottom: 15px; animation: celebrate 0.6s ease; }
+            @keyframes celebrate { 0% { transform: scale(0) rotate(-180deg); } 50% { transform: scale(1.2) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+            .modal h2 { font-size: 1.8rem; margin-bottom: 10px; color: var(--grass-dark); }
+            .dark .modal h2 { color: var(--grass-light); }
+            .modal p { font-size: 1rem; margin-bottom: 20px; opacity: 0.9; }
+            .modal .reward-display { display: flex; justify-content: center; gap: 25px; margin-bottom: 20px; }
+            .reward-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+            .reward-item span:first-child { font-size: 2.2rem; }
+            .reward-item span:last-child { font-weight: 600; color: var(--gold); }
+            .unlock-badge { background: linear-gradient(135deg, #9C27B0, #E91E63); color: white; padding: 8px 20px; border-radius: 20px; margin-bottom: 20px; display: inline-block; font-weight: 600; }
+
+            footer { text-align: center; padding: 25px; color: var(--text-dark); opacity: 0.8; position: relative; z-index: 10; font-size: 0.95rem; }
+            .dark footer { color: var(--text-light); }
+
+            .confetti { position: fixed; pointer-events: none; z-index: 999; }
+            .confetti-piece { position: absolute; width: 10px; height: 10px; animation: confetti-fall 3s ease-out forwards; }
+            @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+            .btn-home { max-width: 250px; margin: 15px auto 5px; background: linear-gradient(135deg, var(--gold) 0%, #FFA000 100%); color: var(--text-dark); box-shadow: 0 4px 15px rgba(255,193,7,0.4); }
+            .btn-home:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 20px rgba(255,193,7,0.6); }
+
+            /* Save/Load Panel */
+            .save-panel {
+                background: var(--card-bg);
+                border-radius: 20px;
+                padding: 16px 20px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+                border: 4px solid var(--wood-dark);
+            }
+            .save-row {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            .btn-save {
+                flex: 1;
+                min-width: 110px;
+                padding: 10px 16px;
+                border: none;
+                border-radius: 12px;
+                font-family: 'Fredoka', sans-serif;
+                font-size: 0.9rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+            .btn-save:hover { transform: translateY(-2px); }
+            .btn-save.download {
+                background: linear-gradient(135deg, #42A5F5, #1565C0);
+                color: white;
+                box-shadow: 0 4px 15px rgba(21,101,192,0.3);
+            }
+            .btn-save.upload {
+                background: linear-gradient(135deg, #AB47BC, #7B1FA2);
+                color: white;
+                box-shadow: 0 4px 15px rgba(123,31,162,0.3);
+            }
+            .btn-save.reset-save {
+                background: linear-gradient(135deg, #EF5350, #C62828);
+                color: white;
+                box-shadow: 0 4px 15px rgba(198,40,40,0.3);
+            }
+            .save-status {
+                margin-top: 10px;
+                font-size: 0.8rem;
+                text-align: center;
+                opacity: 0.7;
+                min-height: 1.2em;
+                transition: opacity 0.3s;
+            }
+            .save-status.flash {
+                opacity: 1;
+                animation: flash-status 2s ease forwards;
+            }
+            @keyframes flash-status {
+                0% { opacity: 1; }
+                70% { opacity: 1; }
+                100% { opacity: 0.5; }
+            }
+
+            /* Confirm Dialog (replaces native confirm()) */
+            .confirm-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                padding: 20px;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.25s ease;
+            }
+            .confirm-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+            .confirm-dialog {
+                background: var(--card-bg);
+                border-radius: 20px;
+                padding: 28px;
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+                border: 4px solid var(--error);
+                box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+                transform: scale(0.85);
+                transition: transform 0.25s ease;
+            }
+            .confirm-overlay.active .confirm-dialog {
+                transform: scale(1);
+            }
+            .confirm-dialog h3 {
+                font-size: 1.3rem;
+                margin-bottom: 10px;
+            }
+            .confirm-dialog p {
+                font-size: 0.95rem;
+                margin-bottom: 20px;
+                opacity: 0.85;
+            }
+            .confirm-btns {
+                display: flex;
+                gap: 10px;
+            }
+            .confirm-btns button {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                border-radius: 12px;
+                font-family: 'Fredoka', sans-serif;
+                font-size: 0.95rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .confirm-btns .confirm-cancel {
+                background: rgba(0,0,0,0.08);
+                color: var(--text-dark);
+            }
+            .dark .confirm-btns .confirm-cancel {
+                background: rgba(255,255,255,0.1);
+                color: var(--text-light);
+            }
+            .confirm-btns .confirm-ok {
+                background: linear-gradient(135deg, #EF5350, #C62828);
+                color: white;
+            }
+            .confirm-btns button:hover { transform: translateY(-2px); }
+
+            /* Hidden file input */
+            #loadFileInput { display: none; }
+
+            @media (max-width: 600px) {
+                .logo h1 { font-size: 1.5rem; }
+                .logo { padding: 10px 20px; }
+                .farm-field { gap: 8px; padding: 12px; }
+                .plot { font-size: 1.8rem; }
+                .stats-bar { gap: 8px; }
+                .stat { padding: 8px 12px; font-size: 0.85rem; }
+                .code-editor { min-height: 180px; }
+                .btn { padding: 10px 16px; font-size: 0.9rem; }
+                .container { padding: 10px; gap: 15px; }
+                .celestial { font-size: 2.5rem; top: 15px; right: 15px; }
+                .challenge-title { font-size: 1.1rem; }
+                .challenge-text { font-size: 0.95rem; }
+                .level-btn { width: 32px; height: 32px; font-size: 0.8rem; }
+                .btn-save { min-width: 90px; font-size: 0.82rem; padding: 9px 12px; }
+            }
+
+            ::-webkit-scrollbar { width: 8px; height: 8px; }
+            ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+            ::-webkit-scrollbar-thumb { background: var(--wood); border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background: var(--wood-dark); }
         </style>
     </head>
     <body>
@@ -1363,12 +440,10 @@
             </div>
             <div class="stat">
                 <span class="stat-icon">⭐</span>
-                <span class="stat-value level">Nível <span
-                        id="level">1</span></span>
+                <span class="stat-value level">Nível <span id="level">1</span></span>
             </div>
             <div class="stat">
-                <span id="levelBadge"
-                    class="level-badge beginner">Iniciante</span>
+                <span id="levelBadge" class="level-badge beginner">Iniciante</span>
             </div>
             <div class="stat">
                 <span class="stat-icon">🏆</span>
@@ -1376,7 +451,19 @@
             </div>
         </div>
 
-        <button class="btn btn-home" onclick="window.location.href='/EstudAI/index.html'"><span>🏠</span> Tela Inicial</button>
+        <input type="file" id="loadFileInput" accept=".json,.codefarm">
+
+        <!-- Confirm Dialog -->
+        <div class="confirm-overlay" id="confirmOverlay">
+            <div class="confirm-dialog">
+                <h3 id="confirmTitle">⚠️ Tem certeza?</h3>
+                <p id="confirmMessage">Esta ação não pode ser desfeita.</p>
+                <div class="confirm-btns">
+                    <button class="confirm-cancel" id="confirmCancel">Cancelar</button>
+                    <button class="confirm-ok" id="confirmOk">Confirmar</button>
+                </div>
+            </div>
+        </div>
 
         <main class="container">
             <!-- Sidebar -->
@@ -1385,27 +472,40 @@
                 <div class="farm-card">
                     <h2 class="section-title">🌻 Sua Fazenda</h2>
                     <div class="farm-field" id="farmField"></div>
-
                     <div class="resources-panel">
                         <div class="resource">
                             <div class="resource-icon">💧</div>
-                            <div class="resource-value"
-                                id="waterResource">∞</div>
+                            <div class="resource-value" id="waterResource">∞</div>
                             <div class="resource-label">Água</div>
                         </div>
                         <div class="resource">
                             <div class="resource-icon">🌱</div>
-                            <div class="resource-value"
-                                id="seedsResource">∞</div>
+                            <div class="resource-value" id="seedsResource">∞</div>
                             <div class="resource-label">Sementes</div>
                         </div>
                         <div class="resource">
                             <div class="resource-icon">⏱️</div>
-                            <div class="resource-value"
-                                id="cyclesResource">-</div>
+                            <div class="resource-value" id="cyclesResource">-</div>
                             <div class="resource-label">Ciclos</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Save/Load Panel -->
+                <div class="save-panel">
+                    <h2 class="section-title">💾 Salvar Progresso</h2>
+                    <div class="save-row">
+                        <button class="btn-save download" id="btnSaveFile" title="Baixar arquivo de save">
+                            <span>⬇️</span> Salvar
+                        </button>
+                        <button class="btn-save upload" id="btnLoadFile" title="Carregar arquivo de save">
+                            <span>⬆️</span> Carregar
+                        </button>
+                        <button class="btn-save reset-save" id="btnResetSave" title="Resetar todo o progresso">
+                            <span>🗑️</span> Resetar
+                        </button>
+                    </div>
+                    <div class="save-status" id="saveStatus">Use os botões para salvar/carregar</div>
                 </div>
 
                 <!-- Simulation Log -->
@@ -1431,7 +531,6 @@
                             <li><code>"seca"</code> - Precisa de água</li>
                             <li><code>"pronta"</code> - Pode colher!</li>
                         </ul>
-
                         <h4>Funções Disponíveis</h4>
                         <ul>
                             <li><code>plantar()</code> - Planta semente</li>
@@ -1451,8 +550,7 @@
                         <span id="xpDisplay">0 / 100 XP</span>
                     </div>
                     <div class="progress-bar-container">
-                        <div class="progress-bar" id="progressBar"
-                            style="width: 0%"></div>
+                        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
                     </div>
                     <div class="level-select" id="levelSelect"></div>
                 </div>
@@ -1463,40 +561,29 @@
                         <div class="challenge-meta">
                             <div class="challenge-badge">
                                 <span>📝</span>
-                                <span>Nível <span
-                                        id="challengeNumber">1</span></span>
+                                <span>Nível <span id="challengeNumber">1</span></span>
                             </div>
-                            <div id="difficultyBadge"
-                                class="difficulty-badge easy">Fácil</div>
+                            <div id="difficultyBadge" class="difficulty-badge easy">Fácil</div>
                         </div>
                         <div class="challenge-reward">
                             <span>🏅</span>
                             <span>+<span id="challengeReward">20</span></span>
                         </div>
                     </div>
-
-                    <h3 class="challenge-title" id="challengeTitle">Plantando
-                        sua primeira semente</h3>
-
+                    <h3 class="challenge-title" id="challengeTitle">Plantando sua primeira semente</h3>
                     <p class="challenge-text" id="challengeText">
-                        Crie uma função <code>plantar()</code> que retorne
-                        <code>"semente"</code>.
+                        Crie uma função <code>plantar()</code> que retorne <code>"semente"</code>.
                     </p>
-
                     <div class="concept-box" id="conceptBox">
                         <h4>🧠 Conceito: Funções</h4>
-                        <p id="conceptText">Funções são blocos de código que
-                            executam tarefas específicas.</p>
+                        <p id="conceptText">Funções são blocos de código que executam tarefas específicas.</p>
                     </div>
-
                     <div class="hint-box">
                         <span>💡</span>
                         <div>
-                            <button class="hint-toggle" id="hintToggle">Ver
-                                dica</button>
+                            <button class="hint-toggle" id="hintToggle">Ver dica</button>
                             <div class="hint-content" id="hintContent">
-                                Use <code>return "semente"</code> dentro da
-                                função!
+                                Use <code>return "semente"</code> dentro da função!
                             </div>
                         </div>
                     </div>
@@ -1510,14 +597,11 @@
                         <div class="editor-dot green"></div>
                         <span class="editor-title">solução.js</span>
                     </div>
+                    <textarea class="code-editor" id="codeEditor" spellcheck="false">// 🌱 Seu código aqui!
+function plantar() {
 
-                    <textarea class="code-editor" id="codeEditor"
-                        spellcheck="false">// 🌱 Seu código aqui!
-                            function plantar() {
-
-                            }
-                    </textarea>
-
+}
+</textarea>
                     <div class="button-row">
                         <button class="btn btn-primary" id="runCode">
                             <span>▶️</span> Executar
@@ -1526,7 +610,6 @@
                             <span>🔄</span> Resetar
                         </button>
                     </div>
-
                     <div class="output-console" id="output">
                         <div class="output-line neutral">
                             <span>⏳</span>
@@ -1538,18 +621,16 @@
         </main>
 
         <footer>
-            <p>🌾 <strong>CodeFarm</strong> — Aprenda JavaScript cultivando! Use
-                <kbd>Ctrl</kbd>+<kbd>Enter</kbd> para executar.</p>
+            <p>🌾 <strong>CodeFarm</strong> — Aprenda JavaScript cultivando! Use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> para executar.</p>
         </footer>
 
-        <!-- Modal -->
+        <!-- Success Modal -->
         <div class="modal-overlay" id="successModal">
             <div class="modal">
                 <div class="modal-icon" id="modalIcon">🎉</div>
                 <h2 id="modalTitle">Parabéns!</h2>
                 <p id="modalText">Você completou o desafio!</p>
-                <div id="unlockBadge" class="unlock-badge"
-                    style="display: none;">🔓 Novo conceito desbloqueado!</div>
+                <div id="unlockBadge" class="unlock-badge" style="display: none;">🔓 Novo conceito desbloqueado!</div>
                 <div class="reward-display">
                     <div class="reward-item">
                         <span>💰</span>
@@ -1560,21 +641,74 @@
                         <span id="modalXP">+25 XP</span>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="nextChallenge"
-                    style="width: 100%;">
+                <button class="btn btn-primary" id="nextChallenge" style="width: 100%;">
                     <span>➡️</span> Próximo Nível
                 </button>
             </div>
         </div>
 
         <script>
-            // Dark mode
+        // Dark mode detection
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             document.documentElement.classList.toggle('dark', e.matches);
         });
+
+        // ==================== STORAGE HELPER ====================
+        // In-memory save cache (persists during session, lost on reload)
+        // Primary persistence is via file download/upload
+        const StorageHelper = {
+            _memoryCache: null,
+
+            save(data) {
+                this._memoryCache = JSON.parse(JSON.stringify(data));
+                return true;
+            },
+
+            load() {
+                return this._memoryCache;
+            },
+
+            clear() {
+                this._memoryCache = null;
+            },
+
+            exportToFile(data) {
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const dateStr = new Date().toISOString().slice(0, 10);
+                a.download = 'codefarm_save_' + dateStr + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            importFromFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (data && typeof data.money === 'number' && typeof data.level === 'number') {
+                                resolve(data);
+                            } else {
+                                reject(new Error('Arquivo de save inválido.'));
+                            }
+                        } catch (err) {
+                            reject(new Error('Não foi possível ler o arquivo.'));
+                        }
+                    };
+                    reader.onerror = () => reject(new Error('Erro ao ler arquivo.'));
+                    reader.readAsText(file);
+                });
+            }
+        };
 
         // ==================== GAME STATE ====================
         const gameState = {
@@ -1594,9 +728,52 @@
             }
         };
 
+        // ==================== SERIALIZE / DESERIALIZE ====================
+        function serializeGameState() {
+            return {
+                version: 1,
+                money: gameState.money,
+                level: gameState.level,
+                xp: gameState.xp,
+                xpToNextLevel: gameState.xpToNextLevel,
+                currentChallenge: gameState.currentChallenge,
+                completedChallenges: Array.from(gameState.completedChallenges),
+                plants: gameState.simulation.plants.map(p => p ? { state: p.state, emoji: p.emoji } : null),
+                savedAt: new Date().toISOString()
+            };
+        }
+
+        function deserializeGameState(data) {
+            if (!data || typeof data.money !== 'number') return false;
+            gameState.money = data.money || 0;
+            gameState.level = data.level || 1;
+            gameState.xp = data.xp || 0;
+            gameState.xpToNextLevel = data.xpToNextLevel || 100;
+            gameState.currentChallenge = data.currentChallenge || 0;
+            gameState.completedChallenges = new Set(data.completedChallenges || []);
+            // Restore plants
+            if (Array.isArray(data.plants)) {
+                gameState.simulation.plants = data.plants.map(p => p ? { state: p.state, emoji: p.emoji } : null);
+            }
+            return true;
+        }
+
+        function autoSave() {
+            const saved = StorageHelper.save(serializeGameState());
+            showSaveStatus('💾 Progresso salvo na sessão!');
+        }
+
+        function showSaveStatus(msg) {
+            const el = document.getElementById('saveStatus');
+            el.textContent = msg;
+            el.classList.remove('flash');
+            // Force reflow
+            void el.offsetWidth;
+            el.classList.add('flash');
+        }
+
         // ==================== CHALLENGES ====================
         const challenges = [
-            // LEVEL 1 - Básico: Primeira função
             {
                 id: 1,
                 title: "Plantando sua primeira semente",
@@ -1609,16 +786,11 @@
                     try {
                         const fn = new Function(code + '\nreturn plantar();');
                         return fn() === 'semente';
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
-                onSuccess: (sim) => {
-                    sim.addPlant(0, 'semente');
-                },
-                reward: 20,
-                xp: 25
+                onSuccess: (sim) => { sim.addPlant(0, 'semente'); },
+                reward: 20, xp: 25
             },
-
-            // LEVEL 2 - Básico: Condição simples
             {
                 id: 2,
                 title: "Regando com cuidado",
@@ -1631,17 +803,11 @@
                     try {
                         const fn = new Function(code + '\nreturn regar(10) === true && regar(3) === false && regar(5) === false;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
-                onSuccess: (sim) => {
-                    sim.waterPlant(0);
-                    sim.growPlant(0, 'crescendo');
-                },
-                reward: 25,
-                xp: 30
+                onSuccess: (sim) => { sim.waterPlant(0); sim.growPlant(0, 'crescendo'); },
+                reward: 25, xp: 30
             },
-
-            // LEVEL 3 - Básico: Múltiplos retornos
             {
                 id: 3,
                 title: "Estágios de crescimento",
@@ -1654,16 +820,11 @@
                     try {
                         const fn = new Function(code + '\nreturn crescer(1)==="🌱" && crescer(2)==="🌱" && crescer(3)==="🌿" && crescer(5)==="🌿" && crescer(6)==="🌻" && crescer(10)==="🌻";');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
-                onSuccess: (sim) => {
-                    sim.growPlant(0, 'pronta', '🌻');
-                },
-                reward: 30,
-                xp: 35
+                onSuccess: (sim) => { sim.growPlant(0, 'pronta', '🌻'); },
+                reward: 30, xp: 35
             },
-
-            // LEVEL 4 - Intermediário: Condições encadeadas (AND/OR)
             {
                 id: 4,
                 title: "Condições combinadas",
@@ -1674,26 +835,13 @@
                 template: '// 🔗 Combine condições com &&\nfunction podeRegar(agua, planta) {\n  // Retorne true se água > 0 E planta não está pronta\n  \n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const t1 = podeRegar(5, {estado: "crescendo"}) === true;
-                    const t2 = podeRegar(0, {estado: "crescendo"}) === false;
-                    const t3 = podeRegar(5, {estado: "pronta"}) === false;
-                    const t4 = podeRegar(0, {estado: "pronta"}) === false;
-                    return t1 && t2 && t3 && t4;
-                    `);
+                        const fn = new Function(code + '\nconst t1 = podeRegar(5, {estado: "crescendo"}) === true;\nconst t2 = podeRegar(0, {estado: "crescendo"}) === false;\nconst t3 = podeRegar(5, {estado: "pronta"}) === false;\nconst t4 = podeRegar(0, {estado: "pronta"}) === false;\nreturn t1 && t2 && t3 && t4;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
-                onSuccess: (sim) => {
-                    sim.addPlant(1, 'semente');
-                    sim.growPlant(1, 'crescendo', '🌿');
-                },
-                reward: 40,
-                xp: 45,
-                unlockConcept: "Operadores Lógicos"
+                onSuccess: (sim) => { sim.addPlant(1, 'semente'); sim.growPlant(1, 'crescendo', '🌿'); },
+                reward: 40, xp: 45, unlockConcept: "Operadores Lógicos"
             },
-
-            // LEVEL 5 - Intermediário: Estados e decisões
             {
                 id: 5,
                 title: "Máquina de estados",
@@ -1704,27 +852,17 @@
                 template: '// 🔄 Decida baseado no estado\nfunction cuidar(planta) {\n  // Analise planta.estado e retorne a ação\n  \n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const t1 = cuidar({estado: "seca"}) === "regar";
-                    const t2 = cuidar({estado: "crescendo"}) === "esperar";
-                    const t3 = cuidar({estado: "pronta"}) === "colher";
-                    const t4 = cuidar({estado: "vazia"}) === "plantar";
-                    return t1 && t2 && t3 && t4;
-                    `);
+                        const fn = new Function(code + '\nconst t1 = cuidar({estado: "seca"}) === "regar";\nconst t2 = cuidar({estado: "crescendo"}) === "esperar";\nconst t3 = cuidar({estado: "pronta"}) === "colher";\nconst t4 = cuidar({estado: "vazia"}) === "plantar";\nreturn t1 && t2 && t3 && t4;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
                     sim.addPlant(2, 'seca', '🥀');
                     setTimeout(() => sim.waterPlant(2), 300);
                     setTimeout(() => sim.growPlant(2, 'crescendo', '🌿'), 600);
                 },
-                reward: 50,
-                xp: 55,
-                unlockConcept: "Máquina de Estados"
+                reward: 50, xp: 55, unlockConcept: "Máquina de Estados"
             },
-
-            // LEVEL 6 - Intermediário: Função com objeto
             {
                 id: 6,
                 title: "Tomando decisões complexas",
@@ -1735,26 +873,17 @@
                 template: '// 🎯 Decisões com múltiplos fatores\nfunction decidir(planta) {\n  // Use planta.estado e planta.diasSemAgua\n  \n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const t1 = decidir({estado: "seca", diasSemAgua: 1}) === "regar";
-                    const t2 = decidir({estado: "crescendo", diasSemAgua: 3}) === "regar";
-                    const t3 = decidir({estado: "pronta", diasSemAgua: 0}) === "colher";
-                    const t4 = decidir({estado: "crescendo", diasSemAgua: 1}) === "esperar";
-                    return t1 && t2 && t3 && t4;
-                    `);
+                        const fn = new Function(code + '\nconst t1 = decidir({estado: "seca", diasSemAgua: 1}) === "regar";\nconst t2 = decidir({estado: "crescendo", diasSemAgua: 3}) === "regar";\nconst t3 = decidir({estado: "pronta", diasSemAgua: 0}) === "colher";\nconst t4 = decidir({estado: "crescendo", diasSemAgua: 1}) === "esperar";\nreturn t1 && t2 && t3 && t4;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
                     for (let i = 0; i < 3; i++) {
                         setTimeout(() => sim.growPlant(i, 'pronta', '🌻'), i * 200);
                     }
                 },
-                reward: 60,
-                xp: 65
+                reward: 60, xp: 65
             },
-
-            // LEVEL 7 - Avançado: Loop while
             {
                 id: 7,
                 title: "Loop até ficar pronta",
@@ -1766,40 +895,24 @@
                 template: '// 🔁 Use while para repetir\nfunction regarAtePronta(planta) {\n  let vezesRegada = 0;\n  \n  // Use while para regar até planta.estado === "pronta"\n  // Chame planta.regar() para regar\n  \n  return vezesRegada;\n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    let regas = 0;
-                    const planta = {
-                        estado: "seca",
-                        regar() {
-                        regas++;
-                        if (regas >= 3) this.estado = "pronta";
-                        else this.estado = "crescendo";
-                        }
-                    };
-                    const result = regarAtePronta(planta);
-                    return result === 3 && planta.estado === "pronta";
-                    `);
+                        const fn = new Function(code + '\nlet regas = 0;\nconst planta = {\n  estado: "seca",\n  regar() {\n    regas++;\n    if (regas >= 3) this.estado = "pronta";\n    else this.estado = "crescendo";\n  }\n};\nconst result = regarAtePronta(planta);\nreturn result === 3 && planta.estado === "pronta";');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
                     sim.log('Iniciando loop...', 'info');
                     let delay = 0;
                     for (let i = 0; i < 3; i++) {
                         setTimeout(() => {
-                            sim.log(`Rega ${i + 1}: 💧`, 'water');
+                            sim.log('Rega ' + (i + 1) + ': 💧', 'water');
                             sim.waterPlant(3 + i % 3);
                         }, delay);
                         delay += 400;
                     }
                     setTimeout(() => sim.log('Loop completo! ✅', 'success'), delay);
                 },
-                reward: 80,
-                xp: 85,
-                unlockConcept: "Loops"
+                reward: 80, xp: 85, unlockConcept: "Loops"
             },
-
-            // LEVEL 8 - Avançado: For com limite
             {
                 id: 8,
                 title: "Recursos limitados",
@@ -1811,36 +924,24 @@
                 template: '// 💧 Gerencie recursos com for\nfunction regarComLimite(plantas) {\n  let aguaUsada = 0;\n  const limiteAgua = 5;\n  let plantasRegadas = 0;\n  \n  // Percorra as plantas e regue as secas\n  // Pare quando a água acabar!\n  \n  return plantasRegadas;\n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const plantas = [
-                        {estado: "seca"}, {estado: "crescendo"}, {estado: "seca"},
-                        {estado: "seca"}, {estado: "pronta"}, {estado: "seca"},
-                        {estado: "seca"}, {estado: "seca"}
-                    ];
-                    const result = regarComLimite(plantas);
-                    return result === 5;
-                    `);
+                        const fn = new Function(code + '\nconst plantas = [\n  {estado: "seca"}, {estado: "crescendo"}, {estado: "seca"},\n  {estado: "seca"}, {estado: "pronta"}, {estado: "seca"},\n  {estado: "seca"}, {estado: "seca"}\n];\nconst result = regarComLimite(plantas);\nreturn result === 5;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
                     sim.setResource('water', 5);
                     let delay = 0;
                     for (let i = 0; i < 5; i++) {
                         setTimeout(() => {
-                            sim.log(`Água ${5 - i} restante`, 'water');
+                            sim.log('Água ' + (5 - i) + ' restante', 'water');
                             sim.waterPlant(i);
                             sim.setResource('water', 4 - i);
                         }, delay);
                         delay += 300;
                     }
                 },
-                reward: 100,
-                xp: 100,
-                unlockConcept: "Gerenciamento de Recursos"
+                reward: 100, xp: 100, unlockConcept: "Gerenciamento de Recursos"
             },
-
-            // LEVEL 9 - Expert: Estratégia
             {
                 id: 9,
                 title: "Maximizando lucros",
@@ -1852,29 +953,18 @@
                 template: '// 🎮 Simule a fazenda!\nfunction maximizarLucro(plantas, ciclos) {\n  let lucro = 0;\n  \n  // Para cada ciclo\n  //   Para cada planta\n  //     Atualize o estado e some lucro se colher\n  \n  return lucro;\n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const plantas = [
-                        {estado: "semente"}, {estado: "crescendo"}, {estado: "pronta"}
-                    ];
-                    const result = maximizarLucro(plantas, 3);
-                    // Ciclo 1: pronta->colhe(10), crescendo->pronta, semente->crescendo
-                    // Ciclo 2: vazia->semente, pronta->colhe(10), crescendo->pronta
-                    // Ciclo 3: semente->crescendo, vazia->semente, pronta->colhe(10)
-                    // Total: 30
-                    return result === 30;
-                    `);
+                        const fn = new Function(code + '\nconst plantas = [\n  {estado: "semente"}, {estado: "crescendo"}, {estado: "pronta"}\n];\nconst result = maximizarLucro(plantas, 3);\nreturn result === 30;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
                     sim.setResource('cycles', 3);
                     const states = ['semente', 'crescendo', 'pronta'];
                     const emojis = ['🌱', '🌿', '🌻'];
                     let delay = 0;
-
                     for (let c = 0; c < 3; c++) {
                         setTimeout(() => {
-                            sim.log(`── Ciclo ${c + 1} ──`, 'info');
+                            sim.log('── Ciclo ' + (c + 1) + ' ──', 'info');
                             for (let i = 0; i < 3; i++) {
                                 const idx = (c + i) % 3;
                                 sim.growPlant(i, states[idx], emojis[idx]);
@@ -1885,12 +975,8 @@
                     }
                     setTimeout(() => sim.log('💰 Lucro: 30 moedas!', 'success'), delay);
                 },
-                reward: 150,
-                xp: 150,
-                unlockConcept: "Pensamento Algorítmico"
+                reward: 150, xp: 150, unlockConcept: "Pensamento Algorítmico"
             },
-
-            // LEVEL 10 - Master: O teste final
             {
                 id: 10,
                 title: "O Fazendeiro Autônomo",
@@ -1901,46 +987,20 @@
                 template: '// 🏆 O DESAFIO FINAL\n// Sem template. Sem ajuda. Você consegue!\n\nfunction gerenciarFazenda(fazenda) {\n  // fazenda.plantas = array de {estado: "..."}\n  // fazenda.agua = número\n  // fazenda.dinheiro = número\n  \n  // Retorne: { plantadas, regadas, colhidas, lucroTotal }\n  \n}',
                 validate: (code) => {
                     try {
-                        const fn = new Function(code + `
-                    const fazenda = {
-                        plantas: [
-                        {estado: "vazia"}, {estado: "seca"}, {estado: "pronta"},
-                        {estado: "crescendo"}, {estado: "pronta"}, {estado: "vazia"}
-                        ],
-                        agua: 5,
-                        dinheiro: 20
-                    };
-                    const result = gerenciarFazenda(fazenda);
-
-                    // Esperado: 2 vazias plantadas (-10), 1 seca regada (-1 água), 2 prontas colhidas (+30)
-                    // Lucro: 30 - 10 = 20
-                    const valid = result &&
-                        typeof result.plantadas === 'number' &&
-                        typeof result.regadas === 'number' &&
-                        typeof result.colhidas === 'number' &&
-                        typeof result.lucroTotal === 'number' &&
-                        result.plantadas === 2 &&
-                        result.regadas === 1 &&
-                        result.colhidas === 2 &&
-                        result.lucroTotal === 20;
-
-                    return valid;
-                    `);
+                        const fn = new Function(code + '\nconst fazenda = {\n  plantas: [\n    {estado: "vazia"}, {estado: "seca"}, {estado: "pronta"},\n    {estado: "crescendo"}, {estado: "pronta"}, {estado: "vazia"}\n  ],\n  agua: 5,\n  dinheiro: 20\n};\nconst result = gerenciarFazenda(fazenda);\nconst valid = result &&\n  typeof result.plantadas === "number" &&\n  typeof result.regadas === "number" &&\n  typeof result.colhidas === "number" &&\n  typeof result.lucroTotal === "number" &&\n  result.plantadas === 2 &&\n  result.regadas === 1 &&\n  result.colhidas === 2 &&\n  result.lucroTotal === 20;\nreturn valid;');
                         return fn();
-                    } catch { return false; }
+                    } catch (e) { return false; }
                 },
                 onSuccess: (sim) => {
-                    // Celebração épica
                     sim.log('🏆 FAZENDA AUTOMATIZADA! 🏆', 'success');
+                    var finalEmojis = ['🌻', '🌹', '🌷', '🌺', '🌸', '💐'];
                     for (let i = 0; i < 6; i++) {
                         setTimeout(() => {
-                            sim.growPlant(i, 'pronta', ['🌻', '🌹', '🌷', '🌺', '🌸', '💐'][i]);
+                            sim.growPlant(i, 'pronta', finalEmojis[i]);
                         }, i * 150);
                     }
                 },
-                reward: 500,
-                xp: 500,
-                isFinal: true
+                reward: 500, xp: 500, isFinal: true
             }
         ];
 
@@ -1958,49 +1018,74 @@
             hintToggle: document.getElementById('hintToggle'),
             hintContent: document.getElementById('hintContent'),
             levelSelect: document.getElementById('levelSelect'),
-            docsContent: document.getElementById('docsContent')
+            docsContent: document.getElementById('docsContent'),
+            btnSaveFile: document.getElementById('btnSaveFile'),
+            btnLoadFile: document.getElementById('btnLoadFile'),
+            btnResetSave: document.getElementById('btnResetSave'),
+            loadFileInput: document.getElementById('loadFileInput'),
+            confirmOverlay: document.getElementById('confirmOverlay'),
+            confirmTitle: document.getElementById('confirmTitle'),
+            confirmMessage: document.getElementById('confirmMessage'),
+            confirmCancel: document.getElementById('confirmCancel'),
+            confirmOk: document.getElementById('confirmOk')
         };
+
+        // ==================== CUSTOM CONFIRM DIALOG ====================
+        function showConfirmDialog(title, message, onConfirm) {
+            elements.confirmTitle.textContent = title;
+            elements.confirmMessage.textContent = message;
+            elements.confirmOverlay.classList.add('active');
+
+            function cleanup() {
+                elements.confirmOverlay.classList.remove('active');
+                elements.confirmOk.removeEventListener('click', handleOk);
+                elements.confirmCancel.removeEventListener('click', handleCancel);
+            }
+            function handleOk() { cleanup(); onConfirm(); }
+            function handleCancel() { cleanup(); }
+
+            elements.confirmOk.addEventListener('click', handleOk);
+            elements.confirmCancel.addEventListener('click', handleCancel);
+        }
 
         // ==================== SIMULATION ENGINE ====================
         const simulation = {
-            addPlant(index, state, emoji = '🌱') {
-                const plot = elements.farmField.children[index];
+            addPlant(index, state, emoji) {
+                emoji = emoji || '🌱';
+                var plot = elements.farmField.children[index];
                 if (!plot) return;
                 plot.classList.remove('empty', 'dead');
                 plot.classList.add('growing');
-                const plantEmoji = plot.querySelector('.plant-emoji');
-                const plantState = plot.querySelector('.plant-state');
+                var plantEmoji = plot.querySelector('.plant-emoji');
+                var plantState = plot.querySelector('.plant-state');
                 plantEmoji.textContent = emoji;
                 plantState.textContent = state;
-                gameState.simulation.plants[index] = { state, emoji };
+                gameState.simulation.plants[index] = { state: state, emoji: emoji };
                 setTimeout(() => plot.classList.remove('growing'), 600);
-                this.log(`Plantou ${emoji} no slot ${index + 1}`, 'plant');
+                this.log('Plantou ' + emoji + ' no slot ' + (index + 1), 'plant');
             },
 
             waterPlant(index) {
-                const plot = elements.farmField.children[index];
+                var plot = elements.farmField.children[index];
                 if (!plot) return;
                 plot.classList.add('watered');
-
-                const drops = document.createElement('div');
+                var drops = document.createElement('div');
                 drops.className = 'water-drops';
                 drops.textContent = '💧💧💧';
                 plot.appendChild(drops);
-
                 setTimeout(() => {
                     plot.classList.remove('watered');
                     if (drops.parentNode) drops.remove();
                 }, 800);
-
-                this.log(`Regou slot ${index + 1} 💧`, 'water');
+                this.log('Regou slot ' + (index + 1) + ' 💧', 'water');
             },
 
             growPlant(index, state, emoji) {
-                const plot = elements.farmField.children[index];
+                var plot = elements.farmField.children[index];
                 if (!plot) return;
                 plot.classList.add('growing');
-                const plantEmoji = plot.querySelector('.plant-emoji');
-                const plantState = plot.querySelector('.plant-state');
+                var plantEmoji = plot.querySelector('.plant-emoji');
+                var plantState = plot.querySelector('.plant-state');
                 if (emoji) plantEmoji.textContent = emoji;
                 plantState.textContent = state;
                 if (gameState.simulation.plants[index]) {
@@ -2011,33 +1096,34 @@
             },
 
             harvestPlant(index) {
-                const plot = elements.farmField.children[index];
+                var plot = elements.farmField.children[index];
                 if (!plot) return;
                 plot.classList.add('harvested');
                 setTimeout(() => {
                     plot.classList.remove('harvested');
                     plot.classList.add('empty');
-                    const plantEmoji = plot.querySelector('.plant-emoji');
-                    const plantState = plot.querySelector('.plant-state');
+                    var plantEmoji = plot.querySelector('.plant-emoji');
+                    var plantState = plot.querySelector('.plant-state');
                     plantEmoji.textContent = '';
                     plantState.textContent = '';
                     gameState.simulation.plants[index] = null;
                 }, 500);
-                this.log(`Colheu do slot ${index + 1} 🧺`, 'harvest');
+                this.log('Colheu do slot ' + (index + 1) + ' 🧺', 'harvest');
             },
 
             killPlant(index) {
-                const plot = elements.farmField.children[index];
+                var plot = elements.farmField.children[index];
                 if (!plot) return;
                 plot.classList.add('dead');
-                this.log(`Planta ${index + 1} morreu! 💀`, 'error');
+                this.log('Planta ' + (index + 1) + ' morreu! 💀', 'error');
             },
 
-            log(message, type = 'info') {
-                const entry = document.createElement('div');
+            log(message, type) {
+                type = type || 'info';
+                var entry = document.createElement('div');
                 entry.className = 'sim-log-entry';
-                const step = elements.simLog.children.length;
-                entry.innerHTML = `<span class="step">[${step}]</span><span class="action ${type}">${message}</span>`;
+                var step = elements.simLog.children.length;
+                entry.innerHTML = '<span class="step">[' + step + ']</span><span class="action ' + type + '">' + message + '</span>';
                 elements.simLog.appendChild(entry);
                 elements.simLog.scrollTop = elements.simLog.scrollHeight;
             },
@@ -2047,7 +1133,7 @@
             },
 
             setResource(type, value) {
-                const el = document.getElementById(`${type}Resource`);
+                var el = document.getElementById(type + 'Resource');
                 if (el) el.textContent = value === Infinity ? '∞' : value;
             },
 
@@ -2061,8 +1147,8 @@
         // ==================== FARM INITIALIZATION ====================
         function initFarm() {
             elements.farmField.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const plot = document.createElement('div');
+            for (var i = 0; i < 9; i++) {
+                var plot = document.createElement('div');
                 plot.className = 'plot empty';
                 plot.dataset.index = i;
                 plot.innerHTML = '<span class="plant-emoji"></span><span class="plant-state"></span>';
@@ -2070,16 +1156,33 @@
             }
         }
 
+        // Restore farm visuals from saved plant data
+        function restoreFarmVisuals() {
+            var plants = gameState.simulation.plants;
+            if (!plants || plants.length === 0) return;
+            for (var i = 0; i < plants.length && i < 9; i++) {
+                var p = plants[i];
+                if (p && p.emoji) {
+                    var plot = elements.farmField.children[i];
+                    if (!plot) continue;
+                    plot.classList.remove('empty');
+                    var plantEmoji = plot.querySelector('.plant-emoji');
+                    var plantState = plot.querySelector('.plant-state');
+                    plantEmoji.textContent = p.emoji;
+                    plantState.textContent = p.state || '';
+                }
+            }
+        }
+
         // ==================== UI UPDATES ====================
         function updateUI() {
             document.getElementById('money').textContent = gameState.money;
             document.getElementById('level').textContent = gameState.level;
-            document.getElementById('completedCount').textContent = `${gameState.completedChallenges.size}/${challenges.length}`;
-            document.getElementById('xpDisplay').textContent = `${gameState.xp} / ${gameState.xpToNextLevel} XP`;
-            document.getElementById('progressBar').style.width = `${(gameState.xp / gameState.xpToNextLevel) * 100}%`;
+            document.getElementById('completedCount').textContent = gameState.completedChallenges.size + '/' + challenges.length;
+            document.getElementById('xpDisplay').textContent = gameState.xp + ' / ' + gameState.xpToNextLevel + ' XP';
+            document.getElementById('progressBar').style.width = ((gameState.xp / gameState.xpToNextLevel) * 100) + '%';
 
-            // Level badge
-            const badge = document.getElementById('levelBadge');
+            var badge = document.getElementById('levelBadge');
             if (gameState.level <= 3) {
                 badge.textContent = 'Iniciante';
                 badge.className = 'level-badge beginner';
@@ -2093,17 +1196,15 @@
                 badge.textContent = 'Mestre';
                 badge.className = 'level-badge master';
             }
-
             updateLevelSelect();
         }
 
         function updateLevelSelect() {
             elements.levelSelect.innerHTML = '';
             challenges.forEach((c, i) => {
-                const btn = document.createElement('button');
+                var btn = document.createElement('button');
                 btn.className = 'level-btn';
                 btn.textContent = c.id;
-
                 if (gameState.completedChallenges.has(i)) {
                     btn.classList.add('completed');
                 } else if (i === gameState.currentChallenge) {
@@ -2112,14 +1213,12 @@
                     btn.classList.add('locked');
                     btn.disabled = true;
                 }
-
                 btn.addEventListener('click', () => {
                     if (!btn.disabled && !btn.classList.contains('locked')) {
                         gameState.currentChallenge = i;
                         loadChallenge(i);
                     }
                 });
-
                 elements.levelSelect.appendChild(btn);
             });
         }
@@ -2130,39 +1229,28 @@
                 showCompletionModal();
                 return;
             }
-
-            const challenge = challenges[index];
-
+            var challenge = challenges[index];
             document.getElementById('challengeNumber').textContent = challenge.id;
             document.getElementById('challengeTitle').textContent = challenge.title;
             document.getElementById('challengeText').innerHTML = challenge.text;
             document.getElementById('challengeReward').textContent = challenge.reward;
             elements.codeEditor.value = challenge.template;
 
-            // Difficulty badge
-            const diffBadge = document.getElementById('difficultyBadge');
-            diffBadge.className = `difficulty-badge ${challenge.difficulty}`;
-            diffBadge.textContent = { easy: 'Fácil', medium: 'Médio', hard: 'Difícil', expert: 'Expert' }[challenge.difficulty];
+            var diffBadge = document.getElementById('difficultyBadge');
+            diffBadge.className = 'difficulty-badge ' + challenge.difficulty;
+            var diffLabels = { easy: 'Fácil', medium: 'Médio', hard: 'Difícil', expert: 'Expert' };
+            diffBadge.textContent = diffLabels[challenge.difficulty];
 
-            // Concept box
-            const conceptBox = document.getElementById('conceptBox');
-            const conceptText = document.getElementById('conceptText');
-            document.querySelector('#conceptBox h4').textContent = `🧠 Conceito: ${challenge.concept.title}`;
-            conceptText.innerHTML = challenge.concept.text;
+            document.querySelector('#conceptBox h4').textContent = '🧠 Conceito: ' + challenge.concept.title;
+            document.getElementById('conceptText').innerHTML = challenge.concept.text;
 
-            // Hint
             elements.hintContent.innerHTML = challenge.hint;
             elements.hintContent.classList.remove('visible');
             elements.hintToggle.textContent = 'Ver dica';
 
-            // Resources
             if (challenge.resources) {
-                if (challenge.resources.water !== undefined) {
-                    simulation.setResource('water', challenge.resources.water);
-                }
-                if (challenge.resources.cycles !== undefined) {
-                    simulation.setResource('cycles', challenge.resources.cycles);
-                }
+                if (challenge.resources.water !== undefined) simulation.setResource('water', challenge.resources.water);
+                if (challenge.resources.cycles !== undefined) simulation.setResource('cycles', challenge.resources.cycles);
             } else {
                 simulation.setResource('water', '∞');
                 simulation.setResource('cycles', '-');
@@ -2174,11 +1262,12 @@
         }
 
         // ==================== OUTPUT ====================
-        function showOutput(message, type = 'neutral') {
-            const line = document.createElement('div');
-            line.className = `output-line ${type}`;
-            const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️', neutral: '📝' };
-            line.innerHTML = `<span>${icons[type]}</span><span>${message}</span>`;
+        function showOutput(message, type) {
+            type = type || 'neutral';
+            var line = document.createElement('div');
+            line.className = 'output-line ' + type;
+            var icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️', neutral: '📝' };
+            line.innerHTML = '<span>' + (icons[type] || '📝') + '</span><span>' + message + '</span>';
             elements.output.appendChild(line);
             elements.output.scrollTop = elements.output.scrollHeight;
         }
@@ -2190,8 +1279,8 @@
 
         // ==================== CODE EXECUTION ====================
         function runCode() {
-            const code = elements.codeEditor.value;
-            const challenge = challenges[gameState.currentChallenge];
+            var code = elements.codeEditor.value;
+            var challenge = challenges[gameState.currentChallenge];
 
             elements.output.innerHTML = '';
             simulation.clearLog();
@@ -2212,7 +1301,6 @@
                             gameState.xp += challenge.xp;
                             gameState.completedChallenges.add(gameState.currentChallenge);
 
-                            // Level up
                             while (gameState.xp >= gameState.xpToNextLevel) {
                                 gameState.xp -= gameState.xpToNextLevel;
                                 gameState.level++;
@@ -2220,39 +1308,39 @@
                             }
 
                             updateUI();
+                            autoSave(); // Auto-save on challenge completion
                             showSuccessModal(challenge);
                         }, 800);
                     } else {
                         showOutput('Hmm, não funcionou. Verifique a lógica!', 'error');
                         simulation.log('Erro na execução ❌', 'error');
 
-                        // Chance to kill a plant
-                        const activePlots = gameState.simulation.plants.filter(p => p).length;
+                        var activePlots = gameState.simulation.plants.filter(function(p) { return p; }).length;
                         if (activePlots > 0 && Math.random() > 0.6) {
-                            const plantedIndexes = gameState.simulation.plants.map((p, i) => p ? i : -1).filter(i => i >= 0);
+                            var plantedIndexes = gameState.simulation.plants.map(function(p, i) { return p ? i : -1; }).filter(function(i) { return i >= 0; });
                             if (plantedIndexes.length > 0) {
-                                const randomIdx = plantedIndexes[Math.floor(Math.random() * plantedIndexes.length)];
+                                var randomIdx = plantedIndexes[Math.floor(Math.random() * plantedIndexes.length)];
                                 simulation.killPlant(randomIdx);
                                 showOutput('💀 Uma planta morreu por código errado!', 'error');
                             }
                         }
                     }
                 } catch (error) {
-                    showOutput(`Erro de sintaxe: ${error.message}`, 'error');
-                    simulation.log(`Erro: ${error.message}`, 'error');
+                    showOutput('Erro de sintaxe: ' + error.message, 'error');
+                    simulation.log('Erro: ' + error.message, 'error');
                 }
             }, 300);
         }
 
         // ==================== MODALS ====================
         function showSuccessModal(challenge) {
-            document.getElementById('modalCoins').textContent = `+${challenge.reward}`;
-            document.getElementById('modalXP').textContent = `+${challenge.xp} XP`;
+            document.getElementById('modalCoins').textContent = '+' + challenge.reward;
+            document.getElementById('modalXP').textContent = '+' + challenge.xp + ' XP';
 
-            const unlockBadge = document.getElementById('unlockBadge');
+            var unlockBadge = document.getElementById('unlockBadge');
             if (challenge.unlockConcept) {
                 unlockBadge.style.display = 'inline-block';
-                unlockBadge.textContent = `🔓 Desbloqueado: ${challenge.unlockConcept}`;
+                unlockBadge.textContent = '🔓 Desbloqueado: ' + challenge.unlockConcept;
             } else {
                 unlockBadge.style.display = 'none';
             }
@@ -2289,13 +1377,12 @@
 
         // ==================== CONFETTI ====================
         function createConfetti() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8', '#a29bfe'];
-            const container = document.createElement('div');
+            var colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#fd79a8', '#a29bfe'];
+            var container = document.createElement('div');
             container.className = 'confetti';
             document.body.appendChild(container);
-
-            for (let i = 0; i < 60; i++) {
-                const piece = document.createElement('div');
+            for (var i = 0; i < 60; i++) {
+                var piece = document.createElement('div');
                 piece.className = 'confetti-piece';
                 piece.style.left = Math.random() * 100 + 'vw';
                 piece.style.background = colors[Math.floor(Math.random() * colors.length)];
@@ -2303,7 +1390,6 @@
                 piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
                 container.appendChild(piece);
             }
-
             setTimeout(() => container.remove(), 3500);
         }
 
@@ -2316,9 +1402,7 @@
 
         elements.nextChallengeBtn.addEventListener('click', () => {
             elements.successModal.classList.remove('active');
-
             if (challenges[gameState.currentChallenge].isFinal || gameState.currentChallenge >= challenges.length - 1) {
-                // Reset game
                 gameState.currentChallenge = 0;
                 gameState.completedChallenges.clear();
                 gameState.money = 0;
@@ -2326,15 +1410,16 @@
                 gameState.level = 1;
                 gameState.xpToNextLevel = 100;
                 simulation.reset();
+                autoSave();
             } else {
                 gameState.currentChallenge++;
+                autoSave();
             }
-
             loadChallenge(gameState.currentChallenge);
         });
 
         elements.hintToggle.addEventListener('click', () => {
-            const isVisible = elements.hintContent.classList.toggle('visible');
+            var isVisible = elements.hintContent.classList.toggle('visible');
             elements.hintToggle.textContent = isVisible ? 'Esconder dica' : 'Ver dica';
         });
 
@@ -2356,19 +1441,86 @@
         elements.codeEditor.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 e.preventDefault();
-                const start = elements.codeEditor.selectionStart;
-                const end = elements.codeEditor.selectionEnd;
+                var start = elements.codeEditor.selectionStart;
+                var end = elements.codeEditor.selectionEnd;
                 elements.codeEditor.value = elements.codeEditor.value.substring(0, start) + '  ' + elements.codeEditor.value.substring(end);
                 elements.codeEditor.selectionStart = elements.codeEditor.selectionEnd = start + 2;
             }
         });
 
+        // ==================== SAVE/LOAD EVENTS ====================
+        elements.btnSaveFile.addEventListener('click', () => {
+            var data = serializeGameState();
+            // Cache in memory
+            StorageHelper.save(data);
+            // Offer file download
+            StorageHelper.exportToFile(data);
+            showSaveStatus('📁 Arquivo de save baixado!');
+        });
+
+        elements.btnLoadFile.addEventListener('click', () => {
+            elements.loadFileInput.click();
+        });
+
+        elements.loadFileInput.addEventListener('change', (e) => {
+            var file = e.target.files[0];
+            if (!file) return;
+            StorageHelper.importFromFile(file).then((data) => {
+                deserializeGameState(data);
+                // Re-init farm and restore visuals
+                initFarm();
+                restoreFarmVisuals();
+                loadChallenge(gameState.currentChallenge);
+                updateUI();
+                // Cache in memory
+                StorageHelper.save(serializeGameState());
+                showSaveStatus('✅ Progresso carregado com sucesso!');
+            }).catch((err) => {
+                showSaveStatus('❌ ' + err.message);
+            });
+            // Reset input so same file can be loaded again
+            elements.loadFileInput.value = '';
+        });
+
+        elements.btnResetSave.addEventListener('click', () => {
+            showConfirmDialog(
+                '⚠️ Resetar Progresso',
+                'Todo o progresso será perdido permanentemente. Deseja continuar?',
+                () => {
+                    StorageHelper.clear();
+                    gameState.money = 0;
+                    gameState.level = 1;
+                    gameState.xp = 0;
+                    gameState.xpToNextLevel = 100;
+                    gameState.currentChallenge = 0;
+                    gameState.completedChallenges.clear();
+                    gameState.simulation.plants = [];
+                    simulation.reset();
+                    loadChallenge(0);
+                    updateUI();
+                    showSaveStatus('🗑️ Progresso resetado.');
+                }
+            );
+        });
+
         // ==================== INITIALIZATION ====================
         elements.celestial.textContent = gameState.isDark ? '🌙' : '☀️';
-        initFarm();
-        loadChallenge(0);
-        updateUI();
 
+        // Try loading saved game
+        var savedData = StorageHelper.load();
+        if (savedData) {
+            deserializeGameState(savedData);
+            initFarm();
+            restoreFarmVisuals();
+            loadChallenge(gameState.currentChallenge);
+            updateUI();
+            showSaveStatus('✅ Progresso anterior restaurado!');
+        } else {
+            initFarm();
+            loadChallenge(0);
+            updateUI();
+            showSaveStatus('💡 Use Salvar para baixar seu progresso');
+        }
         </script>
     </body>
 </html>
