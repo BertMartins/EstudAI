@@ -154,6 +154,8 @@ header .subtitle {
 }
 .reserve-card.white-side .rc-kanji { color: var(--w-piece-border); }
 .reserve-card.black-side .rc-kanji { color: var(--b-piece-border); }
+.reserve-card.active-hand { border-color: var(--gold-dim); }
+.reserve-card.active-hand:hover { border-color: var(--gold); }
 @keyframes card-pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.15); box-shadow: 0 0 12px var(--gold); }
@@ -285,6 +287,83 @@ header .subtitle {
 .btn.primary:hover { background: #d4b458; }
 .btn:disabled { opacity: 0.35; pointer-events: none; }
 
+/* Mode Selection */
+#mode-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  gap: 24px;
+  padding: 24px;
+}
+#mode-screen h1 {
+  font-family: var(--font-jp);
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: var(--gold);
+  text-shadow: 0 4px 24px rgba(201,168,76,0.35);
+}
+#mode-screen .mode-subtitle {
+  font-size: 15px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  margin-top: -12px;
+  text-transform: uppercase;
+}
+.mode-options {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+  margin-top: 12px;
+}
+.mode-btn {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px 24px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mode-btn:hover { border-color: var(--gold); background: var(--gold-dim); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+.mode-btn:active { transform: scale(0.98) translateY(0); }
+.mode-btn .mode-icon {
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+.mode-btn .mode-label { display: flex; flex-direction: column; gap: 2px; }
+.mode-btn .mode-label .mode-desc { font-size: 12px; font-weight: 400; color: var(--text-dim); }
+@keyframes mode-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#mode-screen h1 { animation: mode-fade-in 0.6s ease; }
+#mode-screen .mode-subtitle { animation: mode-fade-in 0.6s ease 0.1s both; }
+.mode-options .mode-btn:nth-child(1) { animation: mode-fade-in 0.5s ease 0.25s both; }
+.mode-options .mode-btn:nth-child(2) { animation: mode-fade-in 0.5s ease 0.4s both; }
+
 /* Modal */
 #modal-overlay {
   position: fixed;
@@ -398,6 +477,24 @@ header .subtitle {
   animation: think-pulse 1s ease-in-out infinite;
 }
 
+/* Turn indicator glow for PvP */
+.reserve-section.active-turn .reserve-label {
+  color: var(--gold);
+  font-weight: 700;
+}
+.reserve-section.active-turn {
+  position: relative;
+}
+.reserve-section.active-turn::before {
+  content: '\u25B6';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  color: var(--gold);
+  font-size: 10px;
+  animation: think-pulse 1.2s ease-in-out infinite;
+}
+
 /* Animations */
 @keyframes fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 #app { animation: fade-in 0.5s ease; }
@@ -405,17 +502,40 @@ header .subtitle {
 @media (max-width: 400px) {
   body { padding: 4px 4px 12px; }
   header h1 { font-size: 22px; letter-spacing: 5px; }
+  #mode-screen h1 { font-size: 36px; letter-spacing: 8px; }
+  .mode-btn { font-size: 16px; padding: 14px 18px; }
+  .mode-btn .mode-icon { font-size: 24px; width: 40px; height: 40px; }
   .reserve-card { width: 38px; height: 44px; }
   .reserve-card .rc-kanji { font-size: 15px; }
   .reserve-card .rc-count { font-size: 9px; }
   .btn { font-size: 13px; padding: 6px 14px; }
 }
-
 </style>
 </head>
 <body>
 
-<div id="app">
+<div id="mode-screen">
+  <h1>軍儀</h1>
+  <div class="mode-subtitle">Gungi</div>
+  <div class="mode-options">
+    <button class="mode-btn" onclick="selectMode('ai')">
+      <div class="mode-icon">🤖</div>
+      <div class="mode-label">
+        <span>Contra a IA</span>
+        <span class="mode-desc">Jogue sozinho contra o computador</span>
+      </div>
+    </button>
+    <button class="mode-btn" onclick="selectMode('pvp')">
+      <div class="mode-icon">⚔️</div>
+      <div class="mode-label">
+        <span>Multiplayer Local</span>
+        <span class="mode-desc">Jogue 1 contra 1 no mesmo dispositivo</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div id="app" style="display:none">
   <header>
     <h1>軍儀</h1>
     <div class="subtitle">GUNGI</div>
@@ -427,7 +547,7 @@ header .subtitle {
   </div>
   <div id="msg-bar"></div>
 
-  <div class="reserve-section">
+  <div class="reserve-section" id="res-section-black">
     <div class="reserve-label" id="res-label-black">Reserva Adversa</div>
     <div class="reserve-row" id="res-black"></div>
   </div>
@@ -436,7 +556,7 @@ header .subtitle {
     <div id="board"></div>
   </div>
 
-  <div class="reserve-section">
+  <div class="reserve-section" id="res-section-white">
     <div class="reserve-label" id="res-label-white">Sua Reserva</div>
     <div class="reserve-row" id="res-white"></div>
   </div>
@@ -468,25 +588,26 @@ header .subtitle {
 })();
 
 /* ===== CONSTANTS ===== */
-const PIECES = {
-  marshal:  { kanji: '帥', name: 'Marechal',   count: 1, value: 1000 },
-  general:  { kanji: '将', name: 'General',     count: 1, value: 60 },
-  samurai:  { kanji: '侍', name: 'Samurai',     count: 2, value: 35 },
-  knight:   { kanji: '馬', name: 'Cavaleiro',   count: 2, value: 28 },
-  spy:      { kanji: '忍', name: 'Espiao',      count: 2, value: 28 },
-  captain:  { kanji: '謀', name: 'Capitao',     count: 1, value: 22 },
-  archer:   { kanji: '弓', name: 'Arqueiro',    count: 2, value: 22 },
-  fortress: { kanji: '砦', name: 'Fortaleza',   count: 2, value: 15 },
-  pawn:     { kanji: '兵', name: 'Peao',        count: 4, value: 5 }
+var PIECES = {
+  marshal:  { kanji: '\u5E25', name: 'Marechal',   count: 1, value: 1000 },
+  general:  { kanji: '\u5C06', name: 'General',     count: 1, value: 60 },
+  samurai:  { kanji: '\u4F8D', name: 'Samurai',     count: 2, value: 35 },
+  knight:   { kanji: '\u99AC', name: 'Cavaleiro',   count: 2, value: 28 },
+  spy:      { kanji: '\u5FCD', name: 'Espiao',      count: 2, value: 28 },
+  captain:  { kanji: '\u8B00', name: 'Capitao',     count: 1, value: 22 },
+  archer:   { kanji: '\u5F13', name: 'Arqueiro',    count: 2, value: 22 },
+  fortress: { kanji: '\u7826', name: 'Fortaleza',   count: 2, value: 15 },
+  pawn:     { kanji: '\u5175', name: 'Peao',        count: 4, value: 5 }
 };
 
 /* ===== STATE ===== */
-let S = {};
-let cells = [];
-let audioCtx = null;
+var S = {};
+var cells = [];
+var audioCtx = null;
+var gameMode = 'ai'; // 'ai' or 'pvp'
 
 function freshState() {
-  const hands = { white: {}, black: {} };
+  var hands = { white: {}, black: {} };
   Object.keys(PIECES).forEach(function(t) {
     hands.white[t] = PIECES[t].count;
     hands.black[t] = PIECES[t].count;
@@ -508,12 +629,39 @@ function freshState() {
   };
 }
 
+/* ===== MODE SELECT ===== */
+function selectMode(mode) {
+  gameMode = mode;
+  document.getElementById('mode-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  startNewGame();
+}
+
+function showModeScreen() {
+  document.getElementById('game-over').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('mode-screen').style.display = 'flex';
+}
+
+/* ===== HELPER: is current player human? ===== */
+function isHumanTurn() {
+  if (gameMode === 'pvp') { return true; }
+  return S.turn === 'white';
+}
+
+function currentPlayerLabel() {
+  if (gameMode === 'pvp') {
+    return S.turn === 'white' ? 'Brancas' : 'Vermelhas';
+  }
+  return S.turn === 'white' ? 'Sua vez' : 'IA pensando...';
+}
+
 /* ===== MOVEMENT RULES ===== */
 function getOffsets(type, tier) {
-  const F = [0,-1], B = [0,1], L = [-1,0], R = [1,0];
-  const FL = [-1,-1], FR = [1,-1], BL = [-1,1], BR = [1,1];
-  const ALL8 = [F,B,L,R,FL,FR,BL,BR];
-  let m;
+  var F = [0,-1], B = [0,1], L = [-1,0], R = [1,0];
+  var FL = [-1,-1], FR = [1,-1], BL = [-1,1], BR = [1,1];
+  var ALL8 = [F,B,L,R,FL,FR,BL,BR];
+  var m;
   switch(type) {
     case 'marshal': return ALL8.slice();
     case 'general':
@@ -560,17 +708,17 @@ function getOffsets(type, tier) {
 }
 
 function getBoardMoves(x, y) {
-  const stack = S.board[y][x];
+  var stack = S.board[y][x];
   if (!stack || stack.length === 0) { return []; }
-  const top = stack[stack.length - 1];
-  const offsets = getOffsets(top.type, stack.length);
-  const result = [];
-  const flip = top.player === 'white' ? 1 : -1;
+  var top = stack[stack.length - 1];
+  var offsets = getOffsets(top.type, stack.length);
+  var result = [];
+  var flip = top.player === 'white' ? 1 : -1;
   offsets.forEach(function(o) {
-    const nx = x + o[0];
-    const ny = y + o[1] * flip;
+    var nx = x + o[0];
+    var ny = y + o[1] * flip;
     if (nx < 0 || nx > 8 || ny < 0 || ny > 8) { return; }
-    const target = S.board[ny][nx];
+    var target = S.board[ny][nx];
     if (target.length === 0) {
       result.push([nx, ny, 'move']);
     } else if (target[target.length - 1].player !== top.player) {
@@ -581,14 +729,14 @@ function getBoardMoves(x, y) {
 }
 
 function getDropTargets(player) {
-  const result = [];
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
+  var result = [];
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
       if (S.phase === 'placement') {
         if (player === 'white' && y < 6) { continue; }
         if (player === 'black' && y > 2) { continue; }
       }
-      const cell = S.board[y][x];
+      var cell = S.board[y][x];
       if (cell.length === 0) {
         result.push([x, y, 'drop']);
       } else if (cell[cell.length - 1].player === player && cell.length < 3) {
@@ -601,9 +749,9 @@ function getDropTargets(player) {
 
 /* ===== ACTIONS ===== */
 function doMove(fx, fy, tx, ty) {
-  const piece = S.board[fy][fx].pop();
-  const target = S.board[ty][tx];
-  let captured = null;
+  var piece = S.board[fy][fx].pop();
+  var target = S.board[ty][tx];
+  var captured = null;
   if (target.length > 0 && target[target.length - 1].player !== piece.player) {
     captured = target.pop();
     S.hands[piece.player][captured.type] = (S.hands[piece.player][captured.type] || 0) + 1;
@@ -634,10 +782,11 @@ function clearSel() {
 
 /* ===== CLICK HANDLERS ===== */
 function clickCell(x, y) {
-  if (S.gameOver || S.turn !== 'white') { return; }
+  if (S.gameOver) { return; }
+  if (!isHumanTurn()) { return; }
 
   if (S.sel) {
-    const hit = S.targets.find(function(t) { return t[0] === x && t[1] === y; });
+    var hit = S.targets.find(function(t) { return t[0] === x && t[1] === y; });
     if (hit) {
       if (S.sel.src === 'board') {
         doMove(S.sel.x, S.sel.y, x, y);
@@ -659,41 +808,45 @@ function clickCell(x, y) {
 }
 
 function trySelectBoard(x, y) {
-  const stack = S.board[y][x];
+  var stack = S.board[y][x];
   if (!stack || stack.length === 0) { render(); return; }
-  const top = stack[stack.length - 1];
-  if (top.player !== 'white') { render(); return; }
+  var top = stack[stack.length - 1];
+  if (top.player !== S.turn) { render(); return; }
   S.sel = { src: 'board', x: x, y: y };
   S.targets = getBoardMoves(x, y);
   render();
 }
 
-function clickHand(type) {
-  if (S.gameOver || S.turn !== 'white') { return; }
-  if (!S.hands.white[type] || S.hands.white[type] <= 0) { return; }
+function clickHand(type, player) {
+  if (S.gameOver) { return; }
+  if (!isHumanTurn()) { return; }
+  if (player !== S.turn) { return; }
+  if (!S.hands[player][type] || S.hands[player][type] <= 0) { return; }
 
-  if (S.sel && S.sel.src === 'hand' && S.sel.type === type) {
+  if (S.sel && S.sel.src === 'hand' && S.sel.type === type && S.sel.player === player) {
     clearSel();
     render();
     return;
   }
-  S.sel = { src: 'hand', type: type };
-  S.targets = getDropTargets('white');
+  S.sel = { src: 'hand', type: type, player: player };
+  S.targets = getDropTargets(player);
   render();
 }
 
 function passTurn() {
-  if (S.gameOver || S.turn !== 'white') { return; }
+  if (S.gameOver) { return; }
+  if (!isHumanTurn()) { return; }
   if (S.phase !== 'placement') { return; }
 
-  const hasMarshal = S.board.some(function(row) {
+  var currentPlayer = S.turn;
+  var hasMarshal = S.board.some(function(row) {
     return row.some(function(stack) {
-      return stack.some(function(p) { return p.player === 'white' && p.type === 'marshal'; });
+      return stack.some(function(p) { return p.player === currentPlayer && p.type === 'marshal'; });
     });
   });
 
   if (!hasMarshal) {
-    S.msg = 'Posicione o Marechal (帥) antes de passar!';
+    S.msg = 'Posicione o Marechal (\u5E25) antes de passar!';
     render();
     return;
   }
@@ -703,6 +856,7 @@ function passTurn() {
     S.phase = 'game';
     S.msg = 'Fase de jogo iniciada!';
   }
+  clearSel();
   endTurn();
 }
 
@@ -716,7 +870,7 @@ function endTurn() {
   S.turn = S.turn === 'white' ? 'black' : 'white';
   S.msg = '';
   render();
-  if (S.turn === 'black') {
+  if (gameMode === 'ai' && S.turn === 'black') {
     setTimeout(aiTurn, 350);
   }
 }
@@ -729,26 +883,26 @@ function aiTurn() {
 }
 
 function aiPlace() {
-  const hand = S.hands.black;
-  const order = ['marshal','general','captain','samurai','knight','spy','archer','fortress','pawn'];
-  let typeToPlace = null;
+  var hand = S.hands.black;
+  var order = ['marshal','general','captain','samurai','knight','spy','archer','fortress','pawn'];
+  var typeToPlace = null;
 
-  for (let i = 0; i < order.length; i++) {
+  for (var i = 0; i < order.length; i++) {
     if (hand[order[i]] > 0) { typeToPlace = order[i]; break; }
   }
 
   if (!typeToPlace) { aiPass(); return; }
 
-  const spots = getDropTargets('black');
+  var spots = getDropTargets('black');
   if (spots.length === 0) { aiPass(); return; }
 
-  let best = null;
-  let bestScore = -Infinity;
+  var best = null;
+  var bestScore = -Infinity;
 
   spots.forEach(function(sp) {
-    const x = sp[0], y = sp[1];
-    let score = 0;
-    const cd = Math.abs(x - 4);
+    var x = sp[0], y = sp[1];
+    var score = 0;
+    var cd = Math.abs(x - 4);
 
     if (typeToPlace === 'marshal') {
       score = (y === 0 ? 10 : 3) + (4 - cd) * 2;
@@ -773,13 +927,13 @@ function aiPlace() {
 }
 
 function aiPass() {
-  const hasMarshal = S.board.some(function(row) {
+  var hasMarshal = S.board.some(function(row) {
     return row.some(function(stack) {
       return stack.some(function(p) { return p.player === 'black' && p.type === 'marshal'; });
     });
   });
   if (!hasMarshal && S.hands.black.marshal > 0) {
-    const spots = getDropTargets('black');
+    var spots = getDropTargets('black');
     if (spots.length > 0) {
       doDrop('marshal', spots[0][0], spots[0][1]);
       S.passCount = 0;
@@ -796,18 +950,18 @@ function aiPass() {
 }
 
 function aiGame() {
-  let bestAction = null;
-  let bestScore = -Infinity;
+  var bestAction = null;
+  var bestScore = -Infinity;
 
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      const stack = S.board[y][x];
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
+      var stack = S.board[y][x];
       if (!stack || stack.length === 0) { continue; }
       if (stack[stack.length - 1].player !== 'black') { continue; }
 
-      const moves = getBoardMoves(x, y);
+      var moves = getBoardMoves(x, y);
       moves.forEach(function(m) {
-        const score = evalMove(x, y, m[0], m[1], m[2]);
+        var score = evalMove(x, y, m[0], m[1], m[2]);
         if (score > bestScore || (score === bestScore && Math.random() > 0.5)) {
           bestScore = score;
           bestAction = { type: 'move', fx: x, fy: y, tx: m[0], ty: m[1] };
@@ -816,12 +970,12 @@ function aiGame() {
     }
   }
 
-  const hand = S.hands.black;
+  var hand = S.hands.black;
   Object.keys(hand).forEach(function(pt) {
     if (hand[pt] <= 0) { return; }
-    const spots = getDropTargets('black');
+    var spots = getDropTargets('black');
     spots.forEach(function(sp) {
-      const score = evalDrop(pt, sp[0], sp[1]);
+      var score = evalDrop(pt, sp[0], sp[1]);
       if (score > bestScore || (score === bestScore && Math.random() > 0.5)) {
         bestScore = score;
         bestAction = { type: 'drop', pt: pt, tx: sp[0], ty: sp[1] };
@@ -844,11 +998,11 @@ function aiGame() {
 }
 
 function evalMove(fx, fy, tx, ty, mtype) {
-  let score = 0;
-  const piece = S.board[fy][fx][S.board[fy][fx].length - 1];
+  var score = 0;
+  var piece = S.board[fy][fx][S.board[fy][fx].length - 1];
 
   if (mtype === 'capture') {
-    const victim = S.board[ty][tx][S.board[ty][tx].length - 1];
+    var victim = S.board[ty][tx][S.board[ty][tx].length - 1];
     score += PIECES[victim.type].value * 10;
   }
 
@@ -871,7 +1025,7 @@ function evalMove(fx, fy, tx, ty, mtype) {
 }
 
 function evalDrop(pt, tx, ty) {
-  let score = PIECES[pt].value * 0.8;
+  var score = PIECES[pt].value * 0.8;
   score += (4 - Math.abs(tx - 4)) * 0.8;
   score += ty * 0.5;
   if (S.board[ty][tx].length > 0) { score += 5; }
@@ -881,12 +1035,12 @@ function evalDrop(pt, tx, ty) {
 }
 
 function isThreatened(x, y, byPlayer) {
-  for (let sy = 0; sy < 9; sy++) {
-    for (let sx = 0; sx < 9; sx++) {
-      const stack = S.board[sy][sx];
+  for (var sy = 0; sy < 9; sy++) {
+    for (var sx = 0; sx < 9; sx++) {
+      var stack = S.board[sy][sx];
       if (!stack || stack.length === 0) { continue; }
       if (stack[stack.length - 1].player !== byPlayer) { continue; }
-      const moves = getBoardMoves(sx, sy);
+      var moves = getBoardMoves(sx, sy);
       if (moves.some(function(m) { return m[0] === x && m[1] === y; })) {
         return true;
       }
@@ -897,12 +1051,12 @@ function isThreatened(x, y, byPlayer) {
 
 /* ===== RENDERING ===== */
 function initBoard() {
-  const el = document.getElementById('board');
+  var el = document.getElementById('board');
   el.innerHTML = '';
   cells = [];
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      const cell = document.createElement('div');
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
+      var cell = document.createElement('div');
       cell.className = 'cell';
       (function(cx, cy) {
         cell.addEventListener('click', function() { clickCell(cx, cy); });
@@ -919,19 +1073,40 @@ function render() {
   renderReserve('white');
   renderReserve('black');
   renderControls();
+  renderLabels();
+}
+
+function renderLabels() {
+  var lblW = document.getElementById('res-label-white');
+  var lblB = document.getElementById('res-label-black');
+  var secW = document.getElementById('res-section-white');
+  var secB = document.getElementById('res-section-black');
+
+  secW.classList.remove('active-turn');
+  secB.classList.remove('active-turn');
+
+  if (gameMode === 'pvp') {
+    lblW.textContent = 'Reserva \u2014 Brancas';
+    lblB.textContent = 'Reserva \u2014 Vermelhas';
+    if (S.turn === 'white') { secW.classList.add('active-turn'); }
+    else { secB.classList.add('active-turn'); }
+  } else {
+    lblW.textContent = 'Sua Reserva';
+    lblB.textContent = 'Reserva Adversa';
+  }
 }
 
 function renderStatus() {
-  const dot = document.getElementById('turn-dot');
-  const txt = document.getElementById('status-text');
-  const msg = document.getElementById('msg-bar');
+  var dot = document.getElementById('turn-dot');
+  var txt = document.getElementById('status-text');
+  var msg = document.getElementById('msg-bar');
 
   dot.className = 'dot ' + (S.turn === 'white' ? 'white-turn' : 'black-turn');
 
-  let phase = S.phase === 'placement' ? 'Posicionamento' : 'Jogo';
-  let turnLabel = S.turn === 'white' ? 'Sua vez' : 'IA pensando...';
+  var phase = S.phase === 'placement' ? 'Posicionamento' : 'Jogo';
+  var turnLabel = currentPlayerLabel();
 
-  if (S.turn === 'black') {
+  if (gameMode === 'ai' && S.turn === 'black') {
     txt.innerHTML = '<span class="thinking-indicator">' + phase + ' \u2014 ' + turnLabel + '</span>';
   } else {
     txt.textContent = phase + ' \u2014 ' + turnLabel;
@@ -942,21 +1117,22 @@ function renderStatus() {
 }
 
 function renderBoard() {
-  const isPlacement = S.phase === 'placement';
-  const boardEl = document.getElementById('board');
-  boardEl.className = S.turn === 'black' ? 'thinking' : '';
+  var isPlacement = S.phase === 'placement';
+  var boardEl = document.getElementById('board');
+  boardEl.className = (gameMode === 'ai' && S.turn === 'black') ? 'thinking' : '';
 
-  for (let y = 0; y < 9; y++) {
-    for (let x = 0; x < 9; x++) {
-      const idx = y * 9 + x;
-      const cell = cells[idx];
-      let cls = 'cell';
+  for (var y = 0; y < 9; y++) {
+    for (var x = 0; x < 9; x++) {
+      var idx = y * 9 + x;
+      var cell = cells[idx];
+      var cls = 'cell';
 
-      if (isPlacement && S.turn === 'white' && y >= 6) {
-        cls += ' placement-zone';
+      if (isPlacement && isHumanTurn()) {
+        if (S.turn === 'white' && y >= 6) { cls += ' placement-zone'; }
+        if (S.turn === 'black' && y <= 2) { cls += ' placement-zone'; }
       }
 
-      const tgt = S.targets.find(function(t) { return t[0] === x && t[1] === y; });
+      var tgt = S.targets.find(function(t) { return t[0] === x && t[1] === y; });
       if (tgt) {
         if (tgt[2] === 'capture') { cls += ' capture-target'; }
         else { cls += ' valid-target'; }
@@ -973,12 +1149,12 @@ function renderBoard() {
 
       cell.className = cls;
 
-      const stack = S.board[y][x];
-      let html = '';
+      var stack = S.board[y][x];
+      var html = '';
 
       if (stack.length > 0) {
-        const top = stack[stack.length - 1];
-        const pCls = 'piece ' + (top.player === 'white' ? 'white-p' : 'black-p')
+        var top = stack[stack.length - 1];
+        var pCls = 'piece ' + (top.player === 'white' ? 'white-p' : 'black-p')
           + (stack.length >= 3 ? ' tier3' : stack.length >= 2 ? ' tier2' : '');
 
         html = '<div class="' + pCls + '">';
@@ -998,34 +1174,43 @@ function renderBoard() {
 }
 
 function renderReserve(player) {
-  const el = document.getElementById('res-' + player);
+  var el = document.getElementById('res-' + player);
   el.innerHTML = '';
-  const hand = S.hands[player];
-  const side = player === 'white' ? 'white-side' : 'black-side';
-  const isActive = S.turn === player && player === 'white' && !S.gameOver;
+  var hand = S.hands[player];
+  var side = player === 'white' ? 'white-side' : 'black-side';
+  var isActive;
+
+  if (gameMode === 'pvp') {
+    isActive = S.turn === player && !S.gameOver;
+  } else {
+    isActive = S.turn === player && player === 'white' && !S.gameOver;
+  }
 
   Object.keys(PIECES).forEach(function(type) {
-    const count = hand[type] || 0;
-    const card = document.createElement('div');
-    let cls = 'reserve-card ' + side;
+    var count = hand[type] || 0;
+    var card = document.createElement('div');
+    var cls = 'reserve-card ' + side;
     if (count <= 0) { cls += ' disabled'; }
-    if (isActive && S.sel && S.sel.src === 'hand' && S.sel.type === type) {
+    if (isActive) { cls += ' active-hand'; }
+    if (isActive && S.sel && S.sel.src === 'hand' && S.sel.type === type && S.sel.player === player) {
       cls += ' selected';
     }
     card.className = cls;
     card.innerHTML = '<span class="rc-kanji">' + PIECES[type].kanji + '</span>'
       + '<span class="rc-count">\u00d7' + count + '</span>';
 
-    if (player === 'white' && count > 0) {
-      card.addEventListener('click', function() { clickHand(type); });
+    if (isActive && count > 0) {
+      (function(t, p) {
+        card.addEventListener('click', function() { clickHand(t, p); });
+      })(type, player);
     }
     el.appendChild(card);
   });
 }
 
 function renderControls() {
-  const btnPass = document.getElementById('btn-pass');
-  btnPass.disabled = S.phase !== 'placement' || S.turn !== 'white' || S.gameOver;
+  var btnPass = document.getElementById('btn-pass');
+  btnPass.disabled = S.phase !== 'placement' || !isHumanTurn() || S.gameOver;
 }
 
 /* ===== SOUND ===== */
@@ -1038,12 +1223,12 @@ function getAudioCtx() {
 
 function playSound(type) {
   try {
-    const ctx = getAudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    var ctx = getAudioCtx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
-    const t = ctx.currentTime;
+    var t = ctx.currentTime;
 
     if (type === 'move') {
       osc.type = 'sine';
@@ -1070,8 +1255,8 @@ function playSound(type) {
       osc.stop(t + 0.06);
     } else if (type === 'win') {
       [523,659,784,1047].forEach(function(freq, i) {
-        const o2 = ctx.createOscillator();
-        const g2 = ctx.createGain();
+        var o2 = ctx.createOscillator();
+        var g2 = ctx.createGain();
         o2.connect(g2);
         g2.connect(ctx.destination);
         o2.frequency.setValueAtTime(freq, t + i * 0.15);
@@ -1086,39 +1271,58 @@ function playSound(type) {
 
 /* ===== GAME OVER ===== */
 function showGameOver() {
-  playSound(S.winner === 'white' ? 'win' : 'capture');
-  const el = document.getElementById('game-over');
-  const isWin = S.winner === 'white';
+  playSound(S.winner === 'white' ? 'win' : (gameMode === 'pvp' ? 'win' : 'capture'));
+  var el = document.getElementById('game-over');
   el.style.display = 'flex';
-  el.innerHTML = '<h2 class="' + (isWin ? 'win' : 'lose') + '">'
-    + (isWin ? '\u52dd\u5229 \u2014 Vitoria!' : '\u6557\u5317 \u2014 Derrota!')
-    + '</h2><button class="btn primary" onclick="startNewGame()">Jogar Novamente</button>';
+
+  var title, cls;
+  if (gameMode === 'pvp') {
+    var winnerName = S.winner === 'white' ? 'Brancas' : 'Vermelhas';
+    title = '\u52DD\u5229 \u2014 ' + winnerName + ' vencem!';
+    cls = 'win';
+  } else {
+    var isWin = S.winner === 'white';
+    title = isWin ? '\u52DD\u5229 \u2014 Vitoria!' : '\u6557\u5317 \u2014 Derrota!';
+    cls = isWin ? 'win' : 'lose';
+  }
+
+  el.innerHTML = '<h2 class="' + cls + '">' + title + '</h2>'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
+    + '<button class="btn primary" onclick="restartSameMode()">Jogar Novamente</button>'
+    + '<button class="btn" onclick="showModeScreen()">Trocar Modo</button>'
+    + '</div>';
+}
+
+function restartSameMode() {
+  document.getElementById('game-over').style.display = 'none';
+  startNewGame();
 }
 
 /* ===== MODALS ===== */
 function confirmNewGame() {
-  const el = document.getElementById('modal-overlay');
+  var el = document.getElementById('modal-overlay');
   el.style.display = 'flex';
   document.getElementById('modal-box').innerHTML =
     '<button class="modal-close" onclick="closeModal()">\u00d7</button>'
     + '<h2>Novo Jogo</h2>'
-    + '<p style="text-align:center;margin-bottom:16px;color:var(--text-dim)">Deseja iniciar uma nova partida?</p>'
-    + '<div style="display:flex;gap:8px;justify-content:center">'
+    + '<p style="text-align:center;margin-bottom:16px;color:var(--text-dim)">O que deseja fazer?</p>'
+    + '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">'
     + '<button class="btn" onclick="closeModal()">Cancelar</button>'
-    + '<button class="btn primary" onclick="closeModal();startNewGame()">Confirmar</button>'
+    + '<button class="btn primary" onclick="closeModal();startNewGame()">Reiniciar</button>'
+    + '<button class="btn" onclick="closeModal();showModeScreen()">Trocar Modo</button>'
     + '</div>';
 }
 
 function showHelp() {
-  const el = document.getElementById('modal-overlay');
+  var el = document.getElementById('modal-overlay');
   el.style.display = 'flex';
 
-  let html = '<button class="modal-close" onclick="closeModal()">\u00d7</button>';
+  var html = '<button class="modal-close" onclick="closeModal()">\u00d7</button>';
   html += '<h2>Guia de Pecas</h2>';
   html += '<p style="font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:10px">'
     + 'Empilhamento aumenta o poder (Tier 1\u21922\u21923). Capture o Marechal inimigo para vencer!</p>';
 
-  const descs = {
+  var descs = {
     marshal:  ['Todas as 8 direcoes, 1 casa','Mesmo','Mesmo'],
     general:  ['Todas as 8 direcoes, 1 casa','+2 casas para frente','+2 casas lateral'],
     samurai:  ['Frente e diagonais frontais','+Recuo','+Laterais'],
@@ -1131,8 +1335,8 @@ function showHelp() {
   };
 
   Object.keys(PIECES).forEach(function(type) {
-    const p = PIECES[type];
-    const d = descs[type];
+    var p = PIECES[type];
+    var d = descs[type];
     html += '<div class="piece-info">';
     html += '<div class="pi-kanji">' + p.kanji + '</div>';
     html += '<div class="pi-details">';
@@ -1152,21 +1356,21 @@ function showHelp() {
   html += '2. <strong>Jogo:</strong> Mova pecas ou posicione da reserva em qualquer lugar<br>';
   html += '3. <strong>Empilhar:</strong> Coloque pecas sobre aliadas (max 3) para evoluir<br>';
   html += '4. <strong>Captura:</strong> Mova para casa do oponente (remove peca do topo)<br>';
-  html += '5. <strong>Vitoria:</strong> Capture o Marechal (帥) inimigo!';
+  html += '5. <strong>Vitoria:</strong> Capture o Marechal (\u5E25) inimigo!';
   html += '</div>';
 
   document.getElementById('modal-box').innerHTML = html;
 }
 
 function buildMoveGrid(type) {
-  let html = '<div style="display:flex;gap:6px;margin-top:4px">';
-  for (let tier = 1; tier <= 3; tier++) {
-    const offsets = getOffsets(type, tier);
+  var html = '<div style="display:flex;gap:6px;margin-top:4px">';
+  for (var tier = 1; tier <= 3; tier++) {
+    var offsets = getOffsets(type, tier);
     html += '<div><div style="font-size:10px;color:var(--text-dim);text-align:center">T' + tier + '</div>';
     html += '<div class="move-grid">';
-    for (let dy = -2; dy <= 2; dy++) {
-      for (let dx = -2; dx <= 2; dx++) {
-        let cls = 'mg-cell';
+    for (var dy = -2; dy <= 2; dy++) {
+      for (var dx = -2; dx <= 2; dx++) {
+        var cls = 'mg-cell';
         if (dx === 0 && dy === 0) { cls += ' mg-center'; }
         else if (offsets.some(function(o) { return o[0] === dx && o[1] === dy; })) {
           cls += ' mg-t' + tier;
@@ -1192,11 +1396,14 @@ function closeModalOutside(e) {
 function startNewGame() {
   document.getElementById('game-over').style.display = 'none';
   S = freshState();
+  if (gameMode === 'pvp') {
+    S.msg = 'Brancas: selecione uma peca e posicione no tabuleiro';
+  } else {
+    S.msg = 'Selecione uma peca da reserva e posicione no tabuleiro';
+  }
   initBoard();
   render();
 }
-
-startNewGame();
 </script>
 </body>
 </html>
