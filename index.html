@@ -758,6 +758,91 @@ input, textarea { font-size: 16px; }
   font-size: 2.5rem;
   animation: bounce-subtle 2s ease-in-out infinite;
 }
+
+/* ===== Plans & Points system ===== */
+.points-badge {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, rgba(0,184,148,0.12), rgba(9,132,227,0.12));
+  color: var(--success);
+}
+.points-badge:hover { border-color: var(--success); transform: scale(1.05); }
+.points-badge.low {
+  background: linear-gradient(135deg, rgba(255,107,107,0.12), rgba(245,158,11,0.12));
+  color: var(--accent-2);
+  animation: mic-pulse 2s ease-in-out infinite;
+}
+.points-badge.low:hover { border-color: var(--accent-2); }
+
+.plan-card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 480px) { .plan-card-grid { grid-template-columns: 1fr; } }
+
+.plan-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+.plan-card.current { border-color: var(--success); background: rgba(0,184,148,0.05); }
+.plan-card.popular::before {
+  content: '⭐ POPULAR';
+  position: absolute; top: 10px; right: -28px;
+  background: linear-gradient(135deg, #F59E0B, #F97316);
+  color: white; font-size: 0.55rem; font-weight: 800;
+  padding: 3px 32px;
+  transform: rotate(45deg);
+}
+.plan-card .plan-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: white;
+}
+.plan-card .plan-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text-1); }
+.plan-card .plan-price { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--accent-1); }
+.plan-card .plan-price .unit { font-size: 0.7rem; font-weight: 600; color: var(--text-3); }
+.plan-card .plan-points { font-size: 0.8rem; font-weight: 700; color: var(--success); }
+.plan-card .plan-feat { font-size: 0.72rem; color: var(--text-2); display: flex; align-items: center; gap: 5px; }
+.plan-card .plan-feat i { color: var(--success); font-size: 0.65rem; }
+.plan-card .plan-btn {
+  margin-top: auto;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.plan-card .plan-btn.active-btn { background: var(--success); color: white; }
+.plan-card .plan-btn.active-btn:hover { opacity: 0.9; }
+.plan-card .plan-btn.current-btn { background: var(--bg-input); color: var(--text-3); cursor: default; }
+.plan-progress-bar {
+  width: 100%; height: 8px;
+  background: var(--bg-input);
+  border-radius: 4px; overflow: hidden;
+}
+.plan-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--success), var(--accent-4));
+  transition: width 0.5s ease;
+}
 .ctx-subject-grid .subject-card { margin-bottom: 0; }
 
 /* ===== Topics / Units system ===== */
@@ -1102,6 +1187,10 @@ input, textarea { font-size: 16px; }
     <div class="flex items-center gap-2">
       <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:var(--bg-input);color:var(--text-2);" id="headerGrade"></span>
       <span class="text-sm font-bold" style="color:var(--text-2);" id="headerName"></span>
+      <div class="points-badge" id="pointsBadge" onclick="openPlansView()" title="Seus pontos — Clique para ver planos">
+        <i class="fas fa-bolt" style="font-size:0.65rem;"></i>
+        <span id="pointsDisplay">3.000</span>
+      </div>
       <button id="helpBtn" class="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
         style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;"
         onclick="openHelpModal()"
@@ -1468,6 +1557,32 @@ input, textarea { font-size: 16px; }
     </div>
   </div>
 
+  <!-- Plans View -->
+  <div id="plansView" class="view-hidden flex-1 flex flex-col" style="overflow-y:auto;">
+    <div class="p-4 max-w-3xl mx-auto w-full">
+      <div class="mb-4 anim-fade-up">
+        <h2 class="font-heading text-2xl font-bold"><span style="font-size:1.1em;">⚡</span> Planos</h2>
+        <p class="text-sm mt-1" style="color:var(--text-2);">Escolha o plano ideal para seus estudos</p>
+      </div>
+      <!-- Current plan info -->
+      <div class="p-4 rounded-xl mb-5 anim-fade-up" style="background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow);animation-delay:0.05s;">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-heading font-bold text-sm" style="color:var(--text-1);">Plano atual: <span id="planCurrentName" style="color:var(--success);">Gratuito</span></span>
+          <span class="text-xs font-bold px-2 py-1 rounded-full" id="planCurrentBadge" style="background:rgba(0,184,148,0.12);color:var(--success);">Free</span>
+        </div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="plan-progress-bar flex-1">
+            <div class="plan-progress-fill" id="planProgressFill" style="width:100%;"></div>
+          </div>
+          <span class="text-xs font-bold" style="color:var(--text-2);" id="planPointsLabel">3.000 / 3.000</span>
+        </div>
+        <p class="text-xs" style="color:var(--text-3);" id="planPointsHint">Cada interação com a IA consome pontos</p>
+      </div>
+      <!-- Plan cards -->
+      <div class="plan-card-grid" id="planCardGrid"></div>
+    </div>
+  </div>
+
   <!-- Coming Soon Screen (inside jogos) -->
   <div id="comingSoonView" class="view-hidden flex-1 flex flex-col">
     <div class="coming-soon-screen anim-fade-up">
@@ -1573,8 +1688,258 @@ const state = {
     minAvg: 7,
     grades: {} // { subjectName: [null, null, null, null] }
   },
-  topicsData: {} // { topicsKey: { numUnits: 4, units: { 0: { topics: [...], explanations: {} }, ... } } }
+  topicsData: {}, // { topicsKey: { numUnits: 4, units: { 0: { topics: [...], explanations: {} }, ... } } }
+  plan: 'free',
+  pointsRemaining: 3000,
+  pointsTotal: 3000
 };
+
+// ===== PLANS & POINTS =====
+var PLANS = [
+  { id: 'free', name: 'Gratuito', icon: 'fas fa-gift', color: '#00B894', points: 3000, price: 0, maxExtraSubjects: 0,
+    features: ['3.000 pontos', 'Matérias padrão', 'Chat com IA', 'Quiz e Atividades'] },
+  { id: 'base', name: 'Base', icon: 'fas fa-rocket', color: '#0984E3', points: 10000, price: 20000, maxExtraSubjects: 1,
+    features: ['10.000 pontos', '+1 matéria extra', 'Todos os recursos', 'Prioridade no suporte'] },
+  { id: 'advanced', name: 'Avançado', icon: 'fas fa-star', color: '#A855F7', points: 50000, price: 100000, maxExtraSubjects: 10, popular: true,
+    features: ['50.000 pontos', '+10 matérias extras', 'Todos os recursos', 'Conteúdo ilimitado'] },
+  { id: 'pro', name: 'Pro', icon: 'fas fa-crown', color: '#F59E0B', points: 999999999, price: 400000, maxExtraSubjects: 9999,
+    features: ['Pontos ilimitados', 'Matérias ilimitadas', 'Todos os recursos', 'Acesso vitalício'] }
+];
+
+var POINT_COSTS = {
+  chat: 100,
+  activity: 150,
+  quiz: 200,
+  topics: 150,
+  topicExplain: 100,
+  converse: 100
+};
+
+function getPlanObj(planId) {
+  return PLANS.find(function(p) { return p.id === planId; }) || PLANS[0];
+}
+
+function formatPoints(n) {
+  if (n >= 999999999) return '∞';
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
+  if (n >= 1000) return n.toLocaleString('pt-BR');
+  return String(n);
+}
+
+function updatePointsDisplay() {
+  var el = $('pointsDisplay');
+  if (!el) return;
+  el.textContent = formatPoints(state.pointsRemaining);
+  var badge = $('pointsBadge');
+  if (badge) {
+    if (state.plan === 'pro') {
+      badge.classList.remove('low');
+    } else if (state.pointsRemaining <= 500) {
+      badge.classList.add('low');
+    } else {
+      badge.classList.remove('low');
+    }
+  }
+}
+
+function checkAndDeductPoints(costType) {
+  if (state.plan === 'pro') return true;
+  var cost = POINT_COSTS[costType] || 100;
+  if (state.pointsRemaining < cost) {
+    showNoPointsModal();
+    return false;
+  }
+  state.pointsRemaining -= cost;
+  updatePointsDisplay();
+  store.set('pointsRemaining', state.pointsRemaining);
+  return true;
+}
+
+function showNoPointsModal() {
+  var existing = document.getElementById('noPointsModal');
+  if (existing) existing.remove();
+  var overlay = document.createElement('div');
+  overlay.id = 'noPointsModal';
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem;animation:fadeIn 0.2s ease;';
+  overlay.innerHTML =
+    '<div style="background:var(--bg-card);border-radius:20px;padding:2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:fadeUp 0.3s ease;">' +
+      '<div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,rgba(255,107,107,0.15),rgba(245,158,11,0.15));margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:2rem;">⚡</div>' +
+      '<h3 class="font-heading font-bold text-lg" style="color:var(--text-1);margin-bottom:0.5rem;">Pontos Insuficientes!</h3>' +
+      '<p class="text-sm" style="color:var(--text-2);margin-bottom:1.5rem;">Seus pontos acabaram. Faça upgrade do seu plano para continuar usando a IA.</p>' +
+      '<div style="display:flex;gap:0.75rem;justify-content:center;">' +
+        '<button class="btn-primary px-5 py-2" style="background:linear-gradient(135deg,#A855F7,#6C5CE7);" onclick="document.getElementById(\'noPointsModal\').remove();openPlansView();">' +
+          '<i class="fas fa-arrow-up mr-1"></i> Ver Planos' +
+        '</button>' +
+        '<button class="px-4 py-2 rounded-xl font-bold text-sm transition-all" style="background:var(--bg-input);color:var(--text-2);border:none;cursor:pointer;" onclick="document.getElementById(\'noPointsModal\').remove();">' +
+          'Fechar' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+}
+
+function openPlansView() {
+  state.currentView = 'plans';
+  $('headerTitle').textContent = 'Planos';
+  show('backBtn');
+  hide('dashboardView');
+  hide('subjectView');
+  hide('calcView');
+  hide('langSelectView');
+  hide('concursoView');
+  hide('jogosView');
+  hide('comingSoonView');
+  show('plansView');
+  renderPlansView();
+}
+
+function renderPlansView() {
+  // Update current plan info
+  var plan = getPlanObj(state.plan);
+  $('planCurrentName').textContent = plan.name;
+  $('planCurrentBadge').textContent = plan.id === 'pro' ? 'PRO ∞' : plan.name;
+  if (state.plan === 'pro') {
+    $('planPointsLabel').textContent = '∞ Ilimitado';
+    $('planProgressFill').style.width = '100%';
+    $('planProgressFill').style.background = 'linear-gradient(90deg, #F59E0B, #F97316)';
+    $('planPointsHint').textContent = 'Plano Pro — Uso ilimitado! 🎉';
+  } else {
+    var pct = state.pointsTotal > 0 ? Math.round((state.pointsRemaining / state.pointsTotal) * 100) : 0;
+    $('planPointsLabel').textContent = formatPoints(state.pointsRemaining) + ' / ' + formatPoints(state.pointsTotal);
+    $('planProgressFill').style.width = Math.max(pct, 2) + '%';
+    $('planProgressFill').style.background = pct <= 20
+      ? 'linear-gradient(90deg, var(--accent-2), #F59E0B)'
+      : 'linear-gradient(90deg, var(--success), var(--accent-4))';
+    $('planPointsHint').textContent = 'Cada interação com a IA consome pontos (~100-200 por uso)';
+  }
+
+  // Render plan cards
+  var grid = $('planCardGrid');
+  grid.innerHTML = '';
+  PLANS.forEach(function(p) {
+    var isCurrent = state.plan === p.id;
+    var card = document.createElement('div');
+    card.className = 'plan-card anim-fade-up' + (isCurrent ? ' current' : '') + (p.popular ? ' popular' : '');
+    var priceHTML;
+    if (p.price === 0) {
+      priceHTML = '<span class="plan-price">Grátis</span>';
+    } else {
+      var milli = p.price;
+      var dollars = milli / 100000;
+      priceHTML = '<span class="plan-price">~' + formatPoints(p.points) + ' <span class="unit">pontos</span></span>';
+    }
+    var featHTML = '';
+    p.features.forEach(function(f) {
+      featHTML += '<div class="plan-feat"><i class="fas fa-check-circle"></i> ' + f + '</div>';
+    });
+    var btnHTML;
+    if (isCurrent) {
+      btnHTML = '<button class="plan-btn current-btn"><i class="fas fa-check mr-1"></i> Plano Atual</button>';
+    } else if (p.price === 0) {
+      btnHTML = '<button class="plan-btn active-btn" onclick="event.stopPropagation();selectPlan(\'' + p.id + '\')">Selecionar</button>';
+    } else {
+      btnHTML = '<button class="plan-btn active-btn" style="background:' + p.color + ';" onclick="event.stopPropagation();selectPlan(\'' + p.id + '\')"><i class="fas fa-bolt mr-1"></i> Comprar</button>';
+    }
+    card.innerHTML =
+      '<div class="plan-icon" style="background:' + p.color + ';"><i class="' + p.icon + '"></i></div>' +
+      '<span class="plan-name">' + p.name + '</span>' +
+      priceHTML +
+      '<div style="display:flex;flex-direction:column;gap:4px;">' + featHTML + '</div>' +
+      btnHTML;
+    grid.appendChild(card);
+  });
+}
+
+async function selectPlan(planId) {
+  var plan = getPlanObj(planId);
+  if (!plan) return;
+
+  if (plan.price === 0) {
+    // Free plan — just set it
+    state.plan = plan.id;
+    state.pointsRemaining = plan.points;
+    state.pointsTotal = plan.points;
+    savePlanData();
+    updatePointsDisplay();
+    renderPlansView();
+    showToast('Plano Gratuito ativado! ⚡', 'success');
+    return;
+  }
+
+  // Paid plan — charge via captureCost
+  try {
+    var result = await window.Poe.captureCost(
+      [{ amountUsdMilliCents: plan.price, description: 'EstudAI — Plano ' + plan.name }],
+      { logChargeOutcome: true }
+    );
+    if (result && result.success) {
+      // Upgrade: set plan tier and ADD points
+      var planIndex = PLANS.findIndex(function(p) { return p.id === planId; });
+      var currentIndex = PLANS.findIndex(function(p) { return p.id === state.plan; });
+      if (planIndex >= currentIndex) {
+        state.plan = plan.id;
+      }
+      if (plan.id === 'pro') {
+        state.pointsRemaining = 999999999;
+        state.pointsTotal = 999999999;
+      } else {
+        state.pointsRemaining += plan.points;
+        state.pointsTotal = Math.max(state.pointsTotal, state.pointsRemaining);
+      }
+      savePlanData();
+      updatePointsDisplay();
+      renderPlansView();
+      showToast('Plano ' + plan.name + ' ativado! 🎉 +' + formatPoints(plan.points) + ' pontos', 'success');
+    }
+  } catch (err) {
+    if (err && err.errorType === 'USER_REJECTED_CONFIRMATION') {
+      showToast('Compra cancelada.', 'error');
+    } else {
+      showToast('Erro ao processar pagamento: ' + (err.message || err), 'error');
+    }
+  }
+}
+
+function savePlanData() {
+  store.set('plan', state.plan);
+  store.set('pointsRemaining', state.pointsRemaining);
+  store.set('pointsTotal', state.pointsTotal);
+}
+
+function getMaxExtraSubjects() {
+  var plan = getPlanObj(state.plan);
+  return plan.maxExtraSubjects;
+}
+
+function countExtraSubjects(context) {
+  if (context === 'concurso') {
+    var defaults = Object.keys(typeof CONCURSO_DEFAULT_SUBJECTS !== 'undefined' ? CONCURSO_DEFAULT_SUBJECTS : {});
+    var current = state.concurso.subjects || [];
+    var extra = 0;
+    current.forEach(function(s) { if (defaults.indexOf(s) === -1) extra++; });
+    return extra;
+  }
+  if (state.grade && state.grade.level === 'fac') {
+    // Fac: all subjects are custom
+    var sem = state.fac.currentSemester || 1;
+    var semData = state.fac.semesters[sem];
+    return semData && semData.subjects ? semData.subjects.length : 0;
+  }
+  // School: count subjects beyond LEVEL_SUBJECTS defaults
+  var levelDefaults = (state.grade && LEVEL_SUBJECTS[state.grade.level]) ? LEVEL_SUBJECTS[state.grade.level] : [];
+  var allSubs = state.userSubjects || [];
+  var extraCount = 0;
+  allSubs.forEach(function(s) { if (levelDefaults.indexOf(s) === -1) extraCount++; });
+  return extraCount;
+}
+
+function canAddMoreSubjects(context) {
+  if (state.plan === 'pro') return true;
+  var max = getMaxExtraSubjects();
+  var current = countExtraSubjects(context);
+  return current < max;
+}
 
 // ===== CONSTANTS =====
 const GRADES = [
@@ -2944,6 +3309,7 @@ function toggleUnit(idx) {
 }
 
 async function loadUnitTopics(unitIdx) {
+  if (!checkAndDeductPoints('topics')) return;
   var data = getTopicsData();
   if (!data.units[unitIdx]) data.units[unitIdx] = { _open: true };
   data.units[unitIdx]._loading = true;
@@ -3028,6 +3394,7 @@ async function loadUnitTopics(unitIdx) {
 async function showTopicExplanation(unitIdx, topicIdx, topicName) {
   var data = getTopicsData();
   if (!data.units[unitIdx]) return;
+  // Point check only if no cached explanation
 
   // If already has explanation, toggle visibility
   var explEl = $('topicExpl_' + unitIdx + '_' + topicIdx);
@@ -3155,6 +3522,7 @@ async function sendChatMessage() {
   var input = $('chatInput');
   var text = input.value.trim();
   if (!text || state.isStreaming) return;
+  if (!checkAndDeductPoints('chat')) return;
   input.value = '';
   state.isStreaming = true;
   $('chatSendBtn').disabled = true;
@@ -3592,6 +3960,7 @@ async function sendActivity() {
   var input = $('activityInput');
   var text = input.value.trim();
   if (!text || state.isStreaming) return;
+  if (!checkAndDeductPoints('activity')) return;
   state.isStreaming = true;
   var btn = $('activitySendBtn');
   var originalHTML = btn.innerHTML;
@@ -3616,6 +3985,7 @@ async function sendActivity() {
 
 // ===== QUIZ FUNCTIONS =====
 async function startQuiz(unitNum) {
+  if (!checkAndDeductPoints('quiz')) return;
   // unitNum: 0 or undefined = general (all units), 1+ = specific unit
   var isRandom = state.quiz.isRandom || false;
   state.quiz = { questions: [], currentIndex: 0, score: 0, streak: 0, maxStreak: 0, answered: false, isRandom: isRandom, unitNum: unitNum || 0 };
@@ -3977,6 +4347,7 @@ var GAMES = [
   { name: 'Flappy Bird',      icon: 'fas fa-dove',          color: '#55E6C1', href: '' },
   { name: 'Labirinto',        icon: 'fas fa-route',         color: '#7C3AED', href: 'jogos/labirinto.html' },
 ];
+
 
 function openJogosView() {
   state.currentView = 'jogos';
